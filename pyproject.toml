@@ -1,0 +1,7 @@
+[project]
+name = "taller-final-curso-1"
+version = "0.1.0"
+description = "Proyecto del taller final del curso 1"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
