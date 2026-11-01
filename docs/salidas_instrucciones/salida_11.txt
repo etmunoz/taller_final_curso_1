@@ -1,0 +1,12 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_11.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 11.
+# Creado: 20261101_1420 (America/Santiago)
+# Actualizado: 20261101_1422 (America/Santiago)
+
+Especificación de la Etapa 2 (`t05` a `t09`) agregada a `plan.json`:
+- `t05`: Herramientas de lectura (`buscar_producto`, `listar_productos`, `mis_compras`) y perfil en `src/bodega/tools.py`.
+- `t06`: Herramientas de acción (`comprar`, `cancelar_compra`) con control de sesión en `src/bodega/tools.py`.
+- `t07`: Grafo `StateGraph` en `src/bodega/graph.py` con router estructurado, agentes por ruta, `ToolNode`, tope `MAX_RONDAS=5`, stubs de juez y memoria, y `ejecutar_turno`.
+- `t08`: Persistencia de historial conversacional con `SqliteSaver` y `thread_id`.
+- `t09`: CLI completa en `main.py` con `--diagrama`, `--saltos`, `--usuario`, `--thread` y `--sin-reiniciar`.
