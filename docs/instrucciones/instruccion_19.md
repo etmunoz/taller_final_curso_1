@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
-> **Archivo:** `docs/instrucciones/instrucciones_19.md`
+> **Archivo:** `docs/instrucciones/instruccion_19.md`
 > **Objetivo:** Instrucción 19: especificación en plan.json de las tareas finales de la Etapa 6 (setup.py, golden_set.json + evaluador, notebook ejecutable agente_bodega.ipynb y README.md completo).
 > **Creado:** 20261101_2030 (America/Santiago)
-> **Actualizado:** 20261101_2030 (America/Santiago)
+> **Actualizado:** 20261101_2122 (America/Santiago)
 
 ```
 @spec Lee AGENTS.md, plan.json y src/bodega/. Agrega SOLO estas tareas finales:

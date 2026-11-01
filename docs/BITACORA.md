@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_2118 (America/Santiago)
+> **Actualizado:** 20261101_2122 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -292,7 +292,7 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Realizado:**
 - Se agregaron en `plan.json` las tareas `t18`, `t19`, `t20` y `t21` en estado `pendiente`, conservando `t01`–`t17` en estado `hecho` con todas sus evidencias.
-- Se rotuló `docs/instrucciones/instrucciones_19.md` y se generó `docs/salidas_instrucciones/salida_19.txt` con el volcado completo de la especificación.
+- Se rotuló `docs/instrucciones/instruccion_19.md` y se generó `docs/salidas_instrucciones/salida_19.txt` con el volcado completo de la especificación.
 - Se actualizó el estado de avance en `README.md` y `docs/BITACORA.md`.
 
 **Verificación:** `plan.json` validado sintácticamente con las 21 tareas del proyecto (`t01`–`t17` en `hecho`, `t18`–`t21` en `pendiente`) y dependencias consistentes (`t18`→`['t09', 't14', 't16', 't17']`; `t19`→`['t12', 't15', 't17', 't18']`; `t20`→`['t18', 't19']`; `t21`→`['t19', 't20']`).
