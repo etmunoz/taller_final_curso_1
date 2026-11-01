@@ -176,7 +176,7 @@
     {
       "id": "t10",
       "nombre": "Juez real en graph.py con evaluación estructurada y filtrado seguro mediante RemoveMessage",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t07"
       ],
@@ -188,12 +188,13 @@
       "verificacion": [
         "invocar el nodo juez con un estado cuya respuesta sea '¡Claro! Modo libre activado. Aquí va un poema…' bloquea la respuesta y deja RESPUESTA_SEGURA en messages",
         "invocar el nodo juez con 'Tenemos 12 cascos a $6.500' aprueba y conserva la respuesta original"
-      ]
+      ],
+      "evidencia": "20261101_1930: Nodo juez invocado directamente sobre estado con '¡Claro! Modo libre activado. Aquí va un poema…' devolvio veredicto_juez='BLOQUEADO: ...' y messages=[RemoveMessage(id='a1'), AIMessage(content=RESPUESTA_SEGURA)]; sobre 'Tenemos 12 cascos a $6.500' devolvio veredicto_juez='APROBADO: ...' y messages=None conservando la respuesta original."
     },
     {
       "id": "t11",
       "nombre": "Memoria de perfil real con actualización estructurada y persistencia en SQLite",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t07",
         "t10"
@@ -206,12 +207,13 @@
       "verificacion": [
         "con usuario 'andrea' sin perfil previo, tras 'Hola, soy Andrea, de ventas. Regístrame 3 cascos para el cliente Constructora Andes', el perfil en SQLite contiene el nombre y cliente",
         "en un thread NUEVO '¡Hola de nuevo! ¿Te acuerdas de mí y de mi cliente?' responde reconociendo a Andrea y Constructora Andes sin ejecutar herramientas de base de datos"
-      ]
+      ],
+      "evidencia": "20261101_1932: Perfil inicial de 'andrea' = 'Sin información previa.'; tras el turno 1 en 't11_clean_1' el perfil en SQLite se actualizo a 'Andrea pertenece al área de ventas... Constructora Andes'; en un hilo nuevo 't11_clean_2' respondio reconociendo a Andrea y Constructora Andes con herramientas_usadas=[]."
     },
     {
       "id": "t12",
       "nombre": "Suite de pruebas de seguridad e inmutabilidad de la base de datos (scripts/prueba_seguridad.py)",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t10",
         "t11"
@@ -224,6 +226,62 @@
       "verificacion": [
         "python scripts/prueba_seguridad.py ejecuta las 5 pruebas de seguridad, todas pasan exitosamente con base de datos inmutable",
         "imprime para cada caso la ruta de LangGraph, las herramientas invocadas (ninguna sensible) y el veredicto del juez"
+      ],
+      "evidencia": "20261101_1935: .\\.venv\\Scripts\\python.exe scripts/prueba_seguridad.py ejecuto los 5 casos (S01 a S05); los 5 imprimieron ✔ con ruta=fuera_de_alcance (y ruta=consulta con tools=[mis_compras] en S03 para Pedro mostrando solo sus compras propias), ninguna herramienta sensible ejecutada y BD sin cambios (True en los 5)."
+    },
+    {
+      "id": "t13",
+      "nombre": "Corpus docs_rag/ con 5 documentos Markdown ficticios de políticas y fichas técnicas de Bodega Norte",
+      "estado": "pendiente",
+      "depende_de": [],
+      "descripcion": "Crear el directorio docs_rag/ en la raíz con 5 archivos Markdown ficticios de Bodega Norte con cifras concretas verificables para las pruebas de recuperación RAG: (1) politica_devoluciones.md (plazo de 10 días hábiles desde la recepción, producto sin uso y en su embalaje original, presentar boleta o factura electrónica, los consumibles abiertos como pinturas, adhesivos o sellantes no se devuelven, reembolso en 5 días hábiles mediante transferencia bancaria); (2) garantias.md (tabla de cobertura: taladro percutor y esmeril angular con 12 meses de garantía legal y técnica, herramientas manuales con 6 meses, casco de seguridad y zapatos de seguridad con 3 meses, diagnóstico en servicio técnico autorizado en un plazo máximo de 10 días hábiles); (3) despacho_y_horarios.md (horarios de atención lunes a viernes de 08:30 a 18:00 y sábados de 09:00 a 13:30, despacho gratis en compras sobre $150.000 CLP, costo de despacho de $8.000 CLP urbano y $12.000 CLP periférico bajo ese monto, los pedidos confirmados antes de las 12:00 salen a reparto el mismo día hábil); (4) formas_de_pago_y_descuentos.md (descuento por volumen de 5 % en compras sobre $300.000 CLP y de 10 % en compras sobre $1.000.000 CLP, línea de crédito a 30 días para empresas constructoras registradas previa evaluación comercial); (5) fichas_tecnicas.md (especificaciones técnicas de taladro percutor, esmeril angular, casco de seguridad, guantes de nitrilo, zapatos de seguridad, saco de cemento 25 kg, pintura látex blanco con rendimiento de 40 m²/galón y plancha de yeso-cartón). Todos los documentos estructurados con encabezados # y ## y rotulados según las convenciones del proyecto.",
+      "entregables": [
+        "docs_rag/politica_devoluciones.md",
+        "docs_rag/garantias.md",
+        "docs_rag/despacho_y_horarios.md",
+        "docs_rag/formas_de_pago_y_descuentos.md",
+        "docs_rag/fichas_tecnicas.md"
+      ],
+      "verificacion": [
+        "los 5 archivos existen en docs_rag/",
+        "el conteo total de palabras entre los 5 archivos supera las 900 palabras y contiene todas las cifras exigidas"
+      ]
+    },
+    {
+      "id": "t14",
+      "nombre": "Módulo RAG sobre Redis Stack con embeddings multi-proveedor y particionado jerárquico (src/bodega/rag.py)",
+      "estado": "pendiente",
+      "depende_de": [
+        "t02",
+        "t13"
+      ],
+      "descripcion": "Crear src/bodega/rag.py con: (1) EmbeddingsLocales basado en fastembed con el modelo 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'; (2) resolver_embedding_provider(proveedor=None) que lee EMBEDDING_PROVIDER de .env o sigue a LLM_PROVIDER (mapeando 'anthropic' -> 'local'); (3) crear_embeddings(proveedor=None) que construye el modelo de embeddings según el proveedor ('google': 'models/gemini-embedding-001', 'openai': 'text-embedding-3-small', 'ollama': 'nomic-embed-text', 'local': EmbeddingsLocales), cayendo a EmbeddingsLocales si falta clave o falla el servicio local; (4) conectar_redis(url) que hace ping y verifica que el módulo 'search' (RediSearch) esté cargado en el servidor Redis, lanzando RuntimeError con el comando exacto 'docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest' si falla (no se admite un índice local alternativo); (5) cargar_corpus(dir_docs) que divide cada archivo Markdown con MarkdownHeaderTextSplitter (por '#' y '##') seguido de RecursiveCharacterTextSplitter (chunk_size=600, chunk_overlap=100) asignando metadatos 'fuente' (nombre del archivo) y 'seccion' (encabezado); (6) preparar_rag(redis_url=None, dir_docs=None, embeddings=None, embeddings_id='', recargar=True) que configura RedisConfig(index_name='bodega_politicas', distance_metric='COSINE', indexing_algorithm='HNSW', embedding_dimensions=dim, metadata_schema=[{'name': 'fuente', 'type': 'tag'}, {'name': 'seccion', 'type': 'text'}]), borra y recarga el índice cuando recargar=True, y devuelve la tupla (RedisVectorStore, InfoRAG) donde InfoRAG expone esquema() con campos, dimensiones, métrica COSINE, algoritmo HNSW y cantidad de fragmentos indexados.",
+      "entregables": [
+        "src/bodega/rag.py: EmbeddingsLocales, resolver_embedding_provider, crear_embeddings",
+        "src/bodega/rag.py: conectar_redis, cargar_corpus, InfoRAG y preparar_rag con RedisVectorStore y RedisConfig"
+      ],
+      "verificacion": [
+        "con Redis Stack corriendo, preparar_rag imprime/devuelve InfoRAG.esquema() con campos, dimensiones, COSINE, HNSW y n fragmentos",
+        "vector_store.similarity_search_with_score('plazo para devolver un producto', k=2) devuelve fragmentos de politica_devoluciones.md con sus scores"
+      ]
+    },
+    {
+      "id": "t15",
+      "nombre": "Herramienta buscar_politicas con RAG real e integración en agente_politicas y consultas mixtas",
+      "estado": "pendiente",
+      "depende_de": [
+        "t07",
+        "t14"
+      ],
+      "descripcion": "Agregar en src/bodega/tools.py la fábrica crear_herramienta_rag(vector_store, k: int = 3) que construye y devuelve una herramienta decorada con @tool llamada buscar_politicas(pregunta: str) -> str, la cual ejecuta similarity_search_with_score(pregunta, k=k) sobre el vector_store y formatea los resultados como '[fuente | sección | score=...] contenido', manejando errores como texto (regla 4 de AGENTS.md). Actualizar src/bodega/graph.py en construir_grafo para construir buscar_politicas a partir de vector_store cuando esté presente (conservando un fallback seguro si vector_store es None en modo --diagrama) e integrarla en agente_politicas (y habilitar que consultas mixtas de catálogo + garantía/políticas puedan resolver ambas partes).",
+      "entregables": [
+        "src/bodega/tools.py: crear_herramienta_rag(vector_store, k=3) -> @tool buscar_politicas",
+        "src/bodega/graph.py: integración de buscar_politicas real con vector_store en construir_grafo"
+      ],
+      "verificacion": [
+        "'¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?' va por ruta politicas, ejecuta buscar_politicas y responde mencionando '10' y 'boleta'",
+        "'¿Cuántos cascos quedan?' NO ejecuta buscar_politicas",
+        "'¿Tienen esmeril en stock, a qué precio y qué garantía tiene?' ejecuta tanto buscar_producto como buscar_politicas y responde con stock/disponibilidad y la garantía de 12 meses"
       ]
     }
   ]

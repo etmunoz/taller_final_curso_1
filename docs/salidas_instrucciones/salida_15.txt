@@ -1,0 +1,117 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_15.txt
+# Objetivo: Volcado crudo, íntegro y detallado paso a paso de la especificación de la Etapa 4 (tareas t13 a t15: corpus docs_rag/, src/bodega/rag.py y herramienta buscar_politicas) en plan.json y verificación del plan.
+# Creado: 20261101_1940 (America/Santiago)
+# Actualizado: 20261101_1945 (America/Santiago)
+
+Ejecuto la instrucción 15. Especificación de la Etapa 4 (`t13` a `t15`) en `plan.json`:
+
+======================= t13 / t14 / t15 (Especificación Etapa 4)
+
+Pedido:
+@spec Lee AGENTS.md, plan.json y src/bodega/. Agrega SOLO estas tareas:
+    13. Corpus docs_rag/ con 5 archivos Markdown ficticios de Bodega Norte, con cifras concretas para poder probarlos:
+    politica_devoluciones.md (10 días hábiles, sin uso, boleta o factura, consumibles abiertos no se devuelven, reembolso
+    5 días hábiles transferencia), garantias.md (tabla: taladro y esmeril 12 meses, herramientas manuales 6 meses, casco y
+    zapatos 3 meses, servicio técnico 10 días hábiles), despacho_y_horarios.md (horarios L-V 08:30-18:00, sáb 09:00-13:30,
+    despacho gratis sobre $150.000, $8.000/$12.000 bajo ese monto, pedidos antes de 12:00 salen el mismo día),
+    formas_de_pago_y_descuentos.md (5 % sobre $300.000, 10 % sobre $1.000.000, crédito a 30 días para constructoras),
+    fichas_tecnicas.md (taladro, esmeril, casco, guantes, zapatos, cemento, látex 40 m²/galón, yeso-cartón).
+    Verificación: los 5 archivos existen y suman más de 900 palabras.
+    14. src/bodega/rag.py: EmbeddingsLocales (fastembed, sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2),
+    resolver_embedding_provider (EMBEDDING_PROVIDER o según LLM_PROVIDER; anthropic → local), crear_embeddings(google:
+    models/gemini-embedding-001 | openai: text-embedding-3-small | ollama: nomic-embed-text | local), conectar_redis(url)
+    que hace ping y exige el módulo search (si falla, error con el comando exacto `docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest`), cargar_corpus (MarkdownHeaderTextSplitter por # y ## +
+    RecursiveCharacterTextSplitter 600/100, metadatos fuente y seccion), preparar_rag(redis_url, dir_docs, embeddings,
+    embeddings_id, recargar) con RedisConfig(index_name="bodega_politicas", distance_metric="COSINE",
+    indexing_algorithm="HNSW", embedding_dimensions=dim, metadata_schema fuente tag + seccion text), que borra y recarga
+    el índice si recargar=True, y devuelve (RedisVectorStore, InfoRAG con esquema()). No se admite un índice local
+    alternativo. Verificación: con Redis Stack corriendo, preparar_rag imprime el esquema (campos, dimensiones, COSINE,
+    HNSW, n fragmentos) y similarity_search_with_score("plazo para devolver un producto", k=2) devuelve fragmentos de
+    politica_devoluciones.md con scores.
+    15. Herramienta RAG: en tools.py, crear_herramienta_rag(vector_store, k=3) que devuelve una @tool buscar_politicas(pregunta)
+    con los 3 mejores fragmentos formateados "[fuente | sección | score] contenido". En graph.py se construye con el
+    vector_store recibido y se usa solo en agente_politicas (reemplaza el placeholder). Verificación con LLM real:
+    "¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?" → ruta politicas,
+    buscar_politicas ejecutada, respuesta con "10" y "boleta"; "¿Cuántos cascos quedan?" → NO ejecuta buscar_politicas;
+    "¿Tienen esmeril en stock, a qué precio y qué garantía tiene?" → usa buscar_producto y buscar_politicas.
+
+Salida de la especificación:
+plan.json actualizado con las tareas t13, t14 y t15 en estado pendiente, manteniendo t01 a t12 en estado hecho con sus evidencias completas.
+
+PS> & ".\.venv\Scripts\python.exe" -c "import json; d = json.load(open('plan.json', encoding='utf-8')); [print(t['id'], t['estado'], t['nombre'], t['depende_de']) for t in d['tareas']]"
+t01 hecho Base SQLite regenerable con productos, compras y perfil []
+t02 hecho Entorno, catálogo de proveedores y construcción del LLM ['t01']
+t03 hecho Prompts del agente: alcance, router, agente, juez y memoria ['t02']
+t04 hecho Traza de llamadas al LLM en memoria y en JSONL ['t02']
+t05 hecho Herramientas de lectura del catálogo, compras del usuario y perfil en SQLite ['t01', 't02']
+t06 hecho Herramientas de acción: comprar y cancelar_compra con control de sesión ['t05']
+t07 hecho Grafo StateGraph con router estructurado, agentes por ruta, ToolNode y tope de rondas ['t03', 't04', 't06']
+t08 hecho Persistencia de conversación entre turnos con SqliteSaver y thread_id ['t07']
+t09 hecho CLI en main.py con soporte para --diagrama, --saltos, --usuario, --thread y modo interactivo ['t08']
+t10 hecho Juez real en graph.py con evaluación estructurada y filtrado seguro mediante RemoveMessage ['t07']
+t11 hecho Memoria de perfil real con actualización estructurada y persistencia en SQLite ['t07', 't10']
+t12 hecho Suite de pruebas de seguridad e inmutabilidad de la base de datos (scripts/prueba_seguridad.py) ['t10', 't11']
+t13 pendiente Corpus docs_rag/ con 5 documentos Markdown ficticios de políticas y fichas técnicas de Bodega Norte []
+t14 pendiente Módulo RAG sobre Redis Stack con embeddings multi-proveedor y particionado jerárquico (src/bodega/rag.py) ['t02', 't13']
+t15 pendiente Herramienta buscar_politicas con RAG real e integración en agente_politicas y consultas mixtas ['t07', 't14']
+
+Volcado JSON de las tareas agregadas (t13, t14, t15):
+PS> & ".\.venv\Scripts\python.exe" -c "import json; d = json.load(open('plan.json', encoding='utf-8')); print(json.dumps([t for t in d['tareas'] if t['id'] in ('t13', 't14', 't15')], indent=2, ensure_ascii=False))"
+[
+  {
+    "id": "t13",
+    "nombre": "Corpus docs_rag/ con 5 documentos Markdown ficticios de políticas y fichas técnicas de Bodega Norte",
+    "estado": "pendiente",
+    "depende_de": [],
+    "descripcion": "Crear el directorio docs_rag/ en la raíz con 5 archivos Markdown ficticios de Bodega Norte con cifras concretas verificables para las pruebas de recuperación RAG: (1) politica_devoluciones.md (plazo de 10 días hábiles desde la recepción, producto sin uso y en su embalaje original, presentar boleta o factura electrónica, los consumibles abiertos como pinturas, adhesivos o sellantes no se devuelven, reembolso en 5 días hábiles mediante transferencia bancaria); (2) garantias.md (tabla de cobertura: taladro percutor y esmeril angular con 12 meses de garantía legal y técnica, herramientas manuales con 6 meses, casco de seguridad y zapatos de seguridad con 3 meses, diagnóstico en servicio técnico autorizado en un plazo máximo de 10 días hábiles); (3) despacho_y_horarios.md (horarios de atención lunes a viernes de 08:30 a 18:00 y sábados de 09:00 a 13:30, despacho gratis en compras sobre $150.000 CLP, costo de despacho de $8.000 CLP urbano y $12.000 CLP periférico bajo ese monto, los pedidos confirmados antes de las 12:00 salen a reparto el mismo día hábil); (4) formas_de_pago_y_descuentos.md (descuento por volumen de 5 % en compras sobre $300.000 CLP y de 10 % en compras sobre $1.000.000 CLP, línea de crédito a 30 días para empresas constructoras registradas previa evaluación comercial); (5) fichas_tecnicas.md (especificaciones técnicas de taladro percutor, esmeril angular, casco de seguridad, guantes de nitrilo, zapatos de seguridad, saco de cemento 25 kg, pintura látex blanco con rendimiento de 40 m²/galón y plancha de yeso-cartón). Todos los documentos estructurados con encabezados # y ## y rotulados según las convenciones del proyecto.",
+    "entregables": [
+      "docs_rag/politica_devoluciones.md",
+      "docs_rag/garantias.md",
+      "docs_rag/despacho_y_horarios.md",
+      "docs_rag/formas_de_pago_y_descuentos.md",
+      "docs_rag/fichas_tecnicas.md"
+    ],
+    "verificacion": [
+      "los 5 archivos existen en docs_rag/",
+      "el conteo total de palabras entre los 5 archivos supera las 900 palabras y contiene todas las cifras exigidas"
+    ]
+  },
+  {
+    "id": "t14",
+    "nombre": "Módulo RAG sobre Redis Stack con embeddings multi-proveedor y particionado jerárquico (src/bodega/rag.py)",
+    "estado": "pendiente",
+    "depende_de": [
+      "t02",
+      "t13"
+    ],
+    "descripcion": "Crear src/bodega/rag.py con: (1) EmbeddingsLocales basado en fastembed con el modelo 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2'; (2) resolver_embedding_provider(proveedor=None) que lee EMBEDDING_PROVIDER de .env o sigue a LLM_PROVIDER (mapeando 'anthropic' -> 'local'); (3) crear_embeddings(proveedor=None) que construye el modelo de embeddings según el proveedor ('google': 'models/gemini-embedding-001', 'openai': 'text-embedding-3-small', 'ollama': 'nomic-embed-text', 'local': EmbeddingsLocales), cayendo a EmbeddingsLocales si falta clave o falla el servicio local; (4) conectar_redis(url) que hace ping y verifica que el módulo 'search' (RediSearch) esté cargado en el servidor Redis, lanzando RuntimeError con el comando exacto 'docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest' si falla (no se admite un índice local alternativo); (5) cargar_corpus(dir_docs) que divide cada archivo Markdown con MarkdownHeaderTextSplitter (por '#' y '##') seguido de RecursiveCharacterTextSplitter (chunk_size=600, chunk_overlap=100) asignando metadatos 'fuente' (nombre del archivo) y 'seccion' (encabezado); (6) preparar_rag(redis_url=None, dir_docs=None, embeddings=None, embeddings_id='', recargar=True) que configura RedisConfig(index_name='bodega_politicas', distance_metric='COSINE', indexing_algorithm='HNSW', embedding_dimensions=dim, metadata_schema=[{'name': 'fuente', 'type': 'tag'}, {'name': 'seccion', 'type': 'text'}]), borra y recarga el índice cuando recargar=True, y devuelve la tupla (RedisVectorStore, InfoRAG) donde InfoRAG expone esquema() con campos, dimensiones, métrica COSINE, algoritmo HNSW y cantidad de fragmentos indexados.",
+    "entregables": [
+      "src/bodega/rag.py: EmbeddingsLocales, resolver_embedding_provider, crear_embeddings",
+      "src/bodega/rag.py: conectar_redis, cargar_corpus, InfoRAG y preparar_rag con RedisVectorStore y RedisConfig"
+    ],
+    "verificacion": [
+      "con Redis Stack corriendo, preparar_rag imprime/devuelve InfoRAG.esquema() con campos, dimensiones, COSINE, HNSW y n fragmentos",
+      "vector_store.similarity_search_with_score('plazo para devolver un producto', k=2) devuelve fragmentos de politica_devoluciones.md con sus scores"
+    ]
+  },
+  {
+    "id": "t15",
+    "nombre": "Herramienta buscar_politicas con RAG real e integración en agente_politicas y consultas mixtas",
+    "estado": "pendiente",
+    "depende_de": [
+      "t07",
+      "t14"
+    ],
+    "descripcion": "Agregar en src/bodega/tools.py la fábrica crear_herramienta_rag(vector_store, k: int = 3) que construye y devuelve una herramienta decorada con @tool llamada buscar_politicas(pregunta: str) -> str, la cual ejecuta similarity_search_with_score(pregunta, k=k) sobre el vector_store y formatea los resultados como '[fuente | sección | score=...] contenido', manejando errores como texto (regla 4 de AGENTS.md). Actualizar src/bodega/graph.py en construir_grafo para construir buscar_politicas a partir de vector_store cuando esté presente (conservando un fallback seguro si vector_store es None en modo --diagrama) e integrarla en agente_politicas (y habilitar que consultas mixtas de catálogo + garantía/políticas puedan resolver ambas partes).",
+    "entregables": [
+      "src/bodega/tools.py: crear_herramienta_rag(vector_store, k=3) -> @tool buscar_politicas",
+      "src/bodega/graph.py: integración de buscar_politicas real con vector_store en construir_grafo"
+    ],
+    "verificacion": [
+      "'¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?' va por ruta politicas, ejecuta buscar_politicas y responde mencionando '10' y 'boleta'",
+      "'¿Cuántos cascos quedan?' NO ejecuta buscar_politicas",
+      "'¿Tienen esmeril en stock, a qué precio y qué garantía tiene?' ejecuta tanto buscar_producto como buscar_politicas y responde con stock/disponibilidad y la garantía de 12 meses"
+    ]
+  }
+]

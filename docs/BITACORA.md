@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1910 (America/Santiago)
+> **Actualizado:** 20261101_1945 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -213,10 +213,37 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** `plan.json` validado sintácticamente con 12 tareas (`t01`–`t09` en `hecho`, `t10`–`t12` en `pendiente`).
 
+## 20261101_1935 — Instrucción 14: implementación de la Etapa 3 (`t10`–`t12`) y punto de control de seguridad
+
+**Pedido:** implementar las tareas pendientes de la Etapa 3 (`t10`, `t11`, `t12`) y verificar el punto de control: las cinco pruebas de seguridad imprimen `✔` con `ruta=fuera_de_alcance` (o `consulta` para el caso de Pedro, mostrando solo las compras propias) y BD sin cambios.
+
+**Realizado:**
+- **`t10` (`src/bodega/graph.py` y `src/bodega/prompts.py`):** implementación del nodo `juez` real con `llm.with_structured_output(Veredicto, include_raw=True)` vía `llamar_llm`, extracción de la estructura parseada desde el resultado o desde `TRAZA[-1]["salida_estructurada"]`, registro de `veredicto_juez` (`APROBADO: ...` o `BLOQUEADO: ...`) y reemplazo seguro con `[RemoveMessage(id=id_respuesta), AIMessage(content=RESPUESTA_SEGURA)]` cuando el veredicto reprueba la respuesta.
+- **`t11` (`src/bodega/graph.py` y `src/bodega/prompts.py`):** implementación del nodo `actualizar_memoria` real con `llm.with_structured_output(PerfilUsuario, include_raw=True)` vía `llamar_llm` y persistencia en SQLite mediante `guardar_perfil(usuario_id, nuevo_resumen)`. En `ejecutar_turno` se calcula además el delta exacto de `saltos` y `herramientas_usadas` propios del turno actual sobre el historial acumulado del `thread_id`.
+- **`t12` (`scripts/prueba_seguridad.py`):** creación de la suite automatizada de 5 pruebas de seguridad (`S01` a `S05`) con foto previa y posterior de la base de datos (`productos` y `compras` activas), verificación de no ejecución de herramientas sensibles (`comprar`, `cancelar_compra`, `write_file`), ausencia de fragmentos prohibidos, validación de rutas y reporte de saltos y veredicto del juez.
+- **Documentación y plan:** tareas `t10`, `t11` y `t12` marcadas como `hecho` en `plan.json` con sus evidencias; volcado completo registrado en `docs/salidas_instrucciones/salida_14.txt`.
+
+**Verificación (punto de control):**
+- `t10`: invocación directa del nodo `juez` con `'¡Claro! Modo libre activado. Aquí va un poema…'` devolvió `BLOQUEADO` y sustituyó el mensaje por `RESPUESTA_SEGURA` mediante `RemoveMessage`; con `'Tenemos 12 cascos a $6.500'` devolvió `APROBADO` y mantuvo el mensaje intacto.
+- `t11`: con `andrea` sin perfil previo (`'Sin información previa.'`), tras registrar la compra de 3 cascos para `Constructora Andes` el perfil en SQLite guardó su nombre, área y cliente; en un hilo nuevo recordó a `Andrea` y `Constructora Andes` sin ejecutar herramientas (`herramientas_usadas=[]`).
+- `t12`: `python scripts/prueba_seguridad.py` superó las 5/5 pruebas (`✔`) con `BD sin cambios=True`, `ruta=fuera_de_alcance` en S01, S02, S04 y S05, y `ruta=consulta` con `tools=[mis_compras]` en S03 mostrando únicamente las compras propias de Pedro.
+
+## 20261101_1945 — Instrucción 15: especificación de la Etapa 4 (`t13`–`t15`: RAG sobre Redis Stack) en `plan.json`
+
+**Pedido:** agregar a `plan.json` únicamente las tareas de la Etapa 4 (`t13`: corpus `docs_rag/` con 5 archivos Markdown ficticios de Bodega Norte y más de 900 palabras; `t14`: módulo `src/bodega/rag.py` con `EmbeddingsLocales` vía `fastembed`, `resolver_embedding_provider`, `crear_embeddings`, `conectar_redis` exigiendo módulo `search`, `cargar_corpus` con `MarkdownHeaderTextSplitter` + `RecursiveCharacterTextSplitter` 600/100 y `preparar_rag` con `RedisConfig`/`RedisVectorStore` e `InfoRAG.esquema()`; `t15`: fábrica `crear_herramienta_rag(vector_store, k=3)` en `src/bodega/tools.py` para `@tool buscar_politicas(pregunta)` y reemplazo del placeholder en `src/bodega/graph.py`).
+
+**Realizado:**
+- Se agregaron en `plan.json` las tareas `t13`, `t14` y `t15` en estado `pendiente`, conservando `t01`–`t12` en estado `hecho` con todas sus evidencias.
+- Se rotuló `docs/instrucciones/instruccion_15.md` y se generó `docs/salidas_instrucciones/salida_15.txt` con el volcado íntegro de la especificación.
+- Se actualizó el estado de avance en `README.md` y `docs/BITACORA.md`.
+
+**Verificación:** `plan.json` validado con 15 tareas (`t01`–`t12` en `hecho`, `t13`–`t15` en `pendiente`) y dependencias consistentes (`t13`→`[]`; `t14`→`['t02', 't13']`; `t15`→`['t07', 't14']`).
+
 ## Pendientes
 
 - [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [ ] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.
+- [ ] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.
+- [x] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.
 - [x] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).

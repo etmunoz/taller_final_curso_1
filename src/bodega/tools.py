@@ -67,9 +67,9 @@ def leer_perfil(usuario_id: str) -> str:
         fila = con.execute("SELECT resumen FROM perfil_usuario WHERE usuario_id = ?", (usuario_id,)).fetchone()
         if fila and fila["resumen"]:
             return str(fila["resumen"])
-        return f"Usuario {usuario_id} sin perfil previo."
+        return "Sin información previa."
     except Exception:
-        return f"Usuario {usuario_id} sin perfil previo."
+        return "Sin información previa."
     finally:
         con.close()
 

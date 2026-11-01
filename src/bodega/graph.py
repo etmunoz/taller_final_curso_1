@@ -1,8 +1,8 @@
 """Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 Archivo: src/bodega/graph.py
-Objetivo: Definir el grafo StateGraph del agente Bodega Norte (router estructurado, agentes por ruta, ToolNode, tope de rondas, stubs y ejecución de turnos).
+Objetivo: Definir el grafo StateGraph del agente Bodega Norte (router estructurado, agentes por ruta, ToolNode, tope de rondas, juez real con RemoveMessage, memoria de perfil real y ejecución de turnos).
 Creado: 20261101_1500 (America/Santiago)
-Actualizado: 20261101_1500 (America/Santiago)
+Actualizado: 20261101_1925 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ from __future__ import annotations
 import operator
 from typing import Annotated, Any, Literal
 
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, RemoveMessage, SystemMessage, ToolMessage
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
@@ -25,7 +25,7 @@ from .prompts import (
     SYSTEM_MEMORIA,
     SYSTEM_ROUTER,
 )
-from .traza import llamar_llm
+from .traza import TRAZA, configurar as configurar_traza, llamar_llm
 from .tools import HERRAMIENTAS_ACCION, HERRAMIENTAS_LECTURA, leer_perfil, guardar_perfil
 from langchain_core.tools import tool
 
@@ -63,13 +63,41 @@ class EstadoAgente(MessagesState):
 MAX_RONDAS = 5
 
 
+def _extraer_estructurada(resultado_raw: Any, clase_modelo: type[BaseModel]) -> Any:
+    """Extrae el modelo Pydantic parseado desde el retorno de llamar_llm o desde TRAZA."""
+    if isinstance(resultado_raw, clase_modelo):
+        return resultado_raw
+    if hasattr(resultado_raw, "parsed") and isinstance(resultado_raw.parsed, clase_modelo):
+        return resultado_raw.parsed
+    if isinstance(resultado_raw, dict) and "parsed" in resultado_raw:
+        parsed = resultado_raw["parsed"]
+        if isinstance(parsed, clase_modelo):
+            return parsed
+        if isinstance(parsed, dict):
+            try:
+                return clase_modelo.model_validate(parsed)
+            except Exception:
+                pass
+    # Fallback al último registro en TRAZA (ya que llamar_llm devuelve el BaseMessage crudo y guarda salida_estructurada en TRAZA)
+    if TRAZA:
+        salida = TRAZA[-1].get("salida_estructurada")
+        if isinstance(salida, clase_modelo):
+            return salida
+        if isinstance(salida, dict):
+            try:
+                return clase_modelo.model_validate(salida)
+            except Exception:
+                pass
+    return None
+
+
 # 3. Fábrica de nodos agente por ruta
-def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str):
+def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str, llm_base: Any = None):
     """Crea una función de nodo agente especializada para una ruta específica."""
     def nodo_agente(state: EstadoAgente, config: Any = None) -> dict[str, Any]:
-        llm = crear_llm()
+        llm = llm_base if llm_base is not None else crear_llm()
         rondas = state.get("rondas", 0) + 1
-        mensajes_actuales = state.get("messages", [])
+        mensajes_actuales = list(state.get("messages", []))
         perfil = state.get("perfil", "")
         usuario_id = "default"
         if config and "configurable" in config:
@@ -101,11 +129,11 @@ def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str
                 "ruta": [f"agente_{ruta_nombre}"],
             }
 
-        # Modo normal con herramientas
+        # Modo normal (usa SYSTEM_AGENTE_SIN_HERRAMIENTAS si la ruta no tiene herramientas)
         llm_con_herramientas = llm.bind_tools(herramientas) if herramientas else llm
-        sys_msg = SystemMessage(content=SYSTEM_AGENTE)
+        sys_msg = SystemMessage(content=SYSTEM_AGENTE if herramientas else SYSTEM_AGENTE_SIN_HERRAMIENTAS)
 
-        # Último mensaje del usuario envuelto con etiquetas (Regla 6)
+        # Último mensaje envuelto con etiquetas (Regla 6)
         texto_usuario = ""
         if mensajes_actuales:
             ult = mensajes_actuales[-1]
@@ -197,12 +225,7 @@ def construir_grafo(
         )
 
         # Extraer la decisión estructurada
-        decision: DecisionRuta | None = None
-        if hasattr(resultado_raw, "parsed") and resultado_raw.parsed:
-            decision = resultado_raw.parsed
-        elif isinstance(resultado_raw, dict) and "parsed" in resultado_raw:
-            decision = resultado_raw["parsed"]
-
+        decision = _extraer_estructurada(resultado_raw, DecisionRuta)
         if isinstance(decision, DecisionRuta):
             ruta_elegida = decision.ruta
         else:
@@ -230,11 +253,11 @@ def construir_grafo(
     )
 
     # Nodos agente por ruta
-    nodo_consulta = _crear_nodo_agente("consulta", herramientas_consulta, modelo_id)
-    nodo_compra = _crear_nodo_agente("compra", herramientas_compra, modelo_id)
-    nodo_politicas = _crear_nodo_agente("politicas", herramientas_politicas, modelo_id)
-    nodo_comprobante = _crear_nodo_agente("comprobante", herramientas_comprobante, modelo_id)
-    nodo_conversacion = _crear_nodo_agente("conversacion", herramientas_conversacion, modelo_id)
+    nodo_consulta = _crear_nodo_agente("consulta", herramientas_consulta, modelo_id, llm)
+    nodo_compra = _crear_nodo_agente("compra", herramientas_compra, modelo_id, llm)
+    nodo_politicas = _crear_nodo_agente("politicas", herramientas_politicas, modelo_id, llm)
+    nodo_comprobante = _crear_nodo_agente("comprobante", herramientas_comprobante, modelo_id, llm)
+    nodo_conversacion = _crear_nodo_agente("conversacion", herramientas_conversacion, modelo_id, llm)
 
     # 3. Nodo herramientas (ToolNode)
     tool_node_base = ToolNode(todas_herramientas)
@@ -249,15 +272,111 @@ def construir_grafo(
             "ruta": [nombre_str],
         }
 
-    # 4. Nodo juez (Stub en esta etapa)
-    def nodo_juez(state: EstadoAgente) -> dict[str, Any]:
-        return {
-            "veredicto_juez": "aprobado",
+    # 4. Nodo juez real (evalúa con SYSTEM_JUEZ y sanitiza con RemoveMessage si es bloqueado)
+    def nodo_juez(state: EstadoAgente, config: Any = None) -> dict[str, Any]:
+        modelo_juez = llm if llm is not None else crear_llm()
+        juez_estructurado = modelo_juez.with_structured_output(Veredicto, include_raw=True)
+        mensajes_actuales = state.get("messages", [])
+        
+        texto_usuario = ""
+        texto_respuesta = ""
+        id_respuesta = None
+        
+        for m in mensajes_actuales:
+            if isinstance(m, HumanMessage):
+                texto_usuario = getattr(m, "content", str(m))
+            elif isinstance(m, AIMessage):
+                texto_respuesta = getattr(m, "content", str(m))
+                id_respuesta = getattr(m, "id", None)
+                
+        sys_msg = SystemMessage(content=SYSTEM_JUEZ)
+        prompt_eval = (
+            f"<mensaje>{texto_usuario}</mensaje>\n"
+            f"<respuesta>{texto_respuesta}</respuesta>"
+        )
+        humano_msg = HumanMessage(content=prompt_eval)
+        thread_id = config["configurable"]["thread_id"] if config and "configurable" in config else "default"
+        
+        resultado_raw = llamar_llm(
+            nodo="juez",
+            modelo=juez_estructurado,
+            mensajes=[sys_msg, humano_msg],
+            modelo_id=modelo_id,
+            temperatura=temperatura,
+            thread_id=thread_id,
+        )
+        
+        veredicto = _extraer_estructurada(resultado_raw, Veredicto)
+            
+        aprobado = True
+        motivo = "Sin objeciones"
+        if isinstance(veredicto, Veredicto):
+            aprobado = veredicto.aprobado
+            motivo = veredicto.motivo
+            
+        resultado_dict: dict[str, Any] = {
+            "veredicto_juez": f"{'APROBADO' if aprobado else 'BLOQUEADO'}: {motivo}",
             "ruta": ["juez"],
         }
+        
+        if not aprobado:
+            # Reemplaza la respuesta insegura por RESPUESTA_SEGURA mediante RemoveMessage
+            reemplazos: list[Any] = []
+            if id_respuesta:
+                reemplazos.append(RemoveMessage(id=id_respuesta))
+            reemplazos.append(AIMessage(content=RESPUESTA_SEGURA))
+            resultado_dict["messages"] = reemplazos
+            
+        return resultado_dict
 
-    # 5. Nodo actualizar_memoria (Stub en esta etapa)
-    def nodo_actualizar_memoria(state: EstadoAgente) -> dict[str, Any]:
+    # 5. Nodo actualizar_memoria real (SYSTEM_MEMORIA y guardado persistente en SQLite)
+    def nodo_actualizar_memoria(state: EstadoAgente, config: Any = None) -> dict[str, Any]:
+        usuario_id = "default"
+        thread_id = "default"
+        if config and "configurable" in config:
+            usuario_id = config["configurable"].get("usuario_id", "default")
+            thread_id = config["configurable"].get("thread_id", "default")
+            
+        modelo_memoria = llm if llm is not None else crear_llm()
+        memoria_estructurada = modelo_memoria.with_structured_output(PerfilUsuario, include_raw=True)
+        
+        perfil_actual = state.get("perfil", "")
+        mensajes_actuales = state.get("messages", [])
+        texto_usuario = ""
+        texto_respuesta = ""
+        for m in mensajes_actuales:
+            if isinstance(m, HumanMessage):
+                texto_usuario = getattr(m, "content", str(m))
+            elif isinstance(m, AIMessage):
+                texto_respuesta = getattr(m, "content", str(m))
+                
+        sys_msg = SystemMessage(content=SYSTEM_MEMORIA)
+        prompt_mem = (
+            f"<perfil_anterior>{perfil_actual}</perfil_anterior>\n"
+            f"<mensaje>{texto_usuario}</mensaje>\n"
+            f"<respuesta>{texto_respuesta}</respuesta>"
+        )
+        humano_msg = HumanMessage(content=prompt_mem)
+        
+        resultado_raw = llamar_llm(
+            nodo="actualizar_memoria",
+            modelo=memoria_estructurada,
+            mensajes=[sys_msg, humano_msg],
+            modelo_id=modelo_id,
+            temperatura=temperatura,
+            thread_id=thread_id,
+        )
+        
+        perfil_obj = _extraer_estructurada(resultado_raw, PerfilUsuario)
+            
+        if isinstance(perfil_obj, PerfilUsuario) and perfil_obj.resumen:
+            nuevo_resumen = perfil_obj.resumen.strip()
+            guardar_perfil(usuario_id, nuevo_resumen)
+            return {
+                "perfil": nuevo_resumen,
+                "ruta": ["actualizar_memoria"],
+            }
+            
         return {
             "ruta": ["actualizar_memoria"],
         }
@@ -363,12 +482,23 @@ def ejecutar_turno(
     verboso: bool = True,
 ) -> dict[str, Any]:
     """Ejecuta un turno del agente, invocando el grafo y devolviendo respuesta, herramientas y saltos."""
+    configurar_traza(verboso=verboso)
     config = {
         "configurable": {
             "thread_id": str(thread_id),
             "usuario_id": str(usuario_id),
         }
     }
+    n_ruta_previa = 0
+    n_msgs_previos = 0
+    try:
+        estado_previo = app.get_state(config)
+        if estado_previo and getattr(estado_previo, "values", None):
+            n_ruta_previa = len(estado_previo.values.get("ruta", []))
+            n_msgs_previos = len(estado_previo.values.get("messages", []))
+    except Exception:
+        pass
+
     estado_inicial = {
         "messages": [HumanMessage(content=texto)],
         "ruta": [],
@@ -380,12 +510,16 @@ def ejecutar_turno(
     respuesta_texto = getattr(respuesta_obj, "content", str(respuesta_obj))
 
     # Herramientas usadas en este turno (ToolMessages nuevos)
-    herramientas_usadas = [m.name for m in mensajes if isinstance(m, ToolMessage)]
+    mensajes_nuevos = mensajes[n_msgs_previos:] if n_msgs_previos <= len(mensajes) else mensajes
+    herramientas_usadas = [m.name for m in mensajes_nuevos if isinstance(m, ToolMessage)]
     ruta_total = resultado.get("ruta", [])
+    saltos_turno = ruta_total[n_ruta_previa:] if n_ruta_previa < len(ruta_total) else ruta_total
 
     return {
         "estado": resultado,
         "respuesta": respuesta_texto,
         "herramientas_usadas": herramientas_usadas,
-        "saltos": ruta_total,
+        "saltos": saltos_turno,
+        "veredicto_juez": resultado.get("veredicto_juez", ""),
+        "ruta_elegida": resultado.get("ruta_elegida", ""),
     }

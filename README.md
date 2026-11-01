@@ -2,7 +2,7 @@
 > **Archivo:** `README.md`
 > **Objetivo:** Presentación del proyecto, equipo, instalación con pip y con uv, configuración multi-proveedor y estado actual.
 > **Creado:** 20261026_2201 (America/Santiago)
-> **Actualizado:** 20261101_1305 (America/Santiago)
+> **Actualizado:** 20261101_1945 (America/Santiago)
 
 # taller_final_curso_1
 
@@ -20,16 +20,18 @@ El agente se especifica y se implementa por tareas (`plan.json`), con un noteboo
 El desarrollo queda registrado en [`docs/BITACORA.md`](docs/BITACORA.md). Todas las fechas se escriben
 como `YYYYMMDD_hhmm` en horario de Santiago de Chile (`America/Santiago`).
 
-## Estado actual (etapa 0: entorno y configuración)
+## Estado actual (Etapas 0–3 completadas · Etapa 4 especificada)
 
 - [x] Python 3.12 con `.venv`
 - [x] Dependencias instaladas (pip y uv sobre el mismo `.venv`)
-- [x] `.env` con Ollama como proveedor por defecto y soporte para Google, OpenAI y Anthropic
+- [x] `.env` con soporte multi-proveedor (`ollama`, `google`, `openai`, `anthropic`)
 - [x] `AGENTS.md` + agentes `@spec` y `@implementador`
-- [x] `plan.json` vacío, listo para la primera especificación
-- [x] Bitácora en `docs/BITACORA.md` con las instrucciones 01–08
+- [x] Etapa 1 (`t01`–`t04`): base SQLite (`crear_bd.py`), entorno (`entorno.py`), prompts (`prompts.py`) y trazas (`traza.py`)
+- [x] Etapa 2 (`t05`–`t09`): herramientas (`tools.py`), grafo `StateGraph` (`graph.py`), historial `SqliteSaver` y CLI (`main.py`)
+- [x] Etapa 3 (`t10`–`t12`): juez real con `RemoveMessage`, memoria de perfil en SQLite y suite `scripts/prueba_seguridad.py` (5/5 `✔`)
+- [ ] Etapa 4 (`t13`–`t15`, especificada en `plan.json`): corpus `docs_rag/`, índice RAG en Redis Stack (`src/bodega/rag.py`) y `buscar_politicas`
+- [x] Bitácora en `docs/BITACORA.md` con las instrucciones 01–15
 - [x] Todos los `.md`, `.ps1`, `.py` y `.txt` rotulados con grupo, objetivo y fechas
-- [ ] Etapa 1: grafo mínimo y herramientas del agente `bodega`
 
 ## Requisitos
 
