@@ -54,21 +54,21 @@ Edite `.env` y complete **únicamente** el bloque del proveedor con el que desee
 ```ini
 LLM_PROVIDER=google
 MODELO=gemini-3.5-flash-lite
-GOOGLE_API_KEY=AIzaSy_SU_CLAVE_AQUI
+GOOGLE_API_KEY=<TU_GOOGLE_API_KEY>
 ```
 
 #### Opción B — Cuenta de OpenAI (verificado)
 ```ini
 LLM_PROVIDER=openai
 MODELO=gpt-4o-mini
-OPENAI_API_KEY=sk-SU_CLAVE_AQUI
+OPENAI_API_KEY=<TU_OPENAI_API_KEY>
 ```
 
 #### Opción C — Cuenta de Anthropic (verificado; alternativa económica: `claude-haiku-4-5-20251001`)
 ```ini
 LLM_PROVIDER=anthropic
 MODELO=claude-sonnet-4-6
-ANTHROPIC_API_KEY=sk-ant-SU_CLAVE_AQUI
+ANTHROPIC_API_KEY=<TU_ANTHROPIC_API_KEY>
 ```
 
 #### Opción D — Ollama Local (sin claves; también actúa como respaldo automático)

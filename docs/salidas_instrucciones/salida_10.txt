@@ -12,7 +12,7 @@ Lanzo @implementador con la tarea t01 (base SQLite con 23 productos):
 ======================= t01
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t01` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json`.
+Ejecuta únicamente la tarea `t01` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json`.
 
 Contexto del entorno (obligatorio):
 - Windows + PowerShell 5.1. Python del proyecto: `.\.venv\Scripts\python.exe` (3.12). No existe `python3`; usa `.\.venv\Scripts\python.exe` para probar.
@@ -235,7 +235,7 @@ Me detengo aquí. t02 queda pendiente esperando tu confirmación.
 ======================= t02
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t02` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01 ya está `hecho`).
+Ejecuta únicamente la tarea `t02` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t01 ya está `hecho`).
 
 Entorno: Windows + PowerShell 5.1. Usa `.\.venv\Scripts\python.exe` (3.12) para todas las pruebas; `python3` no existe. El `.env` ya está configurado así: `LLM_PROVIDER=` vacío, `MODELO=` vacío, claves vacías, `OLLAMA_BASE_URL=http://localhost:11434`. Ollama está corriendo con `qwen3:8b`.
 
@@ -478,7 +478,7 @@ Detengo aquí: t03 queda pendiente hasta que lo indiques.
 ======================= t03
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t03` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01 y t02 ya están `hecho`). Entorno: Windows + PowerShell 5.1; usa `.\.venv\Scripts\python.exe`.
+Ejecuta únicamente la tarea `t03` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t01 y t02 ya están `hecho`). Entorno: Windows + PowerShell 5.1; usa `.\.venv\Scripts\python.exe`.
 
 Crea `src/bodega/prompts.py` con EXACTAMENTE estas siete constantes, en español natural, sin listas de palabras prohibidas y con docstring de una línea por constante indicando su rol. Cada prompt de sistema empieza incorporando el alcance (las constantes que lo necesitan se construyen concatenando `INSTRUCCIONES_ALCANCE`).
 
@@ -1040,7 +1040,7 @@ system_prompt se guarda pasado por resumen(..., 200) (regla de "textos largos pa
 tokens intenta usage_metadata y, si no hay, response_metadata (OpenAI token_usage, Anthropic usage, Ollama prompt_eval_count/eval_count); si el proveedor no informa, quedan None.
 Se sanea el thread_id para el nombre del archivo ([^A-Za-z0-9._-] → _), para no permitir rutas fuera de trazas/; para ids normales el archivo sigue siendo <thread_id>.jsonl.
 Si with_structured_output(include_raw=True) devuelve parsing_error, la llamada se registra igual y, solo con verboso=True, se imprime una línea de aviso adicional.
-Los scripts de verificación se ejecutaron desde C:\Users\etmun\AppData\Local\Temp\opencode\ con PYTHONPATH a la raíz, para no crear archivos en el repo; trazas/ ya está en .gitignore (git check-ignore → .gitignore:10:trazas/).
+Los scripts de verificación se ejecutaron desde %TEMP%/opencode\ con PYTHONPATH a la raíz, para no crear archivos en el repo; trazas/ ya está en .gitignore (git check-ignore → .gitignore:10:trazas/).
 
 
 Nota del programador. Ahora modelo local de Ollama. Veremos cómo avanza:

@@ -9,5 +9,5 @@ Ajustar el proyecto en función de lo siguiente:
 1. Ajustar .env que puede tener que el profesor ejecutar con su cuenta de Google Gemini o de OpenAi o de Anthropic, para dejar eso para la configucacón inicial.
 2. Ajustar que el profesor puede utilizar el Redis remoto, para dejar eso para la configuración inicial.
 3. Ajustar todos los .md para que queden bien alineados.
-4. Crear un documento tutorial para que quede claro cómo probar, ejemplos de prueba, en función de lo que está dicho cómo se va a probar en el documento: C:\Users\etmun\proyecto\taller_final_curso_1\Pauta_tarea_final.pdf. El tutorial tiene que ser auto contenido, y además ejemplificado en el notebook para que se vean todas las salidas de acuerdo a lo solicitado por la C:\Users\etmun\proyecto\taller_final_curso_1\Pauta_tarea_final.pdf.
+4. Crear un documento tutorial para que quede claro cómo probar, ejemplos de prueba, en función de lo que está dicho cómo se va a probar en el documento: Pauta_tarea_final.pdf. El tutorial tiene que ser auto contenido, y además ejemplificado en el notebook para que se vean todas las salidas de acuerdo a lo solicitado por la Pauta_tarea_final.pdf.
 

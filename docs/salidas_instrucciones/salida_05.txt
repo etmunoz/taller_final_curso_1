@@ -22,6 +22,6 @@ OPENAI_API_KEY, ANTHROPIC_API_KEY	vacías (no se usan)
 OLLAMA_BASE_URL	vacía (opcional)
 REDIS_URL	redis://localhost:6379 (ya puesto)
 EMBEDDING_PROVIDER	vacía = sigue al proveedor del LLM (google)
-Completá a mano solo GOOGLE_API_KEY= en C:\Users\etmun\proyecto\taller_final_curso_1\.env. La clave se obtiene gratis en Google AI Studio (aistudio.google.com/apikey).
+Completá a mano solo GOOGLE_API_KEY= en .env. La clave se obtiene gratis en Google AI Studio (aistudio.google.com/apikey).
 
 Me detengo acá como pediste; no leí ni imprimí ningún valor secreto.

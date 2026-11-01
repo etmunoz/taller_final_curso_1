@@ -5,7 +5,7 @@
 # Actualizado: 20261101_1304 (America/Santiago)
 No existe python3 real en este Windows (solo el stub de Microsoft Store). Uso el intérprete 3.12 que pide AGENTS.md (CPython 3.12.13 instalado por uv):
 
-$py312 = 'C:\Users\etmun\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe'
+$py312 = 'python3.12'
 if (-not (Test-Path $py312)) { throw "no existe $py312" }
 Remove-Item -Recurse -Force .venv -ErrorAction SilentlyContinue
 & $py312 -m venv .venv
@@ -14,7 +14,7 @@ if ($LASTEXITCODE -ne 0) { throw "venv falló: $LASTEXITCODE" }
 .\.venv\Scripts\python.exe -m pip --version
 
 Python 3.12.13
-pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+pip 25.0.1 from .venv\Lib\site-packages\pip (python 3.12)
 
 
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt --disable-pip-version-check 2>&1 | Select-Object -Last 40
@@ -97,7 +97,7 @@ redis                        8.1.0
 redisvl                      0.29.0
 
 === import de control ===
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 imports OK
 

@@ -9,7 +9,7 @@ Ejecuto la instrucción 12. Volcado completo de ejecuciones de consola y trazas 
 ======================= t05
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t05` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01–t04 ya están `hecho`).
+Ejecuta únicamente la tarea `t05` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t01–t04 ya están `hecho`).
 
 Contexto del entorno (obligatorio):
 - Windows + PowerShell 5.1. Python del proyecto: `.\.venv\Scripts\python.exe` (3.12).
@@ -35,7 +35,7 @@ El usuario 'andrea' no tiene compras activas registradas.
 ======================= t06
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t06` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t05 ya está `hecho`).
+Ejecuta únicamente la tarea `t06` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t05 ya está `hecho`).
 
 Requisitos:
 - En `src/bodega/tools.py`: `comprar(producto_id, cantidad, config)` que valida stock transaccional, inserta en `compras`, rebaja stock y devuelve JSON con `compra_id`, `producto`, `cantidad`, `total_clp`, `stock_antes`, `stock_despues` y `fecha`.
@@ -66,7 +66,7 @@ Cancelar repetido: La compra con ID 6 ya se encuentra cancelada.
 ======================= t07
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t07` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t03, t04, t06 ya están `hecho`).
+Ejecuta únicamente la tarea `t07` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t03, t04, t06 ya están `hecho`).
 
 Requisitos:
 - Crear `src/bodega/graph.py` respetando reglas 1, 2, 3, 5, 6, 7 y 8 de `AGENTS.md`.
@@ -76,7 +76,7 @@ Requisitos:
 
 Salida de la verificación t07:
 PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo; app = construir_grafo(llm=None); print(app.get_graph().draw_mermaid())"
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 ---
 config:
@@ -134,14 +134,14 @@ Saltos: ['cargar_memoria', 'router', 'agente_consulta', 'herramientas(buscar_pro
 ======================= t08
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t08` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t07 ya está `hecho`).
+Ejecuta únicamente la tarea `t08` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t07 ya está `hecho`).
 
 Requisitos:
 - Historial persistente con `SqliteSaver(sqlite3.connect(RUTA_MEMORIA, check_same_thread=False))` integrado en `construir_grafo` con `thread_id`.
 
 Salida de la verificación t08:
 PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); print('--- Turno 1 ---'); r1 = ejecutar_turno(app, 'Hola, soy Rodrigo, supervisor de obras.', usuario_id='rodrigo', thread_id='t_rodrigo_full'); print(r1['respuesta']); print('--- Turno 2 ---'); r2 = ejecutar_turno(app, '¿Cómo me llamo y en qué trabajo?', usuario_id='rodrigo', thread_id='t_rodrigo_full'); print(r2['respuesta']); print('--- Turno 3 en hilo DISTINTO (debe olvidar) ---'); r3 = ejecutar_turno(app, '¿Cómo me llamo?', usuario_id='rodrigo', thread_id='t_otro_hilo'); print(r3['respuesta'])"
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 --- Turno 1 ---
 [traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 652 tok · tool_calls=1 · respuesta=
@@ -157,7 +157,7 @@ Te llamas Rodrigo y trabajas como supervisor de obras. ¿En qué más puedo ayud
 Te llamas Rodrigo.
 
 PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); print('--- Hilo NUEVO sin previo aviso ---'); r_nuevo = ejecutar_turno(app, '¿Cómo me llamo?', usuario_id='desconocido', thread_id='t_hilo_limpio'); print(r_nuevo['respuesta'])"
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 --- Hilo NUEVO sin previo aviso ---
 [traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 709 tok · tool_calls=1 · respuesta=
@@ -167,7 +167,7 @@ C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\c
 ======================= t09
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t09` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t08 ya está `hecho`).
+Ejecuta únicamente la tarea `t09` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t08 ya está `hecho`).
 
 Requisitos:
 - `main.py` en la raíz con CLI `python main.py bodega [mensaje] [--saltos] [--diagrama] [--usuario] [--thread] [--sin-reiniciar]`.
@@ -176,7 +176,7 @@ Requisitos:
 
 Salida de la verificación t09:
 PS> .\\.venv\Scripts\python.exe main.py bodega --diagrama
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 ---
 config:
@@ -225,7 +225,7 @@ graph TD;
 
 PS> .\\.venv\Scripts\python.exe main.py bodega "Hola, soy Andrea, del área de ventas. ¿Cuántas huinchas hay?" --thread "t_andrea_cli" --saltos
 23 productos, 2 compras
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus::JsonPlusSerializer
 23 productos, 2 compras
 [traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 668 tok · tool_calls=1 · respuesta=
@@ -236,7 +236,7 @@ Hola, Andrea. Actualmente hay 22 unidades de huincha de medir disponibles en sto
 
 PS> .\\.venv\Scripts\python.exe main.py bodega "¿Recuerdas cómo me llamo y de qué área soy?" --thread "t_andrea_cli" --saltos
 23 productos, 2 compras
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus::JsonPlusSerializer
 23 productos, 2 compras
 [traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 678 tok · tool_calls=1 · respuesta=

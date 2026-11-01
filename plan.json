@@ -502,7 +502,7 @@
         "jupyter nbconvert --to notebook --execute pasa sin errores con Google, con Anthropic (claude-sonnet-4-6) y con OpenAI (gpt-4o-mini)",
         "todas las celdas de comprobación imprimen 'COMPROBACIÓN: ...: OK'"
       ],
-      "evidencia": "20261101_2020: notebooks/agente_bodega.ipynb (33 celdas) se ejecuto completo desde cero con jupyter nbconvert --to notebook --execute: 1 vez con anthropic:claude-sonnet-4-6 (19:59:36, 23/23 GS), 1 vez con openai:gpt-4o-mini (20:03:20, 23/23 GS), 1 vez en modo degradado sin Redis (20:17:04, 22/22 GS + 1 omitido) y 3 veces consecutivas con google_genai:gemini-3.5-flash-lite sobre REDIS_URL_ALUMNO (20:06:53, 20:10:22 y 20:20:37 inplace, 23/23 GS), con las 16 celdas 'COMPROBACION: ...: OK' en verde y sin rutas C:\\Users\\."
+      "evidencia": "20261101_2020: notebooks/agente_bodega.ipynb (33 celdas) se ejecuto completo desde cero con jupyter nbconvert --to notebook --execute: 1 vez con anthropic:claude-sonnet-4-6 (19:59:36, 23/23 GS), 1 vez con openai:gpt-4o-mini (20:03:20, 23/23 GS), 1 vez en modo degradado sin Redis (20:17:04, 22/22 GS + 1 omitido) y 3 veces consecutivas con google_genai:gemini-3.5-flash-lite sobre REDIS_URL_ALUMNO (20:06:53, 20:10:22 y 20:20:37 inplace, 23/23 GS), con las 16 celdas 'COMPROBACION: ...: OK' en verde y sin rutas <ruta_usuario_windows>."
     },
     {
       "id": "t27",
@@ -585,20 +585,21 @@
     {
       "id": "t32",
       "nombre": "Higiene de la entrega: rutas relativas sin usuario de Windows, requirements-lock.txt, renombre de instruccion_14.md y auditoría de secretos",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t26",
         "t30"
       ],
-      "descripcion": "Asegurar la higiene total de la entrega según la pauta: (1) Eliminar rutas absolutas con el nombre de usuario de Windows (C:\\Users\\...) de las salidas del notebook y de los logs de MCP/setup/evaluacion imprimiendo rutas relativas a la raíz, y silenciar LangChainPendingDeprecationWarning con warnings.filterwarnings; (2) Generar requirements-lock.txt con las versiones exactas del entorno .venv y referenciarlo en la ficha del README junto con la nota de descarga en 1ª ejecución de npx y fastembed; (3) Normalizar docs/instrucciones/ renombrando instrucción_14.md -> instruccion_14.md y actualizando sus referencias, y declarar en README que docs/instrucciones/, AGENTS.md y .opencode/agents/ constituyen los prompts de desarrollo entregados por separado; (4) Mover code_review_claude_20261101_*.md a docs/revisiones/ y referenciarlos en BITACORA.md; (5) Verificar con grep que ningún archivo versionado ni salida del notebook contenga claves reales (AIza..., sk-..., sk-ant-...), contraseñas de Redis ni rutas C:\\Users\\.",
+      "descripcion": "Asegurar la higiene total de la entrega según la pauta: (1) Eliminar rutas absolutas con el nombre de usuario de Windows (<ruta_usuario_windows>...) de las salidas del notebook y de los logs de MCP/setup/evaluacion imprimiendo rutas relativas a la raíz, y silenciar LangChainPendingDeprecationWarning con warnings.filterwarnings; (2) Generar requirements-lock.txt con las versiones exactas del entorno .venv y referenciarlo en la ficha del README junto con la nota de descarga en 1ª ejecución de npx y fastembed; (3) Normalizar docs/instrucciones/ renombrando instruccion_14.md -> instruccion_14.md y actualizando sus referencias, y declarar en README que docs/instrucciones/, AGENTS.md y .opencode/agents/ constituyen los prompts de desarrollo entregados por separado; (4) Mover code_review_claude_20261101_*.md a docs/revisiones/ y referenciarlos en BITACORA.md; (5) Verificar con grep que ningún archivo versionado ni salida del notebook contenga claves reales (AIza..., sk-..., sk-ant-...), contraseñas de Redis ni rutas <ruta_usuario_windows>.",
       "entregables": [
         "requirements-lock.txt: lockfile exacto del entorno .venv",
         "docs/instrucciones/instruccion_14.md y docs/revisiones/code_review_claude_*.md organizados",
-        "salidas del notebook y logs sin rutas C:\\Users\\ ni warnings ni secretos"
+        "salidas del notebook y logs sin rutas <ruta_usuario_windows> ni warnings ni secretos"
       ],
       "verificacion": [
-        "grep de claves reales, contraseñas de Redis y 'C:\\\\Users\\\\' sobre los archivos versionados y notebooks/agente_bodega.ipynb devuelve 0 coincidencias"
-      ]
+        "grep de claves reales, contraseñas de Redis y '<ruta_usuario_windows>' sobre los archivos versionados y notebooks/agente_bodega.ipynb devuelve 0 coincidencias"
+      ],
+      "evidencia": "20261101_2027: (1) generado requirements-lock.txt con pip freeze del .venv; (2) renombrado docs/instrucciones/instruccion_14.md y movidos los 3 code_review_claude_*.md a docs/revisiones/; (3) grep de 'C:\\Users\\', 'instrucción_14.md' y patrones de claves sobre todos los archivos versionados y notebooks/agente_bodega.ipynb devolvio 0 coincidencias."
     },
     {
       "id": "t31",

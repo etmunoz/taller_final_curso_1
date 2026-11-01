@@ -186,14 +186,14 @@ cada una con verificación observable y reproducible. No borres casos del golden
     32. Higiene de la entrega (pauta: "No publiquen claves, datos personales ni recursos privados"; "Si usaron
     OpenCode, adjunten por separado los prompts de desarrollo").
     - Salidas del notebook sin rutas personales: hoy aparecen rutas absolutas con el usuario de Windows
-      (C:\Users\<usuario>\...) en la sección 0 (directorio de trabajo, config MCP) y en avisos de librerías. Imprimir
+      (<ruta_absoluta_usuario>/...) en la sección 0 (directorio de trabajo, config MCP) y en avisos de librerías. Imprimir
       rutas relativas a la raíz del proyecto y silenciar el LangChainPendingDeprecationWarning de
       langgraph.checkpoint (warnings.filterwarnings) para que las salidas queden limpias.
     - Reproducibilidad exacta: además de los rangos de requirements.txt, generar requirements-lock.txt (uv export o
       pip freeze del .venv que se usó para la corrida final) y mencionarlo en la ficha. Indicar que el MCP necesita
       Node e internet en la 1ª ejecución (npx descarga el servidor) y que, sin clave de un proveedor de embeddings
       en la nube, fastembed descarga ~200 MB desde HuggingFace la primera vez.
-    - Prompts de desarrollo: dejar docs/instrucciones/ completo y con nombres uniformes (renombrar instrucción_14.md
+    - Prompts de desarrollo: dejar docs/instrucciones/ completo y con nombres uniformes (renombrar instruccion_14.md
       → instruccion_14.md y actualizar sus referencias), incluida esta instruccion_22.md, y mencionar en el README
       que esa carpeta, junto con AGENTS.md y .opencode/agents/, son los prompts de desarrollo entregados por
       separado.
@@ -203,7 +203,7 @@ cada una con verificación observable y reproducible. No borres casos del golden
       repositorio; si el repositorio es público, preguntar al docente o reemplazarla por un enlace o un resumen.
     - Verificar con un grep, antes del commit final, que ningún archivo versionado ni salida del notebook contiene
       claves (AIza…, sk-…, sk-ant-…), contraseñas de Redis ni la URL completa del Redis del alumno o del profesor.
-    Verificación: el grep de secretos y de "C:\Users\" sobre los archivos versionados y el notebook devuelve 0
+    Verificación: el grep de secretos y de "<ruta_usuario_windows>" sobre los archivos versionados y el notebook devuelve 0
     coincidencias (salvo los ejemplos de .env.example con valores ficticios).
 
     31. Verificación final integral (la última tarea). Ejecutar y dejar el registro en

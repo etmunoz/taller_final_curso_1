@@ -47,7 +47,7 @@ dependencies = []
 
 === .venv ===
 Python 3.12.13
-pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+pip 25.0.1 from .venv\Lib\site-packages\pip (python 3.12)
 
 
 uv sync --help | Select-String -Pattern 'dry-run|--frozen|--locked|--no-install|--inexact|--exact' -Context 0,1
@@ -120,7 +120,7 @@ En l�nea: 1 Car�cter: 43
  
 Checked 182 packages in 32ms
 === pip sigue disponible? ===
-pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+pip 25.0.1 from .venv\Lib\site-packages\pip (python 3.12)
 
 === uv run ===
 3.12.13 ok
@@ -128,22 +128,22 @@ pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-pack
 
 Ahora verifico que el stack funcione con Ollama (incluido tool calling, que es lo que necesita ReAct):
 
-.\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py" 2>&1
+.\.venv\Scripts\python.exe "%TEMP%/opencode\probar_ollama.py" 2>&1
 proveedor: ollama | modelo: qwen3:8b | base: http://localhost:11434http://localhost:11434
 .\.venv\Scripts\python.exe : Traceback (most recent call last):
 En l�nea: 1 Car�cter: 1
-+ .\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencod ...
++ .\.venv\Scripts\python.exe "<ruta_usuario_windows>etmun\AppData\Local\Temp\opencod ...
 + ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
  
-  File "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py", line 15, in <module>
+  File "%TEMP%/opencode\probar_ollama.py", line 15, in <module>
     llm = ChatOllama(model=modelo, base_url=base)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langchain_core\load\serializable.py", 
+  File ".venv\Lib\site-packages\langchain_core\load\serializable.py", 
 line 115, in __init__
     super().__init__(*args, **kwargs)
-  File "C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pydantic\main.py", line 280, in __init__
+  File ".venv\Lib\site-packages\pydantic\main.py", line 280, in __init__
     validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatOllama
@@ -168,7 +168,7 @@ Get-Content .env | Select-String -Pattern 'OLLAMA_BASE_URL|MODELO|LLM_PROVIDER' 
 Se duplicó la URL al editar. Lo corrijo en ambos archivos:
 
 
-Write-Output "--- .env ---"; Get-Content .env | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "--- .env.example ---"; Get-Content .env.example | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "=== prueba Ollama ==="; .\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py" 2>&1
+Write-Output "--- .env ---"; Get-Content .env | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "--- .env.example ---"; Get-Content .env.example | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "=== prueba Ollama ==="; .\.venv\Scripts\python.exe "%TEMP%/opencode\probar_ollama.py" 2>&1
 --- .env ---
 [OLLAMA_BASE_URL=http://localhost:11434]
 --- .env.example ---
@@ -189,7 +189,7 @@ $p = Join-Path $PWD 'activate.ps1'; $t = [System.IO.File]::ReadAllText($p, [Syst
 ==> Verificando la sesi�n...
     OK  Python: Python 3.12.13
     OK  conda inactivo.
-    OK  python -> C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Scripts\python.exe
+    OK  python -> .venv\Scripts\python.exe
     OK  LLM: ollama / qwen3:8b
 
 Entorno listo. Pr�ximos pasos:
@@ -208,7 +208,7 @@ Checked 182 packages in 43ms
 ==> Verificando la sesi�n...
     OK  Python: Python 3.12.13
     OK  conda inactivo.
-    OK  python -> C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Scripts\python.exe
+    OK  python -> .venv\Scripts\python.exe
     OK  LLM: ollama / qwen3:8b
 
 Entorno listo. Pr�ximos pasos:

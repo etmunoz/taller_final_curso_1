@@ -9,7 +9,7 @@ Ejecuto la instrucción 16. Volcado completo de ejecuciones de consola, levantam
 ======================= t13
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t13` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01–t12 ya están `hecho`).
+Ejecuta únicamente la tarea `t13` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t01–t12 ya están `hecho`).
 
 Requisitos de `t13`:
 - Crear `docs_rag/` con 5 archivos Markdown ficticios de Bodega Norte y cifras concretas:
@@ -33,7 +33,7 @@ Total archivos: 5 | Total palabras: 2369
 ======================= t14
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t14` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t13 ya está `hecho`).
+Ejecuta únicamente la tarea `t14` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t13 ya está `hecho`).
 
 Requisitos y aclaraciones de `t14`:
 - Levantar e instalar un Redis Stack en Docker para `trabajo_final_1` en `localhost:6379` (`REDIS_URL` en `.env`).
@@ -65,7 +65,7 @@ Match 2 {'fuente': 'garantias.md', 'seccion': 'Procedimiento y Plazo del Servici
 ======================= t15 (Herramienta RAG en el Grafo y Punto de Control)
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t15` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t14 ya está `hecho`).
+Ejecuta únicamente la tarea `t15` de `plan.json` en `.`. Lee antes `AGENTS.md` y `plan.json` (t14 ya está `hecho`).
 
 Requisitos de `t15`:
 - En `src/bodega/tools.py`: `crear_herramienta_rag(vector_store, k=3)` que devuelve una `@tool buscar_politicas(pregunta)` con los 3 mejores fragmentos formateados `"[fuente | sección | score] contenido"`.
@@ -77,7 +77,7 @@ Requisitos de `t15`:
 
 Volcado completo de la verificación t15 y Punto de Control:
 PS> .\.venv\Scripts\python.exe -c "from crear_bd import crear; from src.bodega.entorno import crear_llm, resolver_config; from src.bodega.rag import preparar_rag; from src.bodega.graph import construir_grafo, ejecutar_turno; crear(reset=True); vs, info = preparar_rag(recargar=True); cfg = resolver_config(); llm = crear_llm(cfg); app = construir_grafo(llm=llm, vector_store=vs, modelo_id=str(cfg)); print('\n--- Caso 1: Devoluciones ---'); r1 = ejecutar_turno(app, '¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?', usuario_id='pedro', thread_id='t15_rag_v2_1'); print('Ruta elegida:', r1['ruta_elegida']); print('Saltos:', r1['saltos']); print('Herramientas:', r1['herramientas_usadas']); print('Veredicto:', r1['veredicto_juez']); print('Respuesta:', r1['respuesta']); print('\n--- Caso 2: Solo stock (no debe tocar Redis) ---'); r2 = ejecutar_turno(app, '¿Cuántos cascos quedan?', usuario_id='pedro', thread_id='t15_rag_v2_2'); print('Ruta elegida:', r2['ruta_elegida']); print('Saltos:', r2['saltos']); print('Herramientas:', r2['herramientas_usadas']); print('Veredicto:', r2['veredicto_juez']); print('Respuesta:', r2['respuesta']); print('\n--- Caso 3: Mixta (stock + garantía) ---'); r3 = ejecutar_turno(app, '¿Tienen esmeril en stock, a qué precio y qué garantía tiene?', usuario_id='pedro', thread_id='t15_rag_v2_3'); print('Ruta elegida:', r3['ruta_elegida']); print('Saltos:', r3['saltos']); print('Herramientas:', r3['herramientas_usadas']); print('Veredicto:', r3['veredicto_juez']); print('Respuesta:', r3['respuesta'])"
-C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 23 productos, 2 compras
 Índice Redis: bodega_politicas | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 33 | Embeddings: google:models/gemini-embedding-001

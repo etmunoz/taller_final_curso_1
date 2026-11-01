@@ -64,7 +64,7 @@ docs/salidas_instrucciones/salida_01..08.txt: user's saved on-screen reports; sa
 docs/plan_proyecto.md: original 4.0→7.0 plan, now misaligned with bodega/Ollama.
 Important Context
 Windows/PowerShell 5.1; console codepage ibm850 shows accents as � in captured output — files are valid UTF-8 (BOM required for .ps1).
-python3 does not exist on this machine (Microsoft Store stub); use C:\Users\etmun\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe.
+python3 does not exist on this machine (Microsoft Store stub); use python3.12.
 No python3/pip on PATH by default: use .\.venv\Scripts\python.exe.
 Ollama 0.40.13 running with models: qwen3:8b, llama3.2:3b, qwen2.5-coder:7b, mistral, phi3.5, gpt-oss:20b, bge-m3, nomic-embed-text.
 openai/gpt-6-luna (model for both subagents) exists and is active.

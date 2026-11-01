@@ -3,7 +3,7 @@
 # Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 06.
 # Creado: 20261101_1238 (America/Santiago)
 # Actualizado: 20261101_1304 (America/Santiago)
-.\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\verificar_entorno.py" 2>&1
+.\.venv\Scripts\python.exe "%TEMP%/opencode\verificar_entorno.py" 2>&1
 
 GOOGLE_API_KEY: falta
 MODELO en entorno: (no definido; se usa gemini-3.5-flash-lite)

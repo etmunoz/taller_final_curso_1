@@ -1,5 +1,5 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
-> **Archivo:** `docs/instrucciones/instrucción_14.md`
+> **Archivo:** `docs/instrucciones/instruccion_14.md`
 > **Objetivo:** Instrucción 14: implementación completa de la Etapa 3 (t10, t11, t12) y verificación del punto de control de seguridad.
 > **Creado:** 20261101_1920 (America/Santiago)
 > **Actualizado:** 20261101_1920 (America/Santiago)

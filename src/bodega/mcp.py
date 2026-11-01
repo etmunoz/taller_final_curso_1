@@ -27,7 +27,7 @@ from .entorno import DIR_COMPROBANTES, RAIZ, RUTA_BD
 
 # Redirigimos el errlog del subproceso stdio de MCP a os.devnull para:
 # 1) Evitar el fallo de fileno() en ipykernel / jupyter nbconvert sobre Windows, y
-# 2) Evitar que el servidor MCP imprima en stderr rutas absolutas con el usuario del sistema (C:\Users\...).
+# 2) Evitar que el servidor MCP imprima en stderr rutas absolutas con el usuario del sistema (<ruta_usuario_windows>...).
 def _asegurar_stderr_para_mcp() -> None:
     errlog_seguro = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
 

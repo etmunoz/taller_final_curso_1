@@ -34,16 +34,16 @@ Archivos `.md` alineados y rotulados:
 
 Generación y ejecución completa del notebook (`notebooks/agente_bodega.ipynb`, 31 celdas incluyendo Sección 14 del Tutorial):
 PS> .\.venv\Scripts\python.exe notebooks/generar_notebook.py
-Notebook generado exitosamente en: C:\Users\etmun\proyecto\taller_final_curso_1\notebooks\agente_bodega.ipynb (31 celdas)
+Notebook generado exitosamente en: notebooks\agente_bodega.ipynb (31 celdas)
 
 PS> .\.venv\Scripts\jupyter.exe nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb
 [NbConvertApp] Converting notebook notebooks/agente_bodega.ipynb to notebook
 Secure MCP Filesystem Server running on stdio
-Client does not support MCP Roots, using allowed directories set from server args: [ 'C:\\Users\\etmun\\proyecto\\taller_final_curso_1\\comprobantes' ]
+Client does not support MCP Roots, using allowed directories set from server args: [ 'comprobantes' ]
 Secure MCP Filesystem Server running on stdio
-Client does not support MCP Roots, using allowed directories set from server args: [ 'C:\\Users\\etmun\\proyecto\\taller_final_curso_1\\comprobantes' ]
+Client does not support MCP Roots, using allowed directories set from server args: [ 'comprobantes' ]
 Secure MCP Filesystem Server running on stdio
-Client does not support MCP Roots, using allowed directories set from server args: [ 'C:\\Users\\etmun\\proyecto\\taller_final_curso_1\\comprobantes' ]
+Client does not support MCP Roots, using allowed directories set from server args: [ 'comprobantes' ]
 [NbConvertApp] Writing 133375 bytes to notebooks\agente_bodega.ipynb
 
 Volcado de la Sección 0 (con endpoint Redis en el esquema) y de la nueva Sección 14 (Tutorial Autocontenido ejecutado en el Notebook):
@@ -63,7 +63,7 @@ Volcado de la Sección 0 (con endpoint Redis en el esquema) y de la nueva Secci�
 --- Resumen de Configuración ---
 Esquema RAG: Índice Redis: bodega_politicas | Endpoint: redis://localhost:6379 | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 34 | Embeddings: google:models/gemini-embedding-001
 MCP descubiertas: ['read_file', 'read_text_file', 'read_media_file', 'read_multiple_files', 'write_file', 'edit_file', 'create_directory', 'list_directory', 'list_directory_with_sizes', 'directory_tree', 'move_file', 'search_files', 'get_file_info', 'list_allowed_directories']
-MCP config: {'filesystem': {'transport': 'stdio', 'command': 'C:\\Program Files\\nodejs\\npx.cmd', 'args': ['-y', '@modelcontextprotocol/server-filesystem', 'C:\\Users\\etmun\\proyecto\\taller_final_curso_1\\comprobantes']}}
+MCP config: {'filesystem': {'transport': 'stdio', 'command': 'C:\\Program Files\\nodejs\\npx.cmd', 'args': ['-y', '@modelcontextprotocol/server-filesystem', 'comprobantes']}}
 Muestra RAG 1: [politica_devoluciones.md | Plazo y Requisitos para Devolución | score=0.1360]
 Muestra RAG 2: [garantias.md | Procedimiento y Plazo del Servicio Técnico | score=0.1527]
 COMPROBACIÓN: Setup e inicialización integral: OK
