@@ -1,60 +1,55 @@
 """Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 Archivo: src/bodega/mcp.py
-Objetivo: Cliente MCP para el servidor oficial @modelcontextprotocol/server-filesystem sobre comprobantes/, con event loop en hilo de fondo y herramientas síncronas (write_file, read_file, list_directory).
-Creado: 20261101_2015 (America/Santiago)
-Actualizado: 20261101_2015 (America/Santiago)
+Objetivo: Cliente MCP para el servidor oficial @modelcontextprotocol/server-filesystem@2.1.0 sobre comprobantes/, con event loop en hilo de fondo, herramientas síncronas (write_file, read_file) y control de propiedad de comprobante_<id>.txt por usuario_id de sesión.
+Creado: 20261101_1650 (America/Santiago)
+Actualizado: 20261101_1854 (America/Santiago)
 """
 
 from __future__ import annotations
 
 import asyncio
 import io
+import os
+import re
 import shutil
+import sqlite3
 import subprocess
 import sys
 import threading
 from pathlib import Path
 from typing import Any
 
+from langchain_core.runnables.config import ensure_config
 from langchain_core.tools import StructuredTool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
-from .entorno import DIR_COMPROBANTES
+from .entorno import DIR_COMPROBANTES, RAIZ, RUTA_BD
 
-# En Jupyter / nbconvert sobre Windows, ipykernel reemplaza sys.stderr por OutStream sin fileno() real,
-# lo que hace fallar a subprocess.Popen dentro de mcp.client.stdio. Si sys.stderr no tiene fileno() válido,
-# aseguramos un descriptor válido en sys.__stderr__ o un archivo de respaldo para stdio_client.
+# Redirigimos el errlog del subproceso stdio de MCP a os.devnull para:
+# 1) Evitar el fallo de fileno() en ipykernel / jupyter nbconvert sobre Windows, y
+# 2) Evitar que el servidor MCP imprima en stderr rutas absolutas con el usuario del sistema (C:\Users\...).
 def _asegurar_stderr_para_mcp() -> None:
-    try:
-        sys.stderr.fileno()
-    except (AttributeError, io.UnsupportedOperation):
-        try:
-            if sys.__stderr__ is not None:
-                sys.__stderr__.fileno()
-                errlog_seguro = sys.__stderr__
-            else:
-                raise io.UnsupportedOperation("sin __stderr__")
-        except Exception:
-            import os
+    errlog_seguro = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
 
-            errlog_seguro = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
+    import langchain_mcp_adapters.sessions as _lmcp_sessions
+    import mcp.client.stdio as _mcp_stdio
 
-        import langchain_mcp_adapters.sessions as _lmcp_sessions
-        import mcp.client.stdio as _mcp_stdio
+    _orig_stdio = _mcp_stdio.stdio_client
 
-        _orig_stdio = _mcp_stdio.stdio_client
+    def _stdio_client_seguro(server: Any, errlog: Any = None):
+        return _orig_stdio(server, errlog=errlog_seguro)
 
-        def _stdio_client_seguro(server: Any, errlog: Any = None):
-            return _orig_stdio(server, errlog=errlog or errlog_seguro)
-
-        _mcp_stdio.stdio_client = _stdio_client_seguro
-        _lmcp_sessions.stdio_client = _stdio_client_seguro
+    _mcp_stdio.stdio_client = _stdio_client_seguro
+    _lmcp_sessions.stdio_client = _stdio_client_seguro
 
 
 _asegurar_stderr_para_mcp()
 
 URL_NODEJS = "https://nodejs.org/"
-NOMBRES_EXPUESTOS = ("write_file", "read_file", "list_directory")
+VERSION_MCP_FILESYSTEM = "2.1.0"
+PAQUETE_MCP_FILESYSTEM = f"@modelcontextprotocol/server-filesystem@{VERSION_MCP_FILESYSTEM}"
+NOMBRES_EXPUESTOS = ("write_file", "read_file")
+_PATRON_COMPROBANTE = re.compile(r"^comprobante_(\d+)\.txt$", re.IGNORECASE)
 
 _LOOP: asyncio.AbstractEventLoop | None = None
 _THREAD: threading.Thread | None = None
@@ -112,13 +107,12 @@ def _normalizar_ruta_comprobante(valor_path: Any, carpeta_abs: Path) -> str:
     """Resuelve una ruta destinada a comprobantes/ dentro de carpeta_abs sin duplicar el prefijo 'comprobantes/'.
 
     Si el usuario o el modelo intenta salir de carpeta_abs (por ejemplo '../.env' o '.env'),
-    conserva la ruta tal cual para que el propio servidor MCP la rechace por estar fuera del directorio permitido.
+    conserva la ruta fuera de carpeta_abs para que tanto la validación como el servidor MCP la rechacen.
     """
     texto = str(valor_path or "").strip()
     if not texto:
         return str(carpeta_abs)
 
-    # Si contiene intento de traversal o apunta a archivo oculto fuera de comprobantes, no reescribir a carpeta_abs
     norm_slashes = texto.replace("\\", "/")
     if ".." in norm_slashes.split("/") or norm_slashes.startswith(".env") or norm_slashes.endswith("/.env"):
         return str((carpeta_abs.parent / texto).resolve())
@@ -135,8 +129,63 @@ def _normalizar_ruta_comprobante(valor_path: Any, carpeta_abs: Path) -> str:
     return str((carpeta_abs / p).resolve())
 
 
+def _validar_propiedad_comprobante(ruta_resuelta: str, carpeta_abs: Path, usuario_id: str | None) -> str | None:
+    """Verifica que ruta_resuelta sea comprobantes/comprobante_<id>.txt y que la compra <id> pertenezca a usuario_id.
+
+    Devuelve None si es válido o un mensaje de error en texto si debe bloquearse.
+    """
+    p_res = Path(ruta_resuelta).resolve()
+    try:
+        rel = p_res.relative_to(carpeta_abs.resolve())
+    except ValueError:
+        return "Error: acceso denegado fuera de la carpeta comprobantes/."
+
+    if not usuario_id:
+        return None
+
+    if len(rel.parts) != 1:
+        return "Error: solo se permiten archivos directamente en comprobantes/comprobante_<id>.txt."
+
+    m = _PATRON_COMPROBANTE.match(rel.name)
+    if not m:
+        return (
+            f"Error: nombre de archivo '{rel.name}' no permitido. "
+            "Solo se permite leer o escribir 'comprobante_<id>.txt' de compras propias."
+        )
+
+    compra_id = int(m.group(1))
+    if not RUTA_BD.exists():
+        return None
+
+    con = sqlite3.connect(RUTA_BD)
+    try:
+        fila = con.execute("SELECT usuario_id FROM compras WHERE id = ?", (compra_id,)).fetchone()
+    finally:
+        con.close()
+
+    if not fila:
+        return f"Error: no existe ninguna compra registrada con ID {compra_id}."
+
+    dueno = str(fila[0])
+    if dueno != str(usuario_id):
+        return (
+            f"Error: acceso denegado. El archivo 'comprobante_{compra_id}.txt' pertenece a otro usuario "
+            f"y no puede ser leído ni modificado desde la sesión de '{usuario_id}'."
+        )
+    return None
+
+
+def _limpiar_rutas_personales(texto: str) -> str:
+    """Reemplaza rutas absolutas de la raíz del proyecto por rutas relativas para no exponer usuarios del sistema."""
+    salida = str(texto or "")
+    for variante in (str(RAIZ), str(RAIZ).replace("\\", "/"), str(RAIZ).replace("\\", "\\\\")):
+        if variante:
+            salida = salida.replace(variante, ".")
+    return salida
+
+
 def _envolver_herramienta_mcp(tool_remota: Any, carpeta_abs: Path) -> StructuredTool:
-    """Envuelve una herramienta asíncrona de MCP en un StructuredTool síncrono con errores devueltos como texto."""
+    """Envuelve una herramienta asíncrona de MCP en un StructuredTool síncrono con validación de sesión y errores como texto."""
     nombre = tool_remota.name
     descripcion = tool_remota.description or f"Herramienta MCP {nombre}"
     esquema_bruto = getattr(tool_remota, "args_schema", None)
@@ -147,17 +196,29 @@ def _envolver_herramienta_mcp(tool_remota: Any, carpeta_abs: Path) -> Structured
 
     def _ejecutar(**kwargs: Any) -> str:
         argumentos = dict(kwargs)
+        usuario_id: str | None = None
+        try:
+            cfg = ensure_config()
+            usuario_id = (cfg or {}).get("configurable", {}).get("usuario_id")
+        except Exception:
+            usuario_id = None
+
         if "path" in argumentos and argumentos["path"] is not None:
-            argumentos["path"] = _normalizar_ruta_comprobante(argumentos["path"], carpeta_abs)
+            ruta_norm = _normalizar_ruta_comprobante(argumentos["path"], carpeta_abs)
+            err_prop = _validar_propiedad_comprobante(ruta_norm, carpeta_abs, usuario_id)
+            if err_prop:
+                return err_prop
+            argumentos["path"] = ruta_norm
+
         try:
             resultado = run_async(tool_remota.ainvoke(argumentos))
             if isinstance(resultado, (list, dict)):
                 import json
 
-                return json.dumps(resultado, ensure_ascii=False)
-            return str(resultado)
+                return _limpiar_rutas_personales(json.dumps(resultado, ensure_ascii=False))
+            return _limpiar_rutas_personales(str(resultado))
         except Exception as exc:
-            return f"Error en herramienta MCP '{nombre}': {exc}"
+            return _limpiar_rutas_personales(f"Error en herramienta MCP '{nombre}': {exc}")
 
     return StructuredTool.from_function(
         func=_ejecutar,
@@ -170,7 +231,7 @@ def _envolver_herramienta_mcp(tool_remota: Any, carpeta_abs: Path) -> Structured
 def conectar_mcp(
     dir_comprobantes: Path | str | None = None,
 ) -> tuple[list[StructuredTool], list[str], dict[str, Any]]:
-    """Conecta con @modelcontextprotocol/server-filesystem, descubre herramientas y envuelve write_file, read_file y list_directory."""
+    """Conecta con @modelcontextprotocol/server-filesystem@2.1.0, descubre herramientas y envuelve write_file y read_file."""
     version_node = verificar_node()
     npx_cmd = shutil.which("npx.cmd") or shutil.which("npx") or "npx"
 
@@ -178,19 +239,36 @@ def conectar_mcp(
     carpeta_abs = carpeta.expanduser().resolve()
     carpeta_abs.mkdir(parents=True, exist_ok=True)
 
-    config_mcp: dict[str, Any] = {
+    config_interna: dict[str, Any] = {
         "filesystem": {
             "transport": "stdio",
             "command": npx_cmd,
             "args": [
                 "-y",
-                "@modelcontextprotocol/server-filesystem",
+                PAQUETE_MCP_FILESYSTEM,
                 str(carpeta_abs),
             ],
         }
     }
 
-    cliente = MultiServerMCPClient(config_mcp)
+    try:
+        ruta_rel = str(carpeta_abs.relative_to(RAIZ)).replace("\\", "/")
+    except ValueError:
+        ruta_rel = carpeta_abs.name
+
+    config_mcp_publica: dict[str, Any] = {
+        "filesystem": {
+            "transport": "stdio",
+            "command": "npx",
+            "args": [
+                "-y",
+                PAQUETE_MCP_FILESYSTEM,
+                ruta_rel,
+            ],
+        }
+    }
+
+    cliente = MultiServerMCPClient(config_interna)
     herramientas_remotas = run_async(cliente.get_tools())
     nombres_descubiertos = [t.name for t in herramientas_remotas]
 
@@ -200,5 +278,10 @@ def conectar_mcp(
         if nombre in mapa_remotas:
             expuestas.append(_envolver_herramienta_mcp(mapa_remotas[nombre], carpeta_abs))
 
-    print(f"[mcp] Node {version_node} | herramientas descubiertas ({len(nombres_descubiertos)}): {nombres_descubiertos}")
-    return expuestas, nombres_descubiertos, config_mcp
+    print(f"Secure MCP Filesystem Server running on stdio (allowed directory: {ruta_rel})")
+    print(
+        f"[mcp] Node {version_node} | paquete={PAQUETE_MCP_FILESYSTEM} | "
+        f"herramientas descubiertas ({len(nombres_descubiertos)}): {nombres_descubiertos} | "
+        f"expuestas: {[t.name for t in expuestas]}"
+    )
+    return expuestas, nombres_descubiertos, config_mcp_publica
