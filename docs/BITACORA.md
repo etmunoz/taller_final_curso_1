@@ -152,10 +152,12 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** `plan.json` parsea (4 tareas; t02→t01, t03→t02, t04→t02); el escaneo previo al commit no encontró patrones de claves en 36 archivos; push confirmado (`main...origin/main` sin desfase); los dos archivos nuevos quedaron con un único rótulo.
 
+**Decisión posterior (20261101_1342):** a pedido del usuario, `@spec` e `@implementador` pasan de `openai/gpt-6-luna` a `opencode/deepseek-v4.1-flash-free` para que la etapa 1 pueda ejecutarse sin saldo de OpenAI.
+
 ## Pendientes
 
 - [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [ ] Habilitar los subagentes: `openai/gpt-6-luna` no tiene créditos; decidir entre agregar créditos o cambiar el modelo de `@spec` y `@implementador`.
+- [x] Cambiar `@spec` y `@implementador` al modelo gratuito `opencode/deepseek-v4.1-flash-free`, porque `openai/gpt-6-luna` se quedó sin créditos.
 - [ ] Revisar y aprobar `plan.json` y ejecutar t01–t04 con `@implementador`, una tarea por vez.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).

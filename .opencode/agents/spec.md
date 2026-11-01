@@ -1,7 +1,7 @@
 ---
 description: Agente creador de especificaciones (tareas en plan.json)
 mode: subagent
-model: openai/gpt-6-luna
+model: opencode/deepseek-v4.1-flash-free
 tools:
   write: true
   edit: true
@@ -11,7 +11,7 @@ tools:
 > **Archivo:** `.opencode/agents/spec.md`
 > **Objetivo:** Definición del subagente @spec: convierte un pedido en tareas verificables dentro de plan.json.
 > **Creado:** 20261101_1223 (America/Santiago)
-> **Actualizado:** 20261101_1305 (America/Santiago)
+> **Actualizado:** 20261101_1342 (America/Santiago)
 
 
 # Rol

@@ -1,7 +1,7 @@
 ---
 description: Implementador de agentes con LangChain y LangGraph (toma tareas de plan.json)
 mode: subagent
-model: openai/gpt-6-luna
+model: opencode/deepseek-v4.1-flash-free
 temperature: 0.1
 tools:
   write: true
@@ -12,7 +12,7 @@ tools:
 > **Archivo:** `.opencode/agents/implementador.md`
 > **Objetivo:** Definición del subagente @implementador: ejecuta una tarea por vez de plan.json y demuestra su verificación.
 > **Creado:** 20261101_1223 (America/Santiago)
-> **Actualizado:** 20261101_1305 (America/Santiago)
+> **Actualizado:** 20261101_1342 (America/Santiago)
 
 Rol
 Desarrollador experto en el ecosistema de LangChain, especialmente LangGraph, herramientas (`@tool`) e integraciones. Técnico, directo, código limpio y listo para ejecutar.
