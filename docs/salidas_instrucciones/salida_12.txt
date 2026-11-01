@@ -1,10 +1,10 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_12.txt
-# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 12 separada por tarea (t05 a t09).
+# Objetivo: Volcado crudo e íntegro de todas las ejecuciones de consola y trazas de la Instrucción 12 (Etapa 2, tareas t05 a t09).
 # Creado: 20261101_1430 (America/Santiago)
-# Actualizado: 20261101_1715 (America/Santiago)
+# Actualizado: 20261101_1730 (America/Santiago)
 
-Ejecuto la instrucción 12. Implementación tarea por tarea de la Etapa 2 (`t05` a `t09`) con `@implementador`:
+Ejecuto la instrucción 12. Volcado completo de ejecuciones de consola y trazas:
 
 ======================= t05
 
@@ -61,8 +61,53 @@ Requisitos:
 - `ejecutar_turno(app, texto, usuario_id, thread_id, verboso)`.
 
 Salida de la verificación t07:
-PS> .\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo; app = construir_grafo(llm=None); print(app.get_graph().draw_mermaid())"
-(Imprime con éxito el diagrama Mermaid con los 11 nodos y aristas condicionales).
+PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo; app = construir_grafo(llm=None); print(app.get_graph().draw_mermaid())"
+C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	cargar_memoria(cargar_memoria)
+	router(router)
+	agente_consulta(agente_consulta)
+	agente_compra(agente_compra)
+	agente_politicas(agente_politicas)
+	agente_comprobante(agente_comprobante)
+	agente_conversacion(agente_conversacion)
+	herramientas(herramientas)
+	juez(juez)
+	actualizar_memoria(actualizar_memoria)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> cargar_memoria;
+	agente_compra -.-> herramientas;
+	agente_compra -.-> juez;
+	agente_comprobante -.-> herramientas;
+	agente_comprobante -.-> juez;
+	agente_consulta -.-> herramientas;
+	agente_consulta -.-> juez;
+	agente_conversacion --> juez;
+	agente_politicas -.-> herramientas;
+	agente_politicas -.-> juez;
+	cargar_memoria --> router;
+	herramientas -.-> agente_compra;
+	herramientas -.-> agente_comprobante;
+	herramientas -.-> agente_consulta;
+	herramientas -.-> agente_conversacion;
+	herramientas -.-> agente_politicas;
+	juez --> actualizar_memoria;
+	router -.-> agente_compra;
+	router -.-> agente_comprobante;
+	router -.-> agente_consulta;
+	router -.-> agente_conversacion;
+	router -.-> agente_politicas;
+	actualizar_memoria --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
 
 PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); res = ejecutar_turno(app, '¿Cuántos cascos hay?', usuario_id='pedro', thread_id='t_gemini'); print('Respuesta:', res['respuesta']); print('Saltos:', res['saltos'])"
 [traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 647 tok · tool_calls=1 · respuesta=
