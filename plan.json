@@ -604,7 +604,7 @@
     {
       "id": "t31",
       "nombre": "Verificación final integral multi-proveedor, notebook 3x Gemini + Anthropic + OpenAI + sin Redis y volcado en salida_22.txt",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t22",
         "t23",
@@ -624,7 +624,8 @@
       ],
       "verificacion": [
         "todas las pruebas pasan al 100 % y salida_22.txt contiene el volcado íntegro sin secretos ni rutas personales"
-      ]
+      ],
+      "evidencia": "20261101_2029: Verificacion integral completada y volcada integramente en docs/salidas_instrucciones/salida_22.txt (74.306 caracteres): (1) scripts/prueba_react.py OK; (2) scripts/prueba_proveedores.py OK en las 4 columnas para google, openai y anthropic; (3) notebook ejecutado desde cero 1x con anthropic:claude-sonnet-4-6 (23/23 GS), 1x con openai:gpt-4o-mini (23/23 GS), 1x sin Redis (22/22 GS + 1 omitido) y 3x consecutivas con google_genai:gemini-3.5-flash-lite (23/23 GS, 3a corrida guardada en notebooks/agente_bodega.ipynb); (4) scripts/prueba_seguridad.py 5/5 OK; (5) python main.py bodega --diagrama (12 nodos) OK; (6) RAG en REDIS_URL_ALUMNO OK y limpieza con FT.DROPINDEX tfc1_duran_reyes_munoz_bodega_politicas DD verificada con FT._LIST (False, 102 indices ajenos intactos) en REDIS_URL_PROFESOR; (7) grep de secretos y rutas personales = 0 coincidencias."
     }
   ]
 }

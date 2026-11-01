@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_2122 (America/Santiago)
+> **Actualizado:** 20261101_2029 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -338,8 +338,24 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 - `jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb` finalizó con código 0 y las 14 comprobaciones (`COMPROBACIÓN: ...: OK`) aprobadas.
 - `enmascarar_redis_url("redis://profesor:clave_secreta_curso@redis-curso.universidad.cl:6379/0")` imprime `redis://profesor:***@redis-curso.universidad.cl:6379/0` sin exponer secretos.
 
+## 20261101_2029 — Instrucción 22: cierre integral (`t22`–`t32`), compatibilidad multi-proveedor real, Redis seguro, notebook determinista e higiene de entrega
+
+**Pedido:** ejecutar la Instrucción 22 (`docs/instrucciones/instruccion_22.md`) surgida a partir de la pauta oficial y de las tres revisiones independientes externas archivadas en `docs/revisiones/` (`code_review_claude_20261101_1639.md`, `code_review_claude_20261101_1726.md` y `code_review_claude_20261101_1742.md`), especificando y completando las tareas `t22` a `t32` en `plan.json` y registrando el volcado completo en `docs/salidas_instrucciones/salida_22.txt`.
+
+**Realizado:**
+- **`t22` (`src/bodega/graph.py`, `src/bodega/traza.py`, `scripts/prueba_react.py`):** en `_crear_nodo_agente` se reemplazó únicamente el último `HumanMessage` (`_envolver_ultimo_human_message`), preservando intactos y en orden los `AIMessage(tool_calls)` y `ToolMessage` posteriores. Se añadió `texto_de()` para normalizar salidas en bloques (`thinking`/`text`) y `_asegurar_thought_signature_gemini()` en `src/bodega/entorno.py` para conservar `thought_signature` en `langchain-google-genai`.
+- **`t23` (`src/bodega/entorno.py`, `scripts/prueba_proveedores.py`):** actualizado `CATALOGO` de Anthropic a `claude-sonnet-4-6`, creado el helper `estructurada(llm, Modelo)` con reintento y soporte sin `tool_choice` forzado, fijados `timeout=60` y `max_retries=2` en `crear_llm()` exponiendo `_config_efectiva`, y verificados Google (`gemini-3.5-flash-lite`), OpenAI (`gpt-4o-mini`) y Anthropic (`claude-sonnet-4-6`) en `scripts/prueba_proveedores.py` (todos en `OK`).
+- **`t24` (`src/bodega/setup.py`, `src/bodega/evaluacion.py`, `notebooks/generar_notebook.py`):** `setup.preparar()` envuelve RAG y MCP en bloques `try/except` que emiten `[aviso] RAG omitido: ...` o `[aviso] MCP omitido: ...` y permiten que toda la base obligatoria del notebook y del Golden Set corra sin interrumpirse cuando Redis o Node no están disponibles.
+- **`t25` (`src/bodega/rag.py`, `src/bodega/entorno.py`, `src/bodega/tools.py`, `.env.example`):** configurado el índice y `key_prefix` único del grupo `RAG_INDEX=tfc1_duran_reyes_munoz_bodega_politicas`, reducida la dimensión de embeddings a `768` (`~116.1 KB`), lectura real de atributos y memoria desde `FT.INFO`, codificación de credenciales con `urllib.parse.quote` y máscara con `urllib.parse.urlsplit`, y limpieza garantizada con `FT.DROPINDEX <RAG_INDEX> DD` verificada en `FT._LIST` sobre el Redis del profesor (`En FT._LIST: False`, 102 índices de otros grupos intactos).
+- **`t26` (`notebooks/generar_notebook.py`, `notebooks/agente_bodega.ipynb`):** cada sección crea sus propias precondiciones deterministas; la sección 2 imprime los **7 prompts completos** con rol/modelo/temperatura/esquema; la sección 5 muestra la secuencia `AIMessage.tool_calls -> ToolMessage -> AIMessage`, 2 registros `.jsonl` completos, la parada por `MAX_RONDAS=5` con `LLMFalsoReAct` y el historial con `usar_memoria=False` (perfil vacío); la sección 7 verifica `comprar` y `SELECT` en `compras`; la sección 10 evalúa 7 casos (incluido `"¿Cuál es la capital de Francia?"`) con `✔`/`✘` real.
+- **`t27` (`src/bodega/graph.py`, `src/bodega/mcp.py`, `src/bodega/prompts.py`, `scripts/prueba_seguridad.py`):** nodo determinista `fuera_de_alcance` que devuelve `RESPUESTA_SEGURA` sin llamar al LLM, fallos cerrados en router (`conversacion`) y juez (`BLOQUEADO`), filtro de `tool_calls` por `ruta_elegida` en `nodo_herramientas`, guarda en `actualizar_memoria`, versión fija `@modelcontextprotocol/server-filesystem@2.1.0`, exclusión de `list_directory` y validación en SQLite de propiedad de `comprobante_<id>.txt` por `usuario_id`.
+- **`t28` (`golden_set.json`, `src/bodega/evaluacion.py`, `docs/evidencias/`):** Golden Set actualizado a v1.1 (23 casos, criterios endurecidos y casos nuevos `G21`, `G22`, `G23`), calibración de `SYSTEM_JUEZ` con `<contexto_sesion>`, y evidencias versionadas en `docs/evidencias/resultado_golden_set.json` junto con 4 trazas `.jsonl` curadas.
+- **`t29`, `t30` y `t32` (`README.md`, `docs/tutorial_pruebas.md`, `AGENTS.md`, `requirements-lock.txt`, `docs/revisiones/`, `docs/instrucciones/instruccion_14.md`):** unificada la tabla de bonos en los tres documentos, documentadas las versiones exactas y la sección de problemas conocidos, sincronizadas las marcas horarias con `git log` (`America/Santiago`), movidas las revisiones externas de Claude a `docs/revisiones/`, renombrado `instruccion_14.md` sin tilde y eliminada toda ruta `<ruta_usuario_windows>` de las salidas.
+- **`t31` (`docs/salidas_instrucciones/salida_22.txt`):** ejecutada la verificación final integral (6 corridas completas del notebook: 3× Google, 1× Anthropic, 1× OpenAI y 1× sin Redis; `prueba_react.py`; `prueba_proveedores.py`; `prueba_seguridad.py`; Golden Set 23/23; `--diagrama`; RAG en Redis del alumno y limpieza verificada en Redis del profesor; y auditoría `grep` con 0 secretos y 0 rutas personales).
+
 ## Pendientes
 
+- [x] Ejecutar la Instrucción 22 completa (`t22`–`t32`) y generar `docs/salidas_instrucciones/salida_22.txt`.
 - [x] Ajustar configuración multi-proveedor y Redis remoto, alinear `.md` y crear `docs/tutorial_pruebas.md` ejemplificado en el notebook (Instrucción 21).
 - [x] Ejecutar `t18`–`t21` (Etapa 6: `setup.py`, `golden_set.json`, `notebooks/agente_bodega.ipynb` ejecutado y `README.md` final).
 - [x] Ejecutar `t16`–`t17` (Etapa 5: servidor MCP filesystem y emisión de comprobantes).
