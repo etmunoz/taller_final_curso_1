@@ -2,7 +2,7 @@
 Archivo: src/bodega/rag.py
 Objetivo: Indexación y recuperación semántica (RAG) de las políticas de Bodega Norte sobre Redis Stack (RediSearch COSINE/HNSW), con embeddings multi-proveedor y particionado jerárquico Markdown.
 Creado: 20261101_1955 (America/Santiago)
-Actualizado: 20261101_1955 (America/Santiago)
+Actualizado: 20261101_2105 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from langchain_core.embeddings import Embeddings
 from langchain_redis import RedisConfig, RedisVectorStore
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
-from .entorno import DIR_DOCS, RAIZ, resolver_config
+from .entorno import DIR_DOCS, RAIZ, enmascarar_redis_url, resolver_config, resolver_redis_url
 
 INDICE_RAG = "bodega_politicas"
 MODELO_FASTEMBED = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
@@ -108,15 +108,16 @@ def crear_embeddings(proveedor: str | None = None) -> tuple[Embeddings, str]:
 
 
 def conectar_redis(url: str | None = None) -> redis.Redis:
-    """Conecta a Redis, hace ping y exige que el módulo RediSearch ('search') esté cargado."""
-    redis_url = (url or os.getenv("REDIS_URL") or "redis://localhost:6379").strip()
+    """Conecta a Redis (local o remoto del curso), hace ping y exige que el módulo RediSearch ('search') esté cargado."""
+    redis_url = resolver_redis_url(url)
+    url_segura = enmascarar_redis_url(redis_url)
     try:
         cliente = redis.from_url(redis_url, decode_responses=False)
         cliente.ping()
     except Exception as exc:
         raise RuntimeError(
-            f"No se pudo conectar a Redis en {redis_url}. "
-            f"Levanta Redis Stack con:\n  {COMANDO_DOCKER_REDIS}"
+            f"No se pudo conectar a Redis en {url_segura}. "
+            f"Verifica REDIS_URL (si es remoto) o levanta Redis Stack local con:\n  {COMANDO_DOCKER_REDIS}"
         ) from exc
 
     try:
@@ -129,13 +130,13 @@ def conectar_redis(url: str | None = None) -> redis.Redis:
         }
     except Exception as exc:
         raise RuntimeError(
-            f"Error al consultar módulos de Redis en {redis_url}. "
-            f"Levanta Redis Stack con:\n  {COMANDO_DOCKER_REDIS}"
+            f"Error al consultar módulos de Redis en {url_segura}. "
+            f"Verifica permisos o levanta Redis Stack con:\n  {COMANDO_DOCKER_REDIS}"
         ) from exc
 
     if "search" not in nombres and "ft" not in nombres:
         raise RuntimeError(
-            f"El servidor Redis en {redis_url} no tiene el módulo RediSearch ('search'). "
+            f"El servidor Redis en {url_segura} no tiene el módulo RediSearch ('search'). "
             f"No se admite un índice local alternativo. Levanta Redis Stack con:\n  {COMANDO_DOCKER_REDIS}"
         )
 
@@ -213,6 +214,7 @@ class InfoRAG:
         campos_txt = ", ".join(self.campos) if self.campos else "fuente (TAG), seccion (TEXT), content (TEXT), embedding (VECTOR)"
         return (
             f"Índice Redis: {self.index_name} | "
+            f"Endpoint: {enmascarar_redis_url(self.redis_url)} | "
             f"Algoritmo: {self.indexing_algorithm} | "
             f"Métrica: {self.distance_metric} | "
             f"Dimensiones: {self.dimensiones} | "
@@ -229,11 +231,11 @@ def preparar_rag(
     embeddings_id: str = "",
     recargar: bool = True,
 ) -> tuple[RedisVectorStore, InfoRAG]:
-    """Prepara y carga el índice vectorial en Redis Stack (HNSW + COSINE).
+    """Prepara y carga el índice vectorial en Redis Stack (HNSW + COSINE), local o remoto.
 
     Si recargar=True y FT._LIST muestra el índice, lo elimina con FT.DROPINDEX <index> DD antes de indexar.
     """
-    url_final = (redis_url or os.getenv("REDIS_URL") or "redis://localhost:6379").strip()
+    url_final = resolver_redis_url(redis_url)
     cliente = conectar_redis(url_final)
 
     if embeddings is None:

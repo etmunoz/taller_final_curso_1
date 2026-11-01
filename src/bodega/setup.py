@@ -2,7 +2,7 @@
 Archivo: src/bodega/setup.py
 Objetivo: Orquestar e inicializar de forma reproducible todo el entorno del agente Bodega Norte (dependencias, LLM, limpieza, SQLite, trazas, Redis RAG, Node MCP, SqliteSaver y grafo compilado).
 Creado: 20261101_2035 (America/Santiago)
-Actualizado: 20261101_2035 (America/Santiago)
+Actualizado: 20261101_2105 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -26,6 +26,7 @@ from .entorno import (
     TEMPERATURA,
     Config,
     crear_llm,
+    enmascarar_redis_url,
     resolver_config,
 )
 from .graph import construir_grafo
@@ -64,6 +65,7 @@ def preparar(
     recargar_rag: bool = True,
     proveedor: str | None = None,
     modelo: str | None = None,
+    redis_url: str | None = None,
     verboso: bool = True,
     con_rag: bool = True,
     con_mcp: bool = True,
@@ -149,10 +151,11 @@ def preparar(
     if con_rag:
         from .rag import preparar_rag
 
-        vector_store, info_rag = preparar_rag(dir_docs=DIR_DOCS, recargar=recargar_rag)
+        vector_store, info_rag = preparar_rag(redis_url=redis_url, dir_docs=DIR_DOCS, recargar=recargar_rag)
         _ok(
             f"RAG en Redis Stack listo: índice='{info_rag.index_name}' "
-            f"({info_rag.indexing_algorithm}/{info_rag.distance_metric}, "
+            f"(endpoint={enmascarar_redis_url(info_rag.redis_url)}, "
+            f"{info_rag.indexing_algorithm}/{info_rag.distance_metric}, "
             f"dim={info_rag.dimensiones}, {info_rag.n_fragmentos} fragmentos, emb={info_rag.embeddings_id})"
         )
     else:

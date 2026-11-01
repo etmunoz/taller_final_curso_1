@@ -2,7 +2,7 @@
 Archivo: main.py
 Objetivo: CLI principal para ejecutar el agente bodega (modo interactivo, turnos únicos, generación de Mermaid sin claves y control de saltos mediante setup.preparar).
 Creado: 20261101_1530 (America/Santiago)
-Actualizado: 20261101_2035 (America/Santiago)
+Actualizado: 20261101_2105 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -26,6 +26,9 @@ def main() -> None:
     parser.add_argument("--diagrama", action="store_true", help="Imprime el diagrama Mermaid del grafo sin requerir claves.")
     parser.add_argument("--usuario", default="pedro", help="ID de usuario para la sesión (por defecto pedro).")
     parser.add_argument("--thread", default="default", help="ID de hilo (thread_id) para el historial persistente.")
+    parser.add_argument("--proveedor", default=None, help="Proveedor de LLM (google, openai, anthropic, ollama); por defecto usa .env.")
+    parser.add_argument("--modelo", default=None, help="Identificador del modelo; por defecto usa .env o el default del proveedor.")
+    parser.add_argument("--redis-url", default=None, help="URL de Redis Stack (local o remoto del curso); por defecto usa REDIS_URL de .env.")
     parser.add_argument("--sin-reiniciar", action="store_true", help="No regenera la base SQLite ni borra artefactos al iniciar.")
 
     args = parser.parse_args()
@@ -46,6 +49,9 @@ def main() -> None:
     entorno = preparar(
         reiniciar_todo=not args.sin_reiniciar,
         recargar_rag=not args.sin_reiniciar,
+        proveedor=args.proveedor,
+        modelo=args.modelo,
+        redis_url=args.redis_url,
         verboso=False,
     )
     app = entorno.app

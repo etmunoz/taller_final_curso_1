@@ -4,7 +4,7 @@
 # Archivo: activate.ps1
 # Objetivo: Desactiva conda y activa el entorno virtual del proyecto en PowerShell; crea .venv si falta y, con -Sync, ejecuta uv sync.
 # Creado: 20261026_2207 (America/Santiago)
-# Actualizado: 20261101_1304 (America/Santiago)
+# Actualizado: 20261101_2105 (America/Santiago)
 # ======================================================================
 
 <#
@@ -245,9 +245,12 @@ if (Test-Path -LiteralPath $dotenv) {
     Get-Content -LiteralPath $dotenv | ForEach-Object {
         if ($_ -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$') { $valores[$matches[1]] = $matches[2].Trim() }
     }
-    $proveedor = if ($valores['LLM_PROVIDER']) { $valores['LLM_PROVIDER'] } else { '(sin definir)' }
-    $modelo    = if ($valores['MODELO']) { $valores['MODELO'] } else { '(sin definir)' }
+    $proveedor = if ($valores['LLM_PROVIDER']) { $valores['LLM_PROVIDER'] } else { 'google (default -> fallback ollama si falta clave)' }
+    $modelo    = if ($valores['MODELO']) { $valores['MODELO'] } else { '(default del proveedor)' }
+    $redisUrl  = if ($valores['REDIS_URL']) { $valores['REDIS_URL'] } elseif ($valores['REDIS_HOST']) { "redis://$($valores['REDIS_HOST']):$($valores['REDIS_PORT'])" } else { 'redis://localhost:6379' }
+    $redisSafe = $redisUrl -replace '(redis(?:s)?://[^:/@\s]*:)([^@\s]+)(@)', '$1***$3'
     Write-Ok "LLM: $proveedor / $modelo"
+    Write-Ok "Redis RAG: $redisSafe"
 }
 else {
     Write-Warn 'No hay .env; copiá .env.example a .env.'
@@ -255,6 +258,7 @@ else {
 
 Write-Host ''
 Write-Host 'Entorno listo. Próximos pasos:' -ForegroundColor Cyan
-Write-Host '  python main.py bodega "<consulta>"   # ejecutar el agente (etapa 1)'
-Write-Host '  uv sync | pip install -r requirements.txt'
-Write-Host '  deactivate                            # salir del entorno virtual'
+Write-Host '  python main.py bodega "¿cuántos cascos hay?" --saltos'
+Write-Host '  python -m src.bodega.evaluacion                        # correr Golden Set (20 casos)'
+Write-Host '  jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb'
+Write-Host '  deactivate                                             # salir del entorno virtual'

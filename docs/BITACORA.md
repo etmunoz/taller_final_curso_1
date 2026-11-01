@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_2058 (America/Santiago)
+> **Actualizado:** 20261101_2118 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -319,8 +319,28 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 - `python main.py bodega --diagrama` imprime el Mermaid de 11 nodos sin requerir claves.
 - `.env` verificado en `.gitignore` y fuera de git.
 
+## 20261101_2118 — Instrucción 21: configuración inicial multi-proveedor y Redis remoto, alineación de `.md` y tutorial autocontenido
+
+**Pedido:** ajustar el proyecto en 4 puntos: (1) ajustar `.env` / `.env.example` para que el profesor pueda ejecutar con su cuenta de Google Gemini, OpenAI, Anthropic u Ollama en la configuración inicial; (2) soportar que el profesor utilice el Redis remoto del curso desde la configuración inicial; (3) alinear todos los documentos `.md`; (4) crear un documento tutorial autocontenido (`docs/tutorial_pruebas.md`) con cómo probar y ejemplos de prueba según `Pauta_tarea_final.pdf`, referenciarlo en `README.md` y ejemplificarlo en `notebooks/agente_bodega.ipynb` para que se vean todas las salidas.
+
+**Realizado:**
+- **Configuración inicial multi-proveedor y Redis remoto (`.env.example`, `src/bodega/entorno.py`, `src/bodega/rag.py`, `src/bodega/setup.py`, `main.py`, `activate.ps1`):**
+  - `.env.example` ampliado y documentado con bloques listos para Google Gemini (`GOOGLE_API_KEY`), OpenAI (`OPENAI_API_KEY`), Anthropic (`ANTHROPIC_API_KEY`), Ollama local y Redis Stack (tanto local `redis://localhost:6379` como remoto del curso `redis://usuario:pass@host:puerto/0`, `rediss://...` o variables `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_DB`, `REDIS_SSL`).
+  - Se agregaron `resolver_redis_url()` y `enmascarar_redis_url()` en `src/bodega/entorno.py`, integrados en `conectar_redis()`, `preparar_rag()`, `InfoRAG.esquema()` y `setup.preparar()` para ocultar siempre las contraseñas en pantalla.
+  - Se añadieron en `main.py` los flags opcionales `--proveedor`, `--modelo` y `--redis-url`.
+- **Alineación de documentos `.md`:** actualizados y alineados `AGENTS.md`, `README.md`, `docs/plan_proyecto.md`, `docs/BITACORA.md` y `docs/instrucciones/instruccion_21.md`.
+- **Tutorial autocontenido y ejemplificación en el notebook (`docs/tutorial_pruebas.md`, `notebooks/generar_notebook.py`, `notebooks/agente_bodega.ipynb`):**
+  - Creado `docs/tutorial_pruebas.md` con la guía paso a paso para el docente según `Pauta_tarea_final.pdf`, referenciado de forma destacada en `README.md`.
+  - Agregada la **Sección 14** en `notebooks/generar_notebook.py` y re-ejecutado `notebooks/agente_bodega.ipynb` (31 celdas) con `jupyter nbconvert --to notebook --execute --inplace`, mostrando las salidas reales de resolución de los 4 proveedores, enmascaramiento de Redis remoto y batería de pruebas de la pauta.
+  - Volcado completo guardado en `docs/salidas_instrucciones/salida_21.txt`.
+
+**Verificación:**
+- `jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb` finalizó con código 0 y las 14 comprobaciones (`COMPROBACIÓN: ...: OK`) aprobadas.
+- `enmascarar_redis_url("redis://profesor:clave_secreta_curso@redis-curso.universidad.cl:6379/0")` imprime `redis://profesor:***@redis-curso.universidad.cl:6379/0` sin exponer secretos.
+
 ## Pendientes
 
+- [x] Ajustar configuración multi-proveedor y Redis remoto, alinear `.md` y crear `docs/tutorial_pruebas.md` ejemplificado en el notebook (Instrucción 21).
 - [x] Ejecutar `t18`–`t21` (Etapa 6: `setup.py`, `golden_set.json`, `notebooks/agente_bodega.ipynb` ejecutado y `README.md` final).
 - [x] Ejecutar `t16`–`t17` (Etapa 5: servidor MCP filesystem y emisión de comprobantes).
 - [x] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.

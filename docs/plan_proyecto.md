@@ -2,15 +2,15 @@
 > **Archivo:** `docs/plan_proyecto.md`
 > **Objetivo:** Plan del caso y de los criterios de la pauta: base obligatoria y ampliaciones de la tarea final.
 > **Creado:** 20261026_2212 (America/Santiago)
-> **Actualizado:** 20261101_1340 (America/Santiago)
+> **Actualizado:** 20261101_2105 (America/Santiago)
 
 # Plan del proyecto: agente de bodega
 
 Fuente de requisitos: [pauta de la tarea final](pauta_tarea_final.md).
 
 **Caso:** asistente de consulta y compra para **Bodega Norte**, una bodega ficticia de insumos de ferretería y construcción.
-**Entorno:** Python 3.12, LangChain + LangGraph, proveedor local **Ollama** (`qwen3:8b`) por defecto.
-**Entrega:** notebook ejecutable + código en `src/bodega/`, con trazas y pruebas reproducibles.
+**Entorno:** Python 3.12, LangChain + LangGraph, soporte multi-proveedor (`Google Gemini`, `OpenAI`, `Anthropic` u `Ollama` local) y Redis Stack (local en Docker o remoto del curso).
+**Entrega:** notebook ejecutable (`notebooks/agente_bodega.ipynb`) + tutorial autocontenido (`docs/tutorial_pruebas.md`) + código en `src/bodega/`, con trazas y pruebas reproducibles.
 
 ## 1. Caso y criterio de éxito
 
@@ -106,18 +106,19 @@ Total potencial: **+3,0**. El router no se declara como bono de workflow: forma 
 | B06 | “Hola” | Responde sin consultar la base |
 | B07 | Consulta que agota el tope de rondas | Parada explícita, sin respuesta inventada |
 
-## 9. Riesgos y decisiones abiertas
+## 9. Decisiones consolidadas y estado final (Etapas 0 a 6 completadas)
 
-1. **Modelo local del catálogo:** la etapa 1 describe `ollama: qwen2.5:7b`, que no está instalado; los modelos disponibles son `qwen3:8b`, `qwen2.5-coder:7b`, `llama3.2:3b`, `mistral`, `phi3.5` y `gpt-oss:20b`. El `.env` del proyecto usa `qwen3:8b`, cuya capacidad de *tool calling* ya se verificó.
-2. **Proveedor por defecto:** el pedido de la etapa 1 indica `google` como default en `resolver_config`, mientras el `.env` usa `ollama`. Se resuelve al implementar t02, sin romper la regla de que el proveedor se elige por `.env`.
-3. **RAG:** requiere el Redis Stack del curso; si no está disponible, el bono no se declara.
-4. **Claves:** Google, OpenAI y Anthropic quedan para el final; hasta entonces todo se prueba con Ollama.
-5. **Publicación:** la pauta transcripta va al repositorio público; el PDF original no se publica.
+1. **Multi-proveedor LLM en la configuración inicial (`.env`):** `resolver_config()` y `crear_llm()` permiten que el profesor ejecute con su cuenta de **Google Gemini** (`google_genai:gemini-3.5-flash-lite`), **OpenAI** (`openai:gpt-4o-mini`), **Anthropic** (`anthropic:claude-sonnet-4-5`) o local con **Ollama** (`ollama:qwen3:8b`). Si falta la clave del proveedor elegido, el sistema avisa por pantalla y usa automáticamente `ollama:qwen3:8b`.
+2. **Redis Stack local o remoto del curso:** `resolver_redis_url()` en `src/bodega/entorno.py` y `conectar_redis()` en `src/bodega/rag.py` permiten usar tanto un contenedor Docker local (`redis://localhost:6379`) como un servidor Redis remoto del curso (`redis://usuario:password@host:puerto/0` o `rediss://...`, o mediante `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_SSL`), enmascarando siempre las credenciales al imprimir el esquema.
+3. **Catálogo determinista:** 23 productos en 5 categorías (incluyendo `Casco de seguridad blanco`, `Caja de guantes de nitrilo talla M`, `huincha de medir`, `esmeril angular` y `clavos` con stock 0) y 2 compras activas iniciales de `pedro`.
+4. **Publicación y seguridad:** `docs/pauta_tarea_final.md` y `docs/tutorial_pruebas.md` se versionan en el repositorio; el PDF original y `.env` están excluidos en `.gitignore`.
 
-## 10. Orden de ejecución
+## 10. Orden de ejecución (completado al 100 %)
 
-1. Etapa 0 (hecha): entorno, configuración, reglas, agentes y bitácora.
-2. Etapa 1 (especificada): `crear_bd.py`, `entorno.py`, `prompts.py`, `traza.py`, una tarea por vez con `@implementador`.
-3. Etapa 2: estado, grafo, router, herramientas y ReAct con topes.
-4. Etapa 3: historial, seguridad, juez y pruebas B01–B07.
-5. Etapa 4: ampliaciones (RAG, memoria, comprobante, golden set) y notebook final.
+1. **Etapa 0 (hecha):** entorno `.venv` (Python 3.12), configuración, `AGENTS.md`, subagentes y bitácora.
+2. **Etapa 1 (`t01`–`t04`, hecha):** `crear_bd.py`, `src/bodega/entorno.py`, `src/bodega/prompts.py`, `src/bodega/traza.py`.
+3. **Etapa 2 (`t05`–`t09`, hecha):** `src/bodega/tools.py`, `src/bodega/graph.py` (`StateGraph` de 11 nodos), `SqliteSaver` y CLI `main.py`.
+4. **Etapa 3 (`t10`–`t12`, hecha):** nodo `juez` real con `RemoveMessage`, nodo `actualizar_memoria` real en SQLite y `scripts/prueba_seguridad.py` (5/5 `✔`).
+5. **Etapa 4 (`t13`–`t15`, hecha):** corpus `docs_rag/` (5 documentos), `src/bodega/rag.py` (`COSINE`/`HNSW` en Redis Stack) y herramienta `buscar_politicas`.
+6. **Etapa 5 (`t16`–`t17`, hecha):** `src/bodega/mcp.py` (`@modelcontextprotocol/server-filesystem`) y emisión de comprobantes en `comprobantes/comprobante_<id>.txt`.
+7. **Etapa 6 (`t18`–`t21`, hecha):** `src/bodega/setup.py`, `golden_set.json` + `src/bodega/evaluacion.py` (20/20 = 100 %), `notebooks/agente_bodega.ipynb` ejecutado con `nbconvert`, `docs/tutorial_pruebas.md` y `README.md`.

@@ -2,7 +2,7 @@
 Archivo: src/bodega/entorno.py
 Objetivo: Centralizar rutas del proyecto, catálogo de proveedores y la única construcción del LLM.
 Creado: 20261101_1350 (America/Santiago)
-Actualizado: 20261101_1955 (America/Santiago)
+Actualizado: 20261101_2105 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -159,6 +159,38 @@ def resolver_config(proveedor: str | None = None, modelo: str | None = None) -> 
         variable=elegido.variable,
         clave=clave,
     )
+
+
+def resolver_redis_url(url: str | None = None) -> str:
+    """Resuelve la URL de conexión a Redis (local o remoto con credenciales/TLS).
+
+    Prioriza el argumento `url`, luego `REDIS_URL`, y si no está definida pero
+    existe `REDIS_HOST`, construye la URL a partir de `REDIS_HOST`, `REDIS_PORT`,
+    `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_DB` y `REDIS_SSL`.
+    """
+    explicita = (url or _texto_env("REDIS_URL")).strip()
+    if explicita and explicita != "redis://localhost:6379":
+        return explicita
+
+    host = _texto_env("REDIS_HOST")
+    if host:
+        port = _texto_env("REDIS_PORT") or "6379"
+        user = _texto_env("REDIS_USERNAME") or "default"
+        pwd = _texto_env("REDIS_PASSWORD")
+        db = _texto_env("REDIS_DB") or "0"
+        ssl_activo = _texto_env("REDIS_SSL").lower() in ("1", "true", "yes", "si", "tls")
+        esquema = "rediss" if ssl_activo else "redis"
+        auth = f"{user}:{pwd}@" if pwd else (f"{user}@" if _texto_env("REDIS_USERNAME") else "")
+        return f"{esquema}://{auth}{host}:{port}/{db}"
+
+    return explicita or "redis://localhost:6379"
+
+
+def enmascarar_redis_url(url: str) -> str:
+    """Oculta la contraseña de una URL de Redis (`redis://user:***@host:port/db`) para imprimirla sin exponer secretos."""
+    import re
+
+    return re.sub(r"(redis(?:s)?://[^:/@\s]*:)([^@\s]+)(@)", r"\1***\3", str(url or ""))
 
 
 def crear_llm(config: Config | None = None) -> BaseChatModel:

@@ -2,13 +2,15 @@
 > **Archivo:** `README.md`
 > **Objetivo:** Documentación final de entrega del agente Bodega Norte: ficha mínima de reproducción, instalación y ejecución, estructura, mapa de la pauta al notebook, decisiones de diseño y registro del Golden Set.
 > **Creado:** 20261026_2201 (America/Santiago)
-> **Actualizado:** 20261101_2055 (America/Santiago)
+> **Actualizado:** 20261101_2110 (America/Santiago)
 
 # Agente Bodega Norte — Taller Final Curso 1 (`LangChain` + `LangGraph`)
 
-Asistente conversacional de consulta, compra, políticas corporativas (RAG sobre **Redis Stack**) y emisión de comprobantes (**MCP Filesystem**) para **Bodega Norte**, una bodega ficticia de insumos de ferretería y construcción.
+Asistente conversacional de consulta, compra, políticas corporativas (RAG sobre **Redis Stack**, local o remoto del curso) y emisión de comprobantes (**MCP Filesystem**) para **Bodega Norte**, una bodega ficticia de insumos de ferretería y construcción.
 
-El proyecto se especificó y construyó incrementalmente mediante **21 tareas verificables** en `plan.json` (`t01` a `t21`), con trazabilidad completa en JSONL (`trazas/<thread_id>.jsonl`), evaluación automatizada sobre un **Golden Set de 20 casos al 100 %** y entrega reproducible en [`notebooks/agente_bodega.ipynb`](notebooks/agente_bodega.ipynb).
+El proyecto se especificó y construyó incrementalmente mediante **21 tareas verificables** en `plan.json` (`t01` a `t21`), con trazabilidad completa en JSONL (`trazas/<thread_id>.jsonl`), evaluación automatizada sobre un **Golden Set de 20 casos al 100 %**, tutorial autocontenido de evaluación en [`docs/tutorial_pruebas.md`](docs/tutorial_pruebas.md) y entrega reproducible en [`notebooks/agente_bodega.ipynb`](notebooks/agente_bodega.ipynb).
+
+> **Guía rápida para el Profesor / Persona Revisora:** consulte el [**Tutorial Autocontenido de Configuración y Pruebas (`docs/tutorial_pruebas.md`)**](docs/tutorial_pruebas.md) para ver paso a paso cómo configurar su cuenta de **Google Gemini**, **OpenAI**, **Anthropic** u **Ollama**, cómo apuntar al **Redis remoto del curso** (o Docker local) y cómo ejecutar cada prueba exigida por `Pauta_tarea_final.pdf`. Todas las pruebas del tutorial están además ejemplificadas y ejecutadas con sus salidas en [`notebooks/agente_bodega.ipynb`](notebooks/agente_bodega.ipynb) (**Sección 14**).
 
 ---
 
@@ -35,23 +37,27 @@ El registro cronológico detallado de las 20 instrucciones ejecutadas, decisione
 | **Embeddings RAG** | `google:models/gemini-embedding-001` (dim=3072) con `GOOGLE_API_KEY`, o `local:sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2` vía `fastembed` sin claves |
 | **Base de datos relacional** | SQLite `bodega.db` regenerable de forma determinista con `python crear_bd.py --reset` (23 productos en 5 categorías, `clavos` con stock 0, y 2 compras activas iniciales de `pedro`) |
 | **Corpus e Índice RAG** | 5 documentos Markdown en `docs_rag/` (2.375 palabras, 34 fragmentos con `MarkdownHeaderTextSplitter` `#`/`##` + `RecursiveCharacterTextSplitter` 600/100) indexados en **Redis Stack** (`index_name="bodega_politicas"`, métrica `COSINE`, algoritmo `HNSW`) |
-| **Docker (Redis Stack)** | `docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest` |
+| **Docker / Redis Remoto** | Soporta Redis Stack local (`docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest`) o **Redis remoto del curso** vía `REDIS_URL=redis://usuario:pass@host:puerto/0` (o `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_SSL`) |
 | **Node.js / MCP** | Node.js `v26.12.1` (`npx 11.20.0`) ejecutando `@modelcontextprotocol/server-filesystem` por `stdio` restringido a la ruta absoluta de `comprobantes/` |
 | **Persistencia de memoria** | Historial por `thread_id` con `SqliteSaver` (`memoria.json`) + perfil transversal por `usuario_id` en la tabla `perfil_usuario` de `bodega.db` |
+| **Tutorial de pruebas** | [`docs/tutorial_pruebas.md`](docs/tutorial_pruebas.md) (autocontenido y ejemplificado en la Sección 14 de [`notebooks/agente_bodega.ipynb`](notebooks/agente_bodega.ipynb)) |
 
 ### Variables de entorno (`.env.example` — sin valores secretos)
 
-Copia `.env.example` a `.env` (`cp .env.example .env`). **El archivo `.env` está en `.gitignore` y jamás se versiona ni se incluye en la entrega.**
+Copia `.env.example` a `.env` (`Copy-Item .env.example .env`). **El archivo `.env` está en `.gitignore` y jamás se versiona ni se incluye en la entrega.**
 
 | Variable | Descripción | Valor por defecto en código |
 | --- | --- | --- |
-| `LLM_PROVIDER` | Proveedor del LLM (`google`, `ollama`, `openai`, `anthropic`) | `google` (cae a `ollama` si falta clave) |
-| `MODELO` | Nombre del modelo del proveedor elegido | `gemini-3.5-flash-lite` / `qwen3:8b` |
-| `GOOGLE_API_KEY` | Clave de Google AI Studio (opcional si se usa Ollama) | vacío |
-| `OPENAI_API_KEY` | Clave de OpenAI (opcional) | vacío |
-| `ANTHROPIC_API_KEY` | Clave de Anthropic (opcional) | vacío |
+| `LLM_PROVIDER` | Proveedor del LLM (`google`, `openai`, `anthropic`, `ollama`) | `google` (cae a `ollama` si falta clave) |
+| `MODELO` | Nombre del modelo del proveedor elegido | `gemini-3.5-flash-lite` / `gpt-4o-mini` / `claude-sonnet-4-5` / `qwen3:8b` |
+| `GOOGLE_API_KEY` | Clave de Google AI Studio (cuando `LLM_PROVIDER=google`) | vacío |
+| `OPENAI_API_KEY` | Clave de OpenAI (cuando `LLM_PROVIDER=openai`) | vacío |
+| `ANTHROPIC_API_KEY` | Clave de Anthropic (cuando `LLM_PROVIDER=anthropic`) | vacío |
 | `OLLAMA_BASE_URL` | Endpoint del servidor local Ollama | `http://localhost:11434` |
-| `REDIS_URL` | URL de conexión a Redis Stack (con módulo RediSearch `search`) | `redis://localhost:6379` |
+| `REDIS_URL` | URL de Redis Stack (local `redis://localhost:6379` o remoto `redis://user:pass@host:port/0`) | `redis://localhost:6379` |
+| `REDIS_HOST` / `REDIS_PORT` | Host y puerto alternativos para Redis remoto del curso (si no se usa `REDIS_URL`) | vacío / `6379` |
+| `REDIS_USERNAME` / `REDIS_PASSWORD` | Usuario y contraseña para Redis remoto del curso (enmascarados en logs) | vacío |
+| `REDIS_DB` / `REDIS_SSL` | Número de base (`0`) y flag TLS (`true`/`false`) para Redis remoto | `0` / `false` |
 | `EMBEDDING_PROVIDER` | Proveedor de embeddings (`google`, `openai`, `ollama`, `local`) | sigue a `LLM_PROVIDER` (o `local`) |
 
 ---
@@ -139,6 +145,13 @@ taller_final_curso_1/
 ├── .opencode/agents/
 │   ├── spec.md                      # Subagente especificador de tareas en plan.json
 │   └── implementador.md             # Subagente implementador tarea por tarea
+├── docs/
+│   ├── pauta_tarea_final.md         # Transcripción en Markdown de Pauta_tarea_final.pdf
+│   ├── plan_proyecto.md             # Plan arquitectónico y de evaluación del caso Bodega Norte
+│   ├── tutorial_pruebas.md          # Tutorial autocontenido de configuración y pruebas para el profesor
+│   ├── BITACORA.md                  # Registro cronológico de las instrucciones 01 a 21
+│   ├── instrucciones/               # Instrucciones recibidas (01 a 21)
+│   └── salidas_instrucciones/       # Volcados íntegros de consola por instrucción (salida_01 a salida_21)
 ├── docs_rag/                        # Corpus Markdown ficticio de Bodega Norte (5 archivos, 2.375 palabras)
 │   ├── politica_devoluciones.md
 │   ├── garantias.md
@@ -179,6 +192,7 @@ taller_final_curso_1/
 | **Bono 3: Herramienta avanzada MCP (`write_file`)** | +0,5 pt | **Sección 9:**Servidor oficial `@modelcontextprotocol/server-filesystem` por `stdio`, consulta sin escribir archivo y generación de `comprobantes/comprobante_3.txt` | `src/bodega/mcp.py` |
 | **Bono 4: Juez independiente (`SYSTEM_JUEZ`)** | +0,5 pt | **Sección 11:** Prueba aislada con caso benigno (`APROBADO`) y caso adversarial (`BLOQUEADO`) reemplazando el mensaje con `RemoveMessage` + `RESPUESTA_SEGURA` | `src/bodega/graph.py`, `src/bodega/prompts.py` |
 | **Bono 5: Golden Set ejecutado al 100 %** | +0,5 pt | **Sección 12:** Ejecución de los 20 casos de `golden_set.json` (`20/20 casos aprobados (100%)`) y reporte en `trazas/resultado_golden_set.json` | `golden_set.json`, `src/bodega/evaluacion.py` |
+| **Tutorial autocontenido para el docente** | Guía | **Sección 14:** Verificación multi-proveedor, Redis local/remoto y batería de pruebas de [`docs/tutorial_pruebas.md`](docs/tutorial_pruebas.md) | `docs/tutorial_pruebas.md` |
 
 ---
 
