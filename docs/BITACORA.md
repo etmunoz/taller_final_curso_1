@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1435 (America/Santiago)
+> **Actualizado:** 20261101_1855 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -183,10 +183,29 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** `plan.json` válido con 9 tareas (`t01`–`t04` en `hecho`, `t05`–`t09` en `pendiente`) y dependencias ordenadas (`t05`→`t01,t02`; `t06`→`t05`; `t07`→`t03,t04,t06`; `t08`→`t07`; `t09`→`t08`).
 
+## 20261101_1855 — Instrucción 12: ejecución de la Etapa 2 (`t05`–`t09`) y punto de control
+
+**Pedido:** implementar las tareas de la Etapa 2 (`t05` a `t09`), cumpliendo las aclaraciones de la instrucción 12: router con `with_structured_output(DecisionRuta, include_raw=True)`, verificación del router con tres entradas (consulta de stock, saludo e intento de escape/jailbreak), `--diagrama` sin claves ni dependencias externas, y cumplimiento del punto de control (`python main.py bodega --diagrama` imprime Mermaid; `python main.py bodega --saltos "¿cuántas huinchas de medir hay?"` muestra la ruta y cifra real de la BD; segundo turno recuerda el nombre).
+
+**Realizado:**
+- **`t05` y `t06` (`src/bodega/tools.py`):** herramientas de lectura (`buscar_producto` con búsqueda tolerante en 3 niveles, `listar_productos`, `mis_compras` leyendo `usuario_id` estrictamente desde `RunnableConfig`) y de acción (`comprar`, `cancelar_compra` con validación de stock, sesión y reposición transaccional). Ajuste del catálogo semilla en `crear_bd.py` para incluir `"Casco de seguridad blanco"`, `"Caja de guantes de nitrilo talla M"` y `"huincha de medir"`.
+- **`t07` y `t08` (`src/bodega/graph.py`):** grafo LangGraph (`StateGraph`) con router estructurado (`DecisionRuta` vía `llamar_llm`), 5 nodos de agentes por ruta con tope `MAX_RONDAS=5`, `ToolNode`, stubs de juez y memoria, y checkpointer `SqliteSaver` sobre `RUTA_MEMORIA`.
+- **`t09` (`main.py`):** CLI completa con soporte para flags `--diagrama`, `--saltos`, `--usuario`, `--thread` y `--sin-reiniciar`.
+- **Rotulado y salidas:** rotulado de `docs/instrucciones/instruccion_12.md` y volcado paso a paso en `docs/salidas_instrucciones/salida_12.txt`. Tareas `t05` a `t09` marcadas como `hecho` en `plan.json`.
+
+**Incidencias y decisiones:**
+- La ejecución local con Ollama presentó timeouts prolongados en inferencias complejas con llamadas a herramientas; el usuario configuró `GOOGLE_API_KEY` en `.env`, operando el sistema con `google_genai:gemini-3.5-flash-lite` con respuestas fluidas.
+- En PowerShell sobre Windows, el carácter Unicode de flecha (`→`) en `--saltos` provocó un `UnicodeEncodeError` en consolas `cp1252`; se adaptó a `->` para asegurar compatibilidad total en Windows.
+
+**Verificación (punto de control):**
+- `python main.py bodega --diagrama` imprimió el diagrama Mermaid completo (11 nodos) sin solicitar credenciales.
+- `python main.py bodega --saltos "¿cuántas huinchas de medir hay?"` recorrió el grafo (`cargar_memoria -> router -> agente_consulta -> herramientas(buscar_producto) -> ...`) y devolvió la respuesta con el stock exacto (22 unidades).
+- Historial conversacional con `SqliteSaver` validado en turnos sucesivos recordando el nombre del usuario (`Andrea`).
+
 ## Pendientes
 
-- [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [ ] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
+- [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
+- [x] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).
 - [x] Commit y push de la etapa 0.
