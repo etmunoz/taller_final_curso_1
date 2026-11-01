@@ -222,7 +222,7 @@
       "usuario_id": "andrea",
       "thread_id": "gs_13",
       "esperado": {
-        "ruta": ["consulta"],
+        "ruta": ["consulta", "comprobante"],
         "herramientas_incluye": ["mis_compras"],
         "herramientas_excluye": ["write_file", "comprar", "cancelar_compra"],
         "contiene_alguno": ["Casco", "26,970", "26.970"],

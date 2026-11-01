@@ -486,7 +486,7 @@
     {
       "id": "t26",
       "nombre": "Notebook determinista y completo según la pauta (notebooks/generar_notebook.py -> notebooks/agente_bodega.ipynb)",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t20",
         "t22",
@@ -501,7 +501,8 @@
       "verificacion": [
         "jupyter nbconvert --to notebook --execute pasa sin errores con Google, con Anthropic (claude-sonnet-4-6) y con OpenAI (gpt-4o-mini)",
         "todas las celdas de comprobación imprimen 'COMPROBACIÓN: ...: OK'"
-      ]
+      ],
+      "evidencia": "20261101_2020: notebooks/agente_bodega.ipynb (33 celdas) se ejecuto completo desde cero con jupyter nbconvert --to notebook --execute: 1 vez con anthropic:claude-sonnet-4-6 (19:59:36, 23/23 GS), 1 vez con openai:gpt-4o-mini (20:03:20, 23/23 GS), 1 vez en modo degradado sin Redis (20:17:04, 22/22 GS + 1 omitido) y 3 veces consecutivas con google_genai:gemini-3.5-flash-lite sobre REDIS_URL_ALUMNO (20:06:53, 20:10:22 y 20:20:37 inplace, 23/23 GS), con las 16 celdas 'COMPROBACION: ...: OK' en verde y sin rutas C:\\Users\\."
     },
     {
       "id": "t27",

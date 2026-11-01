@@ -165,8 +165,17 @@ def _crear_nodo_agente(
                 "ruta": [f"agente_{ruta_nombre}"],
             }
 
-        # Modo normal (usa SYSTEM_AGENTE_SIN_HERRAMIENTAS si la ruta no tiene herramientas)
-        llm_con_herramientas = llm.bind_tools(herramientas) if herramientas else llm
+        # Modo normal (evitando re-ejecutar en el mismo turno herramientas que ya devolvieron resultado)
+        idx_ult_h = indices_humanos[-1] if indices_humanos else 0
+        tools_usadas_turno = {
+            m.name for m in mensajes_actuales[idx_ult_h + 1 :] if isinstance(m, ToolMessage)
+        }
+        if tools_usadas_turno & {"comprar", "cancelar_compra", "write_file", "read_file"}:
+            herramientas_turno: list[Any] = []
+        else:
+            herramientas_turno = [t for t in herramientas if t.name not in tools_usadas_turno]
+
+        llm_con_herramientas = llm.bind_tools(herramientas_turno) if herramientas_turno else llm
         sys_msg = SystemMessage(content=SYSTEM_AGENTE if herramientas else SYSTEM_AGENTE_SIN_HERRAMIENTAS)
 
         # Último HumanMessage envuelto con etiquetas conservando AIMessage(tool_calls) y ToolMessage posteriores (Regla 6)
@@ -238,6 +247,9 @@ def construir_grafo(
         temp_eff = getattr(modelo_router, "_temperatura_efectiva", temperatura)
         router_estructurado = estructurada(modelo_router, DecisionRuta)
         perfil = state.get("perfil", "")
+        usuario_id = "default"
+        if config and "configurable" in config:
+            usuario_id = config["configurable"].get("usuario_id", "default")
         mensajes_actuales = state.get("messages", [])
         texto_usuario = ""
         if mensajes_actuales:
@@ -246,6 +258,7 @@ def construir_grafo(
 
         sys_msg = SystemMessage(content=SYSTEM_ROUTER)
         prompt_texto = (
+            f"<usuario_id>{usuario_id}</usuario_id>\n"
             f"<perfil_usuario>{perfil}</perfil_usuario>\n"
             f"<mensaje>{texto_usuario}</mensaje>"
         )
@@ -359,7 +372,7 @@ def construir_grafo(
                 mensajes_salida.append(
                     ToolMessage(
                         content=f"Herramienta no permitida en esta ruta ({ruta_actual}): {nom_b}",
-                        name=nom_b,
+                        name=f"bloqueada:{nom_b}",
                         tool_call_id=tc_id,
                     )
                 )
@@ -391,9 +404,12 @@ def construir_grafo(
         texto_usuario = ""
         texto_respuesta = ""
         id_respuesta = None
+        humanos_previos: list[str] = []
         
         for m in mensajes_actuales:
             if isinstance(m, HumanMessage):
+                if texto_usuario:
+                    humanos_previos.append(texto_usuario)
                 texto_usuario = texto_de(m)
             elif isinstance(m, AIMessage):
                 texto_respuesta = texto_de(m)
@@ -407,7 +423,13 @@ def construir_grafo(
             }
                 
         sys_msg = SystemMessage(content=SYSTEM_JUEZ)
+        perfil_juez = state.get("perfil", "")
+        bloque_ctx = ""
+        if humanos_previos or (perfil_juez and perfil_juez != "Sin información previa."):
+            hist_txt = " | ".join(humanos_previos)
+            bloque_ctx = f"<contexto_sesion>Perfil: {perfil_juez} | Turnos previos del usuario: {hist_txt}</contexto_sesion>\n"
         prompt_eval = (
+            f"{bloque_ctx}"
             f"<mensaje>{texto_usuario}</mensaje>\n"
             f"<respuesta>{texto_respuesta}</respuesta>"
         )
@@ -644,9 +666,13 @@ def ejecutar_turno(
     respuesta_obj = mensajes[-1] if mensajes else AIMessage(content="")
     respuesta_texto = texto_de(respuesta_obj)
 
-    # Herramientas usadas en este turno (ToolMessages nuevos)
+    # Herramientas efectivamente ejecutadas en este turno (excluyendo llamadas bloqueadas por el filtro de ruta)
     mensajes_nuevos = mensajes[n_msgs_previos:] if n_msgs_previos <= len(mensajes) else mensajes
-    herramientas_usadas = [m.name for m in mensajes_nuevos if isinstance(m, ToolMessage)]
+    herramientas_usadas = [
+        m.name
+        for m in mensajes_nuevos
+        if isinstance(m, ToolMessage) and not str(m.name or "").startswith("bloqueada:")
+    ]
     ruta_total = resultado.get("ruta", [])
     saltos_turno = ruta_total[n_ruta_previa:] if n_ruta_previa < len(ruta_total) else ruta_total
 

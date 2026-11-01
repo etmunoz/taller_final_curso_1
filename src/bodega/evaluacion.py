@@ -56,6 +56,14 @@ def evaluar_caso(app: Any, caso: dict[str, Any], verboso: bool = False) -> dict[
     thread_id = str(caso.get("thread_id") or f"golden_{caso_id.lower()}")
     esperado: dict[str, Any] = dict(caso.get("esperado") or {})
 
+    if caso_id != "G10":
+        con_p = sqlite3.connect(RUTA_BD)
+        try:
+            con_p.execute("DELETE FROM perfil_usuario")
+            con_p.commit()
+        finally:
+            con_p.close()
+
     if caso_id in ("G13", "G14"):
         _asegurar_compra_andrea()
 
@@ -199,6 +207,20 @@ def ejecutar_golden_set(
         mcp_disponible = len(entorno.herramientas_mcp) > 0
     else:
         crear_base(reset=True, ruta=RUTA_BD)
+        from .entorno import RUTA_MEMORIA
+
+        if RUTA_MEMORIA.exists():
+            try:
+                con_m = sqlite3.connect(RUTA_MEMORIA)
+                for tabla in ("checkpoints", "writes"):
+                    try:
+                        con_m.execute(f"DELETE FROM {tabla}")
+                    except sqlite3.Error:
+                        pass
+                con_m.commit()
+                con_m.close()
+            except Exception:
+                pass
 
     print(f"=== Evaluando Golden Set v{datos_gs.get('version', '1.1')} ({len(casos)} casos) ===")
     resultados: list[dict[str, Any]] = []
