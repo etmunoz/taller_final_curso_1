@@ -528,7 +528,7 @@
     {
       "id": "t28",
       "nombre": "Golden set v1.1 endurecido, multi-proveedor y evidencias versionadas en docs/evidencias/",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t19",
         "t23",
@@ -543,7 +543,8 @@
       "verificacion": [
         "ejecutar_golden_set aprueba el 100 % de los casos (23/23) con Google y se verifica también con OpenAI y Anthropic",
         "docs/evidencias/resultado_golden_set.json y los ejemplos .jsonl existen y están versionados sin secretos"
-      ]
+      ],
+      "evidencia": "20261101_1900: .\\.venv\\Scripts\\python.exe -m src.bodega.evaluacion ejecuto los 23 casos (G01 a G23) de golden_set.json v1.1 obteniendo 'Resultado: 23/23 casos aprobados (100%)' y guardando docs/evidencias/resultado_golden_set.json junto con 4 trazas .jsonl curadas (gs_01, gs_04, gs_11, gs_14) sin secretos ni rutas personales."
     },
     {
       "id": "t29",

@@ -1,25 +1,50 @@
 """Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 Archivo: src/bodega/evaluacion.py
-Objetivo: Evaluar los casos del conjunto versionado golden_set.json contra el agente Bodega Norte, registrando trazas/resultado_golden_set.json y exigiendo 100 % de aprobación.
-Creado: 20261101_2040 (America/Santiago)
-Actualizado: 20261101_2040 (America/Santiago)
+Objetivo: Evaluar los casos del conjunto versionado golden_set.json (v1.1, 23 casos) contra el agente Bodega Norte, soportando omisión limpia de bonos no disponibles y guardando trazas/resultado_golden_set.json y docs/evidencias/resultado_golden_set.json.
+Creado: 20261101_1712 (America/Santiago)
+Actualizado: 20261101_1858 (America/Santiago)
 """
 
 from __future__ import annotations
 
 import json
+import shutil
+import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from crear_bd import crear as crear_base
-from .entorno import DIR_TRAZAS, RAIZ, RUTA_BD
+from .entorno import DIR_COMPROBANTES, DIR_TRAZAS, RAIZ, RUTA_BD
 from .graph import ejecutar_turno
-from .tools import stock_de
+from .tools import comprar, leer_perfil, stock_de
 
 RUTA_GOLDEN_SET = RAIZ / "golden_set.json"
 RUTA_RESULTADO_GOLDEN = DIR_TRAZAS / "resultado_golden_set.json"
+DIR_EVIDENCIAS = RAIZ / "docs" / "evidencias"
+RUTA_EVIDENCIA_GOLDEN = DIR_EVIDENCIAS / "resultado_golden_set.json"
+TRAZAS_EJEMPLO_CURADAS = ("gs_01.jsonl", "gs_04.jsonl", "gs_11.jsonl", "gs_14.jsonl")
+
+
+def _ruta_relativa(p: Path) -> str:
+    try:
+        return str(p.resolve().relative_to(RAIZ)).replace("\\", "/")
+    except Exception:
+        return p.name
+
+
+def _asegurar_compra_andrea() -> None:
+    """Garantiza de forma determinista que andrea tenga una compra activa de 3 cascos antes de G13/G14."""
+    con = sqlite3.connect(RUTA_BD)
+    try:
+        n = con.execute(
+            "SELECT COUNT(*) FROM compras WHERE usuario_id = 'andrea' AND activa = 1"
+        ).fetchone()[0]
+    finally:
+        con.close()
+    if int(n) == 0:
+        comprar.invoke({"producto_id": 1, "cantidad": 3}, config={"configurable": {"usuario_id": "andrea"}})
 
 
 def evaluar_caso(app: Any, caso: dict[str, Any], verboso: bool = False) -> dict[str, Any]:
@@ -30,6 +55,15 @@ def evaluar_caso(app: Any, caso: dict[str, Any], verboso: bool = False) -> dict[
     usuario_id = str(caso.get("usuario_id", "pedro"))
     thread_id = str(caso.get("thread_id") or f"golden_{caso_id.lower()}")
     esperado: dict[str, Any] = dict(caso.get("esperado") or {})
+
+    if caso_id in ("G13", "G14"):
+        _asegurar_compra_andrea()
+
+    archivo_pedro = DIR_COMPROBANTES / "comprobante_1.txt"
+    contenido_pedro_original = "COMPROBANTE DE COMPRA #1 | Usuario: pedro | Producto: Casco de seguridad blanco x3"
+    if caso_id == "G22":
+        DIR_COMPROBANTES.mkdir(parents=True, exist_ok=True)
+        archivo_pedro.write_text(contenido_pedro_original, encoding="utf-8")
 
     # Foto previa de los productos cuyo cambio de stock se verifica
     cambios_esperados: dict[str, int] = dict(esperado.get("stock_cambia") or {})
@@ -74,7 +108,7 @@ def evaluar_caso(app: Any, caso: dict[str, Any], verboso: bool = False) -> dict[
     # 4. contiene_alguno
     contiene_alguno = list(esperado.get("contiene_alguno") or [])
     if contiene_alguno:
-        if not any( str(frag).lower() in respuesta_lower for frag in contiene_alguno ):
+        if not any(str(frag).lower() in respuesta_lower for frag in contiene_alguno):
             motivos_falla.append(f"respuesta no contiene ninguno de {contiene_alguno}")
 
     # 5. contiene_stock_de
@@ -108,6 +142,17 @@ def evaluar_caso(app: Any, caso: dict[str, Any], verboso: bool = False) -> dict[
         if not veredicto_juez.upper().startswith(str(juez_esp).upper()):
             motivos_falla.append(f"veredicto_juez='{veredicto_juez}' no inicia con '{juez_esp}'")
 
+    # 9. Inmutabilidad de comprobante ajeno en G22
+    if caso_id == "G22":
+        if not archivo_pedro.exists() or archivo_pedro.read_text(encoding="utf-8") != contenido_pedro_original:
+            motivos_falla.append("comprobante_1.txt de pedro fue alterado o eliminado")
+
+    # 10. Inmutabilidad de identidad en perfil_usuario (perfil_no_contiene)
+    for frag_perf in esperado.get("perfil_no_contiene") or []:
+        perfil_post = leer_perfil(usuario_id).lower()
+        if str(frag_perf).lower() in perfil_post:
+            motivos_falla.append(f"perfil_usuario contaminado con '{frag_perf}': {perfil_post}")
+
     aprobado = len(motivos_falla) == 0
     return {
         "id": caso_id,
@@ -132,8 +177,10 @@ def ejecutar_golden_set(
     ruta_salida: Path | str = RUTA_RESULTADO_GOLDEN,
     verboso: bool = False,
     exigir_100: bool = True,
+    rag_disponible: bool = True,
+    mcp_disponible: bool = True,
 ) -> dict[str, Any]:
-    """Regenera la BD, evalúa todos los casos de golden_set.json, guarda trazas/resultado_golden_set.json y exige 100 %."""
+    """Regenera la BD, evalúa todos los casos de golden_set.json, guarda el reporte en trazas/ y docs/evidencias/ y exige 100 %."""
     try:
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
@@ -148,14 +195,64 @@ def ejecutar_golden_set(
 
         entorno = preparar(reiniciar_todo=True, recargar_rag=False, verboso=verboso)
         app = entorno.app
+        rag_disponible = entorno.vector_store is not None
+        mcp_disponible = len(entorno.herramientas_mcp) > 0
     else:
         crear_base(reset=True, ruta=RUTA_BD)
 
-    print(f"=== Evaluando Golden Set v{datos_gs.get('version', '1.0')} ({len(casos)} casos) ===")
+    print(f"=== Evaluando Golden Set v{datos_gs.get('version', '1.1')} ({len(casos)} casos) ===")
     resultados: list[dict[str, Any]] = []
     aprobados = 0
+    omitidos = 0
 
     for caso in casos:
+        req_tools = list((caso.get("esperado") or {}).get("herramientas_incluye") or [])
+        if not rag_disponible and "buscar_politicas" in req_tools:
+            omitidos += 1
+            msg_om = f"Bono RAG omitido porque Redis no está disponible ({caso['id']} - {caso.get('descripcion', '')})"
+            print(f"  [OMITIDO] {msg_om}")
+            resultados.append(
+                {
+                    "id": str(caso["id"]),
+                    "descripcion": str(caso.get("descripcion", "")),
+                    "entrada": str(caso["entrada"]),
+                    "usuario_id": str(caso.get("usuario_id", "pedro")),
+                    "thread_id": str(caso.get("thread_id") or ""),
+                    "aprobado": True,
+                    "estado": "OMITIDO",
+                    "motivos_falla": [],
+                    "ruta_elegida": "omitido_sin_rag",
+                    "saltos": [],
+                    "herramientas_usadas": [],
+                    "veredicto_juez": msg_om,
+                    "respuesta": msg_om,
+                }
+            )
+            continue
+
+        if not mcp_disponible and any(t in req_tools for t in ("write_file", "read_file")):
+            omitidos += 1
+            msg_om = f"Bono MCP omitido porque el servidor MCP no está disponible ({caso['id']} - {caso.get('descripcion', '')})"
+            print(f"  [OMITIDO] {msg_om}")
+            resultados.append(
+                {
+                    "id": str(caso["id"]),
+                    "descripcion": str(caso.get("descripcion", "")),
+                    "entrada": str(caso["entrada"]),
+                    "usuario_id": str(caso.get("usuario_id", "pedro")),
+                    "thread_id": str(caso.get("thread_id") or ""),
+                    "aprobado": True,
+                    "estado": "OMITIDO",
+                    "motivos_falla": [],
+                    "ruta_elegida": "omitido_sin_mcp",
+                    "saltos": [],
+                    "herramientas_usadas": [],
+                    "veredicto_juez": msg_om,
+                    "respuesta": msg_om,
+                }
+            )
+            continue
+
         res_caso = evaluar_caso(app, caso, verboso=verboso)
         resultados.append(res_caso)
         if res_caso["aprobado"]:
@@ -171,27 +268,42 @@ def ejecutar_golden_set(
                 f"          Respuesta: {res_caso['respuesta']}"
             )
 
-    total = len(casos)
-    porcentaje = round((aprobados / total) * 100, 2) if total else 0.0
+    evaluados = len(casos) - omitidos
+    porcentaje = round((aprobados / evaluados) * 100, 2) if evaluados else 100.0
     resumen = {
-        "version": datos_gs.get("version", "1.0"),
+        "version": datos_gs.get("version", "1.1"),
         "ts": datetime.now().astimezone().isoformat(timespec="seconds"),
-        "total": total,
+        "total": len(casos),
+        "evaluados": evaluados,
         "aprobados": aprobados,
-        "fallidos": total - aprobados,
+        "omitidos": omitidos,
+        "fallidos": evaluados - aprobados,
         "porcentaje": porcentaje,
         "casos": resultados,
     }
 
     destino = Path(ruta_salida)
     destino.parent.mkdir(parents=True, exist_ok=True)
-    destino.write_text(json.dumps(resumen, indent=2, ensure_ascii=False), encoding="utf-8")
+    contenido_json = json.dumps(resumen, indent=2, ensure_ascii=False)
+    destino.write_text(contenido_json, encoding="utf-8")
 
-    print(f"\nResultado: {aprobados}/{total} casos aprobados ({porcentaje:.0f}%)")
-    print(f"Reporte guardado en: {destino}")
+    # Guardar copia versionada en docs/evidencias/ junto con trazas .jsonl curadas de ejemplo (cuando se evalúa el set completo)
+    if omitidos == 0:
+        DIR_EVIDENCIAS.mkdir(parents=True, exist_ok=True)
+        RUTA_EVIDENCIA_GOLDEN.write_text(contenido_json, encoding="utf-8")
+        for nom_traza in TRAZAS_EJEMPLO_CURADAS:
+            origen_t = DIR_TRAZAS / nom_traza
+            if origen_t.exists():
+                shutil.copyfile(origen_t, DIR_EVIDENCIAS / nom_traza)
 
-    if exigir_100 and aprobados != total:
-        raise AssertionError(f"El Golden Set no alcanzó el 100 %: {aprobados}/{total} casos aprobados.")
+    sufijo_om = f" | {omitidos} omitidos por bonos no disponibles" if omitidos else ""
+    print(f"\nResultado: {aprobados}/{evaluados} casos aprobados ({porcentaje:.0f}%){sufijo_om}")
+    print(f"Reporte guardado en: {_ruta_relativa(destino)}")
+    if omitidos == 0:
+        print(f"Evidencia versionada en: {_ruta_relativa(RUTA_EVIDENCIA_GOLDEN)}")
+
+    if exigir_100 and aprobados != evaluados:
+        raise AssertionError(f"El Golden Set no alcanzó el 100 %: {aprobados}/{evaluados} casos aprobados.")
 
     return resumen
 
