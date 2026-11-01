@@ -1,0 +1,317 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_07.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 07.
+# Creado: 20261101_1247 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+Antes de tocar nada, relevo el estado real (Ollama, uv, pip y archivos de configuración):
+
+Write-Output "=== Ollama ==="
+$o = Get-Command ollama -ErrorAction SilentlyContinue
+if ($o) { ollama --version; Write-Output "--- modelos ---"; ollama list } else { "ollama NO está en PATH" }
+try { $t = Invoke-RestMethod -Uri 'http://localhost:11434/api/tags' -TimeoutSec 3; "servicio: arriba, $($t.models.Count) modelo(s): " + (($t.models | ForEach-Object { $_.name }) -join ', ') } catch { "servicio: no responde ($($_.Exception.Message))" }
+Write-Output ""
+Write-Output "=== uv ==="
+uv --version
+Write-Output "--- pyproject / .python-version ---"
+Get-Content pyproject.toml
+Get-Content .python-version
+Write-Output ""
+Write-Output "=== .venv ==="
+.\.venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe -m pip --version
+=== Ollama ===
+ollama version is 0.40.13
+--- modelos ---
+NAME                       ID              SIZE      MODIFIED     
+qwen3:8b                   500a1f067a9f    5.2 GB    4 days ago      
+bge-m3:latest              790764642607    1.2 GB    4 days ago      
+nomic-embed-text:latest    0a109f422b47    274 MB    4 months ago    
+phi3.5:latest              61819fb370a3    2.2 GB    4 months ago    
+llama3.2:3b                a80c4f17acd5    2.0 GB    4 months ago    
+qwen2.5-coder:7b           dae161e27b0e    4.7 GB    5 months ago    
+mistral:latest             6577803aa9a0    4.4 GB    5 months ago    
+gpt-oss:20b                17052f91a42e    13 GB     5 months ago    
+servicio: arriba, 8 modelo(s): qwen3:8b, bge-m3:latest, nomic-embed-text:latest, phi3.5:latest, llama3.2:3b, qwen2.5-coder:7b, mistral:latest, gpt-oss:20b
+
+=== uv ===
+uv 0.11.24 (5e04460c0 2026-06-23 x86_64-pc-windows-msvc)
+--- pyproject / .python-version ---
+[project]
+name = "taller-final-curso-1"
+version = "0.1.0"
+description = "Proyecto del taller final del curso 1"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+3.13
+
+=== .venv ===
+Python 3.12.13
+pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+
+
+uv sync --help | Select-String -Pattern 'dry-run|--frozen|--locked|--no-install|--inexact|--exact' -Context 0,1
+
+
+>       --inexact
+            Do not remove extraneous packages present in the environment
+>       --no-install-project
+            Do not install the current project [env: UV_NO_INSTALL_PROJECT=]
+>       --no-install-workspace
+            Do not install any workspace members, including the root project [env:
+>       --no-install-local
+            Do not install local path dependencies [env: UV_NO_INSTALL_LOCAL=]
+>       --no-install-package <NO_INSTALL_PACKAGE>
+            Do not install the given package(s)
+>       --locked
+            Assert that the `uv.lock` will remain unchanged [env: UV_LOCKED=]
+>       --frozen
+            Sync without updating the `uv.lock` file [env: UV_FROZEN=]
+>       --dry-run
+            Perform a dry run, without writing the lockfile or modifying the project environment
+
+
+
+
+const a = await tools.opencode.models({ provider: "anthropic", limit: 4 });
+const g = await tools.opencode.models({ provider: "google", limit: 6 });
+return {
+  anthropic: a.providers.map(p => ({ p: p.id, m: p.models.map(x => x.id) })),
+  google: g.providers.map(p => ({ p: p.id, m: p.models.map(x => x.id) })),
+};
+{
+  "anthropic": [],
+  "google": []
+}
+
+
+Ollama está arriba con 8 modelos. Configuro multi-proveedor con Ollama como default y dejo el proyecto funcionando con pip y con uv:
+
+$env:UV_PYTHON_PREFERENCE="only-managed"; uv lock 2>&1 | Select-Object -Last 5; Write-Output "=== dry-run de uv sync ==="; uv sync --dry-run 2>&1 | Select-Object -First 40
+
+Added websockets v17.4
+Added widgetsnbextension v4.0.16
+Added win32-setctime v1.2.1
+Added xxhash v4.0.2
+Added zstandard v0.25.0
+=== dry-run de uv sync ===
+uv : Would use project environment at: .venv
+En l�nea: 1 Car�cter: 124
++ ... e-Output "=== dry-run de uv sync ==="; uv sync --dry-run 2>&1 | Selec ...
++                                            ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Would use project environment at: .venv:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Resolved 187 packages in 3ms
+Found up-to-date lockfile at: uv.lock
+Checked 182 packages in 59ms
+Would make no changes
+
+Exited with code 1
+
+
+$env:UV_PYTHON_PREFERENCE="only-managed"; uv sync 2>&1 | Select-Object -Last 3; Write-Output "=== pip sigue disponible? ==="; .\.venv\Scripts\python.exe -m pip --version; Write-Output "=== uv run ==="; uv run python -c "import sys, langchain, langgraph, langchain_ollama; print(sys.version.split()[0], 'ok')" 2>&1
+uv : Resolved 187 packages in 3ms
+En l�nea: 1 Car�cter: 43
++ $env:UV_PYTHON_PREFERENCE="only-managed"; uv sync 2>&1 | Select-Objec ...
++                                           ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Resolved 187 packages in 3ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Checked 182 packages in 32ms
+=== pip sigue disponible? ===
+pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+
+=== uv run ===
+3.12.13 ok
+
+
+Ahora verifico que el stack funcione con Ollama (incluido tool calling, que es lo que necesita ReAct):
+
+.\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py" 2>&1
+proveedor: ollama | modelo: qwen3:8b | base: http://localhost:11434http://localhost:11434
+.\.venv\Scripts\python.exe : Traceback (most recent call last):
+En l�nea: 1 Car�cter: 1
++ .\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py", line 15, in <module>
+    llm = ChatOllama(model=modelo, base_url=base)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langchain_core\load\serializable.py", 
+line 115, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pydantic\main.py", line 280, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatOllama
+  Value error, Port could not be cast to integer value as '11434http:' [type=value_error, input_value={'model': 
+'qwen3:8b', 'ba...http://localhost:11434'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.14/v/value_error
+
+Exited with code 1
+
+
+Get-Content .env | Select-String -Pattern 'OLLAMA_BASE_URL|MODELO|LLM_PROVIDER' | ForEach-Object { "[$($_.Line)]" }; Write-Output "--- ejemplo ---"; Get-Content .env.example | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "--- variable en la sesion ---"; "[$env:OLLAMA_BASE_URL]"
+[LLM_PROVIDER=ollama]
+[# Modelo segǧn el proveedor elegido (cambie LLM_PROVIDER y MODELO juntos):]
+[MODELO=qwen3:8b]
+[OLLAMA_BASE_URL=http://localhost:11434http://localhost:11434]
+--- ejemplo ---
+[OLLAMA_BASE_URL=http://localhost:11434http://localhost:11434]
+--- variable en la sesion ---
+[]
+
+
+Se duplicó la URL al editar. Lo corrijo en ambos archivos:
+
+
+Write-Output "--- .env ---"; Get-Content .env | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "--- .env.example ---"; Get-Content .env.example | Select-String -Pattern 'OLLAMA_BASE_URL' | ForEach-Object { "[$($_.Line)]" }; Write-Output "=== prueba Ollama ==="; .\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\probar_ollama.py" 2>&1
+--- .env ---
+[OLLAMA_BASE_URL=http://localhost:11434]
+--- .env.example ---
+[OLLAMA_BASE_URL=http://localhost:11434]
+=== prueba Ollama ===
+proveedor: ollama | modelo: qwen3:8b | base: http://localhost:11434
+respuesta: 'OK'
+tool_calls: [{'name': 'consultar_stock', 'args': {'articulo': 'cascos'}, 'id': 'd7835c3e-f496-4ac5-a5db-86bee84a9a0f', 'type': 'tool_call'}]
+
+
+Ollama responde y hace tool calling correctamente. Actualizo README y el script de activación para que convivan pip y uv:
+
+
+$p = Join-Path $PWD 'activate.ps1'; $t = [System.IO.File]::ReadAllText($p, [System.Text.UTF8Encoding]::new($false)); [System.IO.File]::WriteAllText($p, $t, [System.Text.UTF8Encoding]::new($true)); .\activate.ps1; Write-Output ""; Write-Output "=== con -Sync ==="; .\activate.ps1 -Sync | Select-Object -Last 6
+==> conda no est� activo en esta sesi�n.
+    OK  .venv encontrado.
+==> Activando el entorno virtual del proyecto...
+==> Verificando la sesi�n...
+    OK  Python: Python 3.12.13
+    OK  conda inactivo.
+    OK  python -> C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Scripts\python.exe
+    OK  LLM: ollama / qwen3:8b
+
+Entorno listo. Pr�ximos pasos:
+  python main.py bodega "<consulta>"   # ejecutar el agente (etapa 1)
+  uv sync | pip install -r requirements.txt
+  deactivate                            # salir del entorno virtual
+
+=== con -Sync ===
+==> conda no est� activo en esta sesi�n.
+    OK  .venv encontrado.
+==> Sincronizando con uv...
+Resolved 187 packages in 3ms
+Checked 182 packages in 43ms
+    OK  uv.lock al d�a.
+==> Activando el entorno virtual del proyecto...
+==> Verificando la sesi�n...
+    OK  Python: Python 3.12.13
+    OK  conda inactivo.
+    OK  python -> C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Scripts\python.exe
+    OK  LLM: ollama / qwen3:8b
+
+Entorno listo. Pr�ximos pasos:
+  python main.py bodega "<consulta>"   # ejecutar el agente (etapa 1)
+  uv sync | pip install -r requirements.txt
+  deactivate                            # salir del entorno virtual
+
+
+
+Write-Output "=== .env vs .env.example ==="
+$a = (Get-Content .env -Raw); $b = (Get-Content .env.example -Raw); if ($a -ceq $b) { "identicos (solo difieren las claves que vas a pegar)" } else { "difieren" }
+Write-Output "=== claves con valor (sin mostrarlas) ==="
+Get-Content .env | Where-Object { $_ -match '^(GOOGLE|OPENAI|ANTHROPIC)_API_KEY=' } | ForEach-Object { $k,$v = $_ -split '=',2; "$k -> $(if ($v) { 'con valor' } else { 'vacia' })" }
+Write-Output "=== paquetes ==="
+.\.venv\Scripts\pip.exe list --disable-pip-version-check | Measure-Object -Line | Select-Object -ExpandProperty Lines
+Write-Output "=== uv.lock / pyproject ==="
+"uv.lock: $((Get-Item uv.lock).Length) bytes | pyproject deps: $((Select-String -Path pyproject.toml -Pattern '^    \"').Count)"
+Write-Output "=== git ==="
+git status --short | Select-Object -First 20
+Write-Output "=== raiz ==="
+Get-ChildItem -Force | Where-Object { $_.Name -notin '.venv','.git' } | Select-Object -ExpandProperty Name
+=== .env vs .env.example ===
+identicos (solo difieren las claves que vas a pegar)
+=== claves con valor (sin mostrarlas) ===
+GOOGLE_API_KEY -> vacia
+OPENAI_API_KEY -> vacia
+ANTHROPIC_API_KEY -> vacia
+=== paquetes ===
+185
+=== uv.lock / pyproject ===
+uv.lock: 765931 bytes | pyproject deps: 17
+=== git ===
+ M .gitignore
+ M .python-version
+ M README.md
+ M pyproject.toml
+ M uv.lock
+?? .env.example
+?? .opencode/
+?? AGENTS.md
+?? activate.ps1
+?? docs/
+?? plan.json
+?? requirements.txt
+=== raiz ===
+.opencode
+docs
+.env
+.env.example
+.gitignore
+.python-version
+activate.ps1
+AGENTS.md
+main.py
+Pauta_tarea_final.pdf
+plan.json
+pyproject.toml
+README.md
+requirements.txt
+uv.lock
+
+
+
+
+Estatus general
+1. Entorno (funciona con pip y con uv, sobre el mismo .venv)
+Elemento	Estado
+Python	3.12.13 (.venv, el que pide AGENTS.md)
+Paquetes instalados	183 (pip 25.0.1)
+uv	0.11.24 — uv sync → "Would make no changes" (182 verificados)
+uv.lock	regenerado: 187 paquetes resueltos
+pyproject.toml	espeja las 17 dependencias de requirements.txt, requires-python >=3.12
+.python-version	3.12
+Convivencia	uv run y .venv\Scripts\python funcionan; pip sigue presente tras uv sync
+Rutas verificadas: A) python -m venv + pip install -r requirements.txt (usada, ya instalada); B) uv sync (sin cambios). Ambas documentadas en el README.
+
+2. Proveedores de LLM (Ollama operativo, APIs listas para tus claves)
+Proveedor	Config	Prueba
+ollama (default)	LLM_PROVIDER=ollama, MODELO=qwen3:8b, OLLAMA_BASE_URL=http://localhost:11434	✅ respondió OK y ✅ generó tool_call consultar_stock(articulo='cascos')
+google	gemini-3.5-flash-lite	configurado, sin clave
+openai	gpt-5.4-mini (ejemplo)	configurado, sin clave
+anthropic	identificador vigente	configurado, sin clave
+Las tres claves (GOOGLE_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY) están vacías, listas para que las pegues al final. .env y .env.example son idénticos hoy (por eso no hay secretos adentro).
+
+Ollama tiene 8 modelos locales; para cambiar de modelo basta MODELO= en .env (llama3.2:3b es más rápido, gpt-oss:20b más potente).
+
+3. Archivos y cambios de esta etapa
+Archivo	Cambio
+.env / .env.example	multi-proveedor, Ollama por defecto, OLLAMA_BASE_URL completado
+pyproject.toml, .python-version	alineados a Python 3.12 y a las 17 dependencias
+AGENTS.md	proveedor por defecto ollama; regla 8: un único crear_llm() en src/llm.py; entorno dual pip/uv
+.opencode/agents/implementador.md	guía de modelo cambiada a crear_llm() / ChatOllama
+.opencode/agents/spec.md	sin cambios
+activate.ps1	ya no ejecuta uv sync por defecto (ahora -Sync), activa .venv y muestra LLM: ollama / qwen3:8b
+README.md	reescrito: instalación pip y uv, tabla de variables/proveedores, verificación
+.gitignore	+ editores/sistema + Pauta_tarea_final.pdf (material del curso)
+4. Estado del proyecto
+Etapa 0 completa: entorno, configuración, reglas y agentes.
+plan.json sigue vacío ({"proyecto": "bodega", "tareas": []}). No hay código de agente todavía, así que no hubo "código que ajustar": la regla del factory quedó en AGENTS.md y en la guía de @implementador, y será la primera tarea de @spec.
+main.py sigue siendo el stub de uv init; la CLI (python main.py bodega "...", --saltos, --diagrama) se implementa en la etapa 1.
+Nada está commiteado ni pusheado: hay 6 archivos modificados y 7 nuevos sin commit.
+5. Advertencias
+El repo de GitHub es público: docs/pauta_tarea_final.md y el PDF son material del curso. El PDF ya está ignorado; el .md de la pauta no. Decime si querés ignorarlo también.
+No mezcles cambios a mano entre pip install y uv add: editá requirements.txt y pyproject.toml (hoy están sincronizados).
+¿Arrancamos la etapa 1 lanzando @spec para que escriba en plan.json las tareas (empezando por src/llm.py con crear_llm(), estado y grafo mínimo)?
+

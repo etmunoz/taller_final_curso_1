@@ -1,0 +1,27 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_02.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 02.
+# Creado: 20261101_1224 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+Verifico que OpenCode pueda interpretar los archivos y que el modelo declarado exista:
+
+Ejecutada la instrucción 02. Creé los dos subagentes:
+
+Archivo	Resultado
+.opencode/agents/spec.md	Idéntico al bloque del instructivo (2094 caracteres), frontmatter válido
+.opencode/agents/implementador.md	Contenido idéntico salvo 2 reparaciones necesarias (ver abajo)
+Reparaciones aplicadas al bloque de implementador.md (el origen venía malformado; sin ellas el archivo no carga):
+
+Faltaba el --- de cierre del frontmatter → el bloque YAML quedaba abierto y OpenCode no podía leer el agente.
+Las claves write, edit, bash habían perdido la indentación bajo tools: → en YAML quedaban como claves de primer nivel y tools quedaba vacío. Les devolví los 2 espacios. (En spec.md sí venían indentadas.)
+Todo lo demás —texto, títulos sin #, viñetas sin -, el JSON de ejemplo— quedó palabra por palabra como en el original, sin agregar líneas en blanco ni reformatear.
+
+Verificado:
+
+Ambos frontmatter parsean bien: mode: subagent, model: openai/gpt-6-luna, tools: {write, edit, bash}.
+openai/gpt-6-luna existe y está activo (GPT-6 Luna, 0,1/0,5 USD por millón de tokens).
+Los agentes aparecen como @spec y @implementador disponibles.
+Aviso: los títulos del bloque de implementador.md quedaron como texto plano (Rol, Pasos obligatorios, Guía de construcción…) porque así vienen en el instructivo, y sus 6 pasos sin numerar. El agente funciona igual, pero si querés que se lean como secciones Markdown, decime y los convierto a #/## con listas numeradas.
+
+Sigue pendiente lo estructural: plan.json, requirements.txt, .env.example, src/bodega/, y decidir si el entorno va a Python 3.12 + pip (como manda AGENTS.md) o sigue con uv 3.13.
+

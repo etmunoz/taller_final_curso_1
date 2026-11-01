@@ -1,0 +1,35 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_06.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 06.
+# Creado: 20261101_1238 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+.\.venv\Scripts\python.exe "C:\Users\etmun\AppData\Local\Temp\opencode\verificar_entorno.py" 2>&1
+
+GOOGLE_API_KEY: falta
+MODELO en entorno: (no definido; se usa gemini-3.5-flash-lite)
+RESULTADO: no se ejecuta la llamada al modelo porque falta la clave.
+El script buscó .env desde su carpeta temporal, no desde el proyecto. Corrijo la ruta y repito:
+
+.env encontrado: True
+GOOGLE_API_KEY: falta
+MODELO: gemini-3.5-flash-lite   (cargado desde .env)
+
+MODELO usado: gemini-3.5-flash-lite
+ERROR: DefaultCredentialsError
+Your default credentials were not found. To set up Application Default Credentials,
+see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.
+
+No cambié MODELO ni ningún valor.
+
+Checkpoint de archivos (todo lo demás en orden):
+
+Elemento	Estado
+AGENTS.md, .opencode/agents/spec.md, .opencode/agents/implementador.md	OK
+requirements.txt, .env.example, .env, .gitignore, plan.json	OK
+.venv/ (Python 3.12.13 con dependencias)	OK
+Pauta_tarea_final.pdf	faltaba en la carpeta; la copié desde Downloads (85 KB, sin trackear)
+Llamada de prueba al modelo	pendiente: falta la clave
+Qué tenés que hacer: editá .env línea 3 y completá GOOGLE_API_KEY= con tu clave de Google AI Studio (sin comillas ni espacios). Avisame cuando esté y repito la verificación: debería responder algo equivalente a OK. Si el modelo gemini-3.5-flash-lite no existiera, te lo digo y no cambio MODELO sin consultarte.
+
+Después de eso, reiniciá OpenCode para que cargue AGENTS.md y los dos agentes antes de la etapa 1.
+

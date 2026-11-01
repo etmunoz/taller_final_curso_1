@@ -1,0 +1,28 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_03.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 03.
+# Creado: 20261101_1226 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+El bloque vuelve a venir con marcas perdidas (comentarios sin # y globs de .gitignore rotos por el Markdown). Creo los cuatro archivos reparando solo lo que impide que funcionen:
+
+Ejecutada la instrucción 03. Creé solo los cuatro archivos pedidos (nada más, sin instalar dependencias ni crear .env).
+
+Archivo	Estado
+requirements.txt	17 dependencias, todas parseables (PEP 508)
+.env.example	7 variables, sin valores secretos
+.gitignore	reemplazado por la lista indicada
+plan.json	JSON válido: {"proyecto": "bodega", "tareas": []}
+Reparaciones necesarias (el Markdown del instructivo se comió marcas; sin esto los archivos no funcionan):
+
+Archivo	Problema en el origen	Arreglo
+requirements.txt	6 líneas de prosa (--- agregados por este proyecto ---, historial persistente (SqliteSaver), etc.) quedarían como requisitos inválidos y pip fallaría	las convertí en comentarios #
+.env.example	8 líneas de prosa quedarían como variables y romperían load_dotenv()	las convertí en comentarios #
+.gitignore	pycache/ (por __pycache__/), .pyc (por *.pyc) y memoria.db- (por memoria.db-*) no coincidían con ningún archivo real	restauré los globs originales
+Ningún pin de versión, variable ni línea de contenido cambió; solo agregué los # y los *.
+
+Verificado con git check-ignore: .env, .venv/, __pycache__/, bodega.db, memoria.db-wal, trazas/ y comprobantes/*.txt quedan ignorados; .env.example sí se versiona.
+
+Ojo con .gitignore: al reemplazarlo se perdieron las entradas que tenía del proyecto anterior (build/, dist/, wheels/, *.egg-info, .vscode/, .idea/, .DS_Store, Thumbs.db, .env.*). Si querés que las vuelva a agregar al final de la lista, lo hago en un paso aparte.
+
+Sigue sin resolverse el punto de entorno: requirements.txt apunta a pip/Python 3.12 (lo que manda AGENTS.md), pero el proyecto hoy corre en .venv de uv con Python 3.13.
+

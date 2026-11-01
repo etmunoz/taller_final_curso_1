@@ -1,0 +1,145 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_04.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 04.
+# Creado: 20261101_1228 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+No existe python3 real en este Windows (solo el stub de Microsoft Store). Uso el intérprete 3.12 que pide AGENTS.md (CPython 3.12.13 instalado por uv):
+
+$py312 = 'C:\Users\etmun\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe'
+if (-not (Test-Path $py312)) { throw "no existe $py312" }
+Remove-Item -Recurse -Force .venv -ErrorAction SilentlyContinue
+& $py312 -m venv .venv
+if ($LASTEXITCODE -ne 0) { throw "venv falló: $LASTEXITCODE" }
+.\.venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe -m pip --version
+
+Python 3.12.13
+pip 25.0.1 from C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\pip (python 3.12)
+
+
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt --disable-pip-version-check 2>&1 | Select-Object -Last 40
+
+Downloading jupyter_events-0.12.1-py3-none-any.whl (19 kB)
+Downloading jupyter_server_terminals-0.5.4-py3-none-any.whl (13 kB)
+Downloading prometheus_client-0.26.0-py3-none-any.whl (64 kB)
+Using cached psutil-7.2.2-cp37-abi3-win_amd64.whl (137 kB)
+Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+Downloading python_dateutil-4.0.0-py3-none-any.whl (92 kB)
+Downloading pywinpty-3.1.2-cp312-cp312-win_amd64.whl (2.1 MB)
+   ---------------------------------------- 2.1/2.1 MB 4.4 MB/s eta 0:00:00
+Downloading send2trash-2.1.0-py3-none-any.whl (17 kB)
+Downloading soupsieve-3.0.4-py3-none-any.whl (42 kB)
+Using cached stack_data-0.6.3-py3-none-any.whl (24 kB)
+Downloading terminado-0.18.1-py3-none-any.whl (14 kB)
+Downloading tinycss2-1.5.1-py3-none-any.whl (28 kB)
+Downloading truststore-0.10.5-py3-none-any.whl (19 kB)
+Downloading wcwidth-0.9.4-cp310-abi3-win_amd64.whl (597 kB)
+   ---------------------------------------- 597.8/597.8 kB 2.7 MB/s eta 0:00:00
+Downloading webencodings-0.6.1-py3-none-any.whl (8.7 kB)
+Downloading websocket_client-1.9.2-py3-none-any.whl (95 kB)
+Downloading asttokens-3.0.2-py3-none-any.whl (28 kB)
+Downloading cffi-2.1.1-cp312-cp312-win_amd64.whl (185 kB)
+Downloading executing-2.3.0-py3-none-any.whl (29 kB)
+Using cached parso-0.8.7-py2.py3-none-any.whl (107 kB)
+Downloading pyasn1-0.6.5-py3-none-any.whl (84 kB)
+Downloading python_json_logger-4.2.0-py3-none-any.whl (14 kB)
+Downloading rfc3986_validator-0.1.1-py2.py3-none-any.whl (4.2 kB)
+Downloading argon2_cffi_bindings-26.1.0-cp310-abi3-win_amd64.whl (25 kB)
+Downloading pure_eval-0.2.4-py3-none-any.whl (11 kB)
+Downloading rfc3339_validator-0.1.4-py2.py3-none-any.whl (3.5 kB)
+Downloading tzdata-2026.6-py2.py3-none-any.whl (348 kB)
+Downloading rfc3987_syntax-1.1.0-py3-none-any.whl (8.0 kB)
+Downloading webcolors-25.10.0-py3-none-any.whl (14 kB)
+Downloading fqdn-1.6.0-py3-none-any.whl (12 kB)
+Downloading isoduration-20.11.0-py3-none-any.whl (11 kB)
+Downloading pycparser-3.12-py3-none-any.whl (62 kB)
+Using cached six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading uri_template-1.3.0-py3-none-any.whl (11 kB)
+Downloading arrow-1.4.0-py3-none-any.whl (68 kB)
+Downloading lark-1.3.1-py3-none-any.whl (113 kB)
+Installing collected packages: sqlite-vec, pure-eval, flatbuffers, filetype, zstandard, xxhash, win32-setctime, widgetsnbextension, websockets, websocket-client, webencodings, webcolors, wcwidth, uuid-utils, urllib3, uri-template, tzdata, typing-extensions, truststore, traitlets, tornado, tenacity, soupsieve, sniffio, six, send2trash, rpds-py, rfc3986-validator, regex, redis, pyzmq, PyYAML, pywinpty, pywin32, python-ulid, python-multipart, python-json-logger, python-dotenv, pyjwt, pygments, pycparser, pyasn1, py-rust-stemmers, psutil, protobuf, prometheus-client, platformdirs, pillow, parso, pandocfilters, packaging, ormsgpack, orjson, numpy, nest-asyncio2, mmh3, mistune, MarkupSafe, lark, jupyterlab_widgets, jupyterlab-pygments, jsonpointer, jsonpath-ng, json5, jiter, idna, hf-xet, h11, fsspec, fqdn, filelock, fastjsonschema, executing, docstring-parser, distro, defusedxml, debugpy, comm, colorama, click, charset_normalizer, certifi, babel, attrs, async-lru, asttokens, annotated-types, aiosqlite, uvicorn, typing-inspection, tqdm, tinycss2, terminado, stack_data, SQLAlchemy, rfc3987-syntax, rfc3339-validator, requests, referencing, python-dateutil, pydantic-core, pyasn1-modules, proto-plus, prompt-toolkit, opentelemetry-api, onnxruntime, ml-dtypes, matplotlib-inline, loguru, jupyter-core, jsonpatch, jinja2, jedi, ipython-pygments-lexers, httpcore2, httpcore, grpcio, googleapis-common-protos, cffi, bleach, beautifulsoup4, anyio, tiktoken, starlette, requests-toolbelt, pydantic, jupyter-server-terminals, jupyter-client, jupyter-builder, jsonschema-specifications, ipython, httpx2, httpx, grpcio-status, cryptography, arrow, argon2-cffi-bindings, sse-starlette, redisvl, openai, ollama, mcp-types, langsmith, langgraph-sdk, jsonschema, isoduration, ipywidgets, ipykernel, huggingface-hub, google-auth, argon2-cffi, anthropic, tokenizers, nbformat, mcp, langchain-core, jupyter-console, google-api-core, nbclient, langgraph-checkpoint, langchain-text-splitters, langchain-redis, langchain-openai, langchain-ollama, langchain-mcp-adapters, langchain-anthropic, jupyter-events, fastembed, nbconvert, langgraph-prebuilt, langgraph-checkpoint-sqlite, langchain, google-ai-generativelanguage, langgraph, langchain-google-genai, jupyter-server, notebook-shim, jupyterlab-server, jupyter-lsp, jupyterlab, notebook, jupyter
+Successfully installed MarkupSafe-3.0.4 PyYAML-6.0.3 SQLAlchemy-2.1.6 aiosqlite-0.22.1 annotated-types-0.8.0 anthropic-0.125.0 anyio-4.16.0 argon2-cffi-25.1.0 argon2-cffi-bindings-26.1.0 arrow-1.4.0 asttokens-3.0.2 async-lru-2.4.0 attrs-26.1.0 babel-2.18.0 beautifulsoup4-4.15.0 bleach-6.4.0 certifi-2025.11.12 cffi-2.1.1 charset_normalizer-3.5.2 click-8.5.0 colorama-0.4.6 comm-0.2.3 cryptography-50.0.2 debugpy-1.8.22 defusedxml-0.7.1 distro-1.9.0 docstring-parser-0.18.0 executing-2.3.0 fastembed-0.9.1 fastjsonschema-2.22.2 filelock-4.2.6 filetype-1.2.0 flatbuffers-25.12.19 fqdn-1.6.0 fsspec-2026.9.0 google-ai-generativelanguage-0.12.1 google-api-core-2.43.2 google-auth-2.62.0 googleapis-common-protos-1.76.0 grpcio-1.85.1 grpcio-status-1.85.1 h11-0.16.0 hf-xet-1.8.0 httpcore-1.0.9 httpcore2-2.16.0 httpx-0.28.1 httpx2-2.16.0 huggingface-hub-1.33.0 idna-3.20 ipykernel-7.4.0 ipython-9.18.0 ipython-pygments-lexers-1.1.1 ipywidgets-8.1.9 isoduration-20.11.0 jedi-0.20.1 jinja2-3.1.6 jiter-0.18.0 json5-0.17.3 jsonpatch-1.38 jsonpath-ng-1.15.0 jsonpointer-3.6 jsonschema-4.26.0 jsonschema-specifications-2025.9.1 jupyter-1.1.1 jupyter-builder-1.2.4 jupyter-client-8.10.0 jupyter-console-6.6.3 jupyter-core-5.9.1 jupyter-events-0.12.1 jupyter-lsp-2.3.1 jupyter-server-2.21.1 jupyter-server-terminals-0.5.4 jupyterlab-4.6.5 jupyterlab-pygments-0.3.0 jupyterlab-server-2.28.1 jupyterlab_widgets-3.0.17 langchain-0.3.30 langchain-anthropic-0.3.22 langchain-core-0.3.86 langchain-google-genai-2.1.12 langchain-mcp-adapters-0.1.14 langchain-ollama-0.3.10 langchain-openai-0.3.35 langchain-redis-0.2.4 langchain-text-splitters-0.3.11 langgraph-0.5.4 langgraph-checkpoint-2.1.2 langgraph-checkpoint-sqlite-2.0.11 langgraph-prebuilt-0.5.2 langgraph-sdk-0.1.74 langsmith-0.14.16 lark-1.3.1 loguru-0.7.3 matplotlib-inline-0.2.2 mcp-2.3.0 mcp-types-2.3.0 mistune-3.4.0 ml-dtypes-0.6.0 mmh3-5.3.1 nbclient-0.11.0 nbconvert-7.17.2 nbformat-5.11.1 nest-asyncio2-1.7.4 notebook-7.6.4 notebook-shim-0.2.4 numpy-2.5.4 ollama-0.6.3 onnxruntime-1.31.1 openai-2.54.0 opentelemetry-api-1.45.2 orjson-3.13.0 ormsgpack-1.13.0 packaging-25.0 pandocfilters-1.5.1 parso-0.8.7 pillow-13.0.0 platformdirs-4.14.2 prometheus-client-0.26.0 prompt-toolkit-3.0.53 proto-plus-1.29.0 protobuf-7.36.2 psutil-7.2.2 pure-eval-0.2.4 py-rust-stemmers-0.1.8 pyasn1-0.6.5 pyasn1-modules-0.4.2 pycparser-3.12 pydantic-2.14.2 pydantic-core-2.50.2 pygments-2.21.0 pyjwt-2.15.1 python-dateutil-4.0.0 python-dotenv-1.2.4 python-json-logger-4.2.0 python-multipart-0.0.33 python-ulid-4.1.0 pywin32-312 pywinpty-3.1.2 pyzmq-27.2.0 redis-8.1.0 redisvl-0.29.0 referencing-0.37.0 regex-2026.9.29 requests-2.34.2 requests-toolbelt-1.0.0 rfc3339-validator-0.1.4 rfc3986-validator-0.1.1 rfc3987-syntax-1.1.0 rpds-py-2026.9.1 send2trash-2.1.0 six-1.17.0 sniffio-1.3.1 soupsieve-3.0.4 sqlite-vec-0.1.9 sse-starlette-3.6.0 stack_data-0.6.3 starlette-1.10.0 tenacity-9.2.1 terminado-0.18.1 tiktoken-0.14.0 tinycss2-1.5.1 tokenizers-0.23.3 tornado-6.6 tqdm-4.70.1 traitlets-5.16.1 truststore-0.10.5 typing-extensions-4.16.0 typing-inspection-0.4.4 tzdata-2026.6 uri-template-1.3.0 urllib3-2.8.0 uuid-utils-0.19.0 uvicorn-0.54.0 wcwidth-0.9.4 webcolors-25.10.0 webencodings-0.6.1 websocket-client-1.9.2 websockets-17.4 widgetsnbextension-4.0.16 win32-setctime-1.2.1 xxhash-4.0.2 zstandard-0.25.0
+
+
+Write-Output "=== .venv\Scripts\python.exe --version ==="
+.\.venv\Scripts\python.exe --version
+Write-Output ""
+Write-Output "=== .venv\Scripts\pip.exe list (langchain|langgraph|redis|mcp|fastembed) ==="
+.\.venv\Scripts\pip.exe list --disable-pip-version-check | Select-String -Pattern 'langchain|langgraph|redis|mcp|fastembed'
+Write-Output ""
+Write-Output "=== import de control ==="
+.\.venv\Scripts\python.exe -c "import langchain, langgraph, langchain_google_genai, redis, fastembed, langgraph.checkpoint.sqlite, langchain_mcp_adapters; print('imports OK')"
+
+
+=== .venv\Scripts\python.exe --version ===
+Python 3.12.13
+
+=== .venv\Scripts\pip.exe list (langchain|langgraph|redis|mcp|fastembed) ===
+
+fastembed                    0.9.1
+langchain                    0.3.30
+langchain-anthropic          0.3.22
+langchain-core               0.3.86
+langchain-google-genai       2.1.12
+langchain-mcp-adapters       0.1.14
+langchain-ollama             0.3.10
+langchain-openai             0.3.35
+langchain-redis              0.2.4
+langchain-text-splitters     0.3.11
+langgraph                    0.5.4
+langgraph-checkpoint         2.1.2
+langgraph-checkpoint-sqlite  2.0.11
+langgraph-prebuilt           0.5.2
+langgraph-sdk                0.1.74
+mcp                          2.3.0
+mcp-types                    2.3.0
+redis                        8.1.0
+redisvl                      0.29.0
+
+=== import de control ===
+C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+imports OK
+
+
+
+
+=== .venv\Scripts\python.exe --version ===
+Python 3.12.13
+
+=== .venv\Scripts\pip.exe list (langchain|langgraph|redis|mcp|fastembed) ===
+fastembed                    0.9.1
+langchain                    0.3.30
+langchain-anthropic          0.3.22
+langchain-core               0.3.86
+langchain-google-genai       2.1.12
+langchain-mcp-adapters       0.1.14
+langchain-ollama             0.3.10
+langchain-openai             0.3.35
+langchain-redis              0.2.4
+langchain-text-splitters     0.3.11
+langgraph                    0.5.4
+langgraph-checkpoint         2.1.2
+langgraph-checkpoint-sqlite  2.0.11
+langgraph-prebuilt           0.5.2
+langgraph-sdk                0.1.74
+mcp                          2.3.0
+mcp-types                    2.3.0
+redis                        8.1.0
+redisvl                      0.29.0
+
+
+Detalles de ejecución:
+
+No existe python3 real en este Windows (solo el stub de Microsoft Store). Usé el CPython 3.12.13 instalado por uv, que es la versión que exige AGENTS.md.
+Recreé .venv desde cero con -m venv (el anterior era el de uv con 3.13 y no tenía paquetes).
+pip install -r requirements.txt terminó sin errores ni conflictos: 17 dependencias directas y ~180 paquetes en total.
+Todo se instaló dentro de .venv; no ejecuté pip fuera de él.
+Import de control OK (langchain, langgraph, langchain_google_genai, redis, fastembed, langgraph.checkpoint.sqlite, langchain_mcp_adapters). Solo aparece un aviso de deprecación interno de LangGraph, inofensivo.
+Riesgo inmediato que dejó este cambio: activate.ps1 (el script de la primera sesión) ejecuta uv sync, y pyproject.toml dice requires-python >=3.13 con .python-version en 3.13. Si lo corrés ahora, uv reemplazaría este .venv de 3.12 por uno de 3.13 y borraría lo instalado. Opciones:
+
+Eliminar los restos de uv (pyproject.toml, uv.lock, .python-version) y dejar el proyecto como pide AGENTS.md: venv + requirements.txt.
+Bajar requires-python a >=3.12 y pinear .python-version en 3.12, manteniendo uv como gestor opcional.
+Dejar activate.ps1 solo para desactivar conda y activar .venv, sin uv sync.
+¿Cuál preferís?
+

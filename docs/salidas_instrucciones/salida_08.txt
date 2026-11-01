@@ -1,0 +1,74 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_08.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 08.
+# Creado: 20261101_1301 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+
+
+Necesito los timestamps reales (Santiago) de cada artefacto para la bitácora:
+
+Actualizo el estado en README.md:
+
+Ahora el script de rotulado (respeta frontmatter YAML, BOM y saltos de línea de cada archivo):
+
+Aparecieron archivos nuevos (docs/salidas_instrucciones/). Los reviso antes de rotular:
+
+La verificación de rótulos dio falso negativo; la reviso de nuevo:
+
+Todos los 25 archivos quedaron rotulados. Ahora creo la bitácora con el registro de las instrucciones 01–08:
+
+El rotulador duplicó encabezados en los .md (mi chequeo de idempotencia no contemplaba el **Grupo:** en negrita). Lo corrijo:
+
+Reviso los dos agentes, que quedaron fuera de esa reparación:
+
+Instrucción 08 completada.
+
+1. Documentación actualizada
+README.md — nuevas secciones y estado al día:
+
+Sección	Contenido
+## Equipo	Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+## Estado actual	etapa 0 completa; añadidos bitácora y rotulado
+## Registro y rotulado	formato de fecha y convención de encabezados
+Enlace	docs/BITACORA.md
+docs/BITACORA.md — creada, con 10 entradas fechadas en America/Santiago:
+
+Fecha	Hito
+20261026_2201	Preparación inicial (repo, uv, activate.ps1)
+20261026_2212	Pauta transcripta y plan del proyecto
+20261101_1215	Instr. 01 — AGENTS.md
+20261101_1223	Instr. 02 — @spec y @implementador
+20261101_1226	Instr. 03 — dependencias y configuración
+20261101_1228	Instr. 04 — .venv + 183 paquetes
+20261101_1237	Instr. 05 — .env
+20261101_1239	Instr. 06 — verificación del modelo (sin clave)
+20261101_1250	Instr. 07 — 4 proveedores + entorno dual
+20261101_1305	Instr. 08 — documentación y rotulado
+Cada entrada registra pedido, realizado, archivos, verificación e incidencias.
+
+2. Rotulado aplicado (26 archivos)
+Tipo	Archivos	Formato del rótulo
+.md	14 (README, AGENTS, BITACORA, pauta, plan, 8 instrucciones)	cita > al inicio; en los agentes va después del frontmatter
+.txt	8 (docs/salidas_instrucciones/salida_01..08)	comentarios #
+.ps1	1 (activate.ps1)	bloque de comentarios bajo #Requires
+.py	1 (main.py)	docstring de módulo
+.txt	1 (requirements.txt)	comentarios #
+Cada uno lleva: Grupo, Archivo, Objetivo, Creado y Actualizado en YYYYMMDD_hhmm (America/Santiago, UTC−3). No se rotularon .env (credenciales) ni plan.json/uv.lock (no son .md/.ps1/.py/.txt).
+
+3. Incidencias corregidas
+Encabezados duplicados: la primera pasada del rotulador no reconocía el **Grupo:** en negrita y volvió a rotular los .md. Se colapsaron a un único encabezado por archivo.
+Sufijo de zona horaria perdido: al reparar se cayó el (America/Santiago) en las líneas Actualizado. Restituido.
+Falso positivo de verificación: un **Grupo:** citado dentro del texto de la bitácora hacía parecer que tenía dos encabezados; es sólo mención en prosa.
+4. Verificación
+Comprobación	Resultado
+Rótulos	26/26 con un solo encabezado, Creado y Actualizado con zona horaria
+Agentes	frontmatter sigue primero y parsea (PyYAML): subagent, openai/gpt-6-luna, bash/edit/write
+main.py	compila (py_compile)
+activate.ps1	parsea sin errores (Parser::ParseFile)
+Integridad	instruccion_01.md conserva su contenido; plan.json intacto; .env sin claves cargadas
+5. Pendientes
+Commit y push de la etapa 0 (hay 13 rutas sin commitear).
+Completar las tres API keys y probar Google/OpenAI/Anthropic.
+Actualizar docs/plan_proyecto.md al caso bodega + Ollama.
+Decidir si docs/pauta_tarea_final.md se publica en el repo público.
+Etapa 1: lanzar @spec para escribir las tareas en plan.json.

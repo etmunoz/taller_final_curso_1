@@ -1,0 +1,24 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_01.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 01.
+# Creado: 20261101_1221 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+Verifico que el contenido sea idéntico al del instructivo, carácter por carácter:
+
+AGENTS.md creado en la raíz y verificado: idéntico al bloque del instructivo (3513 caracteres, 48 líneas, comparación sensible a mayúsculas).
+
+Estado del repo:
+
+Archivo	Estado
+AGENTS.md	nuevo, sin commitear
+activate.ps1	nuevo, sin commitear
+docs/ (pauta, plan, instrucción)	nuevos, sin commitear
+Falta lo que el propio AGENTS.md describe (probablemente viene en instruccion_02): .opencode/agents/spec.md, .opencode/agents/implementador.md, plan.json, requirements.txt, .env.example, src/bodega/.
+
+Tres discrepancias que conviene resolver antes de implementar (no toqué nada, porque el instructivo pedía copiar el contenido sin cambios):
+
+Entorno: AGENTS.md fija Python 3.12 + venv + pip install -r requirements.txt; el proyecto hoy usa uv + Python 3.13 (pyproject.toml, uv.lock).
+Modelo: AGENTS.md define gemini-3.5-flash-lite por langchain-google-genai; el plan que armamos asumía OpenAI.
+Caso: AGENTS.md ya nombra el agente de esta tarea: bodega ("¿cuántos cascos hay?"); el plan apuntaba a agenda/tareas.
+¿Querés que adapte el entorno a lo que manda AGENTS.md (Python 3.12 + Gemini + requirements.txt), que ajustemos el plan al agente bodega, o que solo commitee lo pendiente y esperemos la siguiente instrucción?
+

@@ -1,0 +1,27 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_05.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 05.
+# Creado: 20261101_1237 (America/Santiago)
+# Actualizado: 20261101_1304 (America/Santiago)
+Hecho. .env creado como copia exacta de .env.example (772 bytes, sin modificar valores).
+
+Verificaciones:
+
+Comprobación	Resultado
+.env existe	sí
+Está en .gitignore	sí — regla en la línea 1 (.env)
+Está rastreado por git	no (untracked; git status no lo lista)
+.env.example	no ignorado, queda visible para versionar
+Variables en .env (solo nombres y si tienen valor):
+
+Variable	Estado
+LLM_PROVIDER	google (ya puesto)
+MODELO	gemini-3.5-flash-lite (ya puesto)
+GOOGLE_API_KEY	vacía — es la única que tenés que completar
+OPENAI_API_KEY, ANTHROPIC_API_KEY	vacías (no se usan)
+OLLAMA_BASE_URL	vacía (opcional)
+REDIS_URL	redis://localhost:6379 (ya puesto)
+EMBEDDING_PROVIDER	vacía = sigue al proveedor del LLM (google)
+Completá a mano solo GOOGLE_API_KEY= en C:\Users\etmun\proyecto\taller_final_curso_1\.env. La clave se obtiene gratis en Google AI Studio (aistudio.google.com/apikey).
+
+Me detengo acá como pediste; no leí ni imprimí ningún valor secreto.
