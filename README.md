@@ -2,7 +2,7 @@
 > **Archivo:** `README.md`
 > **Objetivo:** Presentación del proyecto, equipo, instalación con pip y con uv, configuración multi-proveedor y estado actual.
 > **Creado:** 20261026_2201 (America/Santiago)
-> **Actualizado:** 20261101_2000 (America/Santiago)
+> **Actualizado:** 20261101_2008 (America/Santiago)
 
 # taller_final_curso_1
 
@@ -20,7 +20,7 @@ El agente se especifica y se implementa por tareas (`plan.json`), con un noteboo
 El desarrollo queda registrado en [`docs/BITACORA.md`](docs/BITACORA.md). Todas las fechas se escriben
 como `YYYYMMDD_hhmm` en horario de Santiago de Chile (`America/Santiago`).
 
-## Estado actual (Etapas 0–4 completadas)
+## Estado actual (Etapas 0–4 completadas · Etapa 5 especificada)
 
 - [x] Python 3.12 con `.venv`
 - [x] Dependencias instaladas (pip y uv sobre el mismo `.venv`)
@@ -30,7 +30,8 @@ como `YYYYMMDD_hhmm` en horario de Santiago de Chile (`America/Santiago`).
 - [x] Etapa 2 (`t05`–`t09`): herramientas (`tools.py`), grafo `StateGraph` (`graph.py`), historial `SqliteSaver` y CLI (`main.py`)
 - [x] Etapa 3 (`t10`–`t12`): juez real con `RemoveMessage`, memoria de perfil en SQLite y suite `scripts/prueba_seguridad.py` (5/5 `✔`)
 - [x] Etapa 4 (`t13`–`t15`): corpus `docs_rag/` (5 documentos, 2369 palabras), índice RAG en Redis Stack (`src/bodega/rag.py`, `COSINE`/`HNSW`) y herramienta `buscar_politicas`
-- [x] Bitácora en `docs/BITACORA.md` con las instrucciones 01–16
+- [ ] Etapa 5 (`t16`–`t17`, especificada en `plan.json`): servidor MCP filesystem (`src/bodega/mcp.py`) y generación de comprobantes en `agente_comprobante`
+- [x] Bitácora en `docs/BITACORA.md` con las instrucciones 01–17
 - [x] Todos los `.md`, `.ps1`, `.py` y `.txt` rotulados con grupo, objetivo y fechas
 
 ## Requisitos

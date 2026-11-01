@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_2000 (America/Santiago)
+> **Actualizado:** 20261101_2008 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -257,9 +257,21 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 - Pregunta de stock (`"¿Cuántos cascos quedan?"`) → `ruta=consulta`, ejecutó únicamente `buscar_producto` sin tocar Redis.
 - Pregunta mixta (`"¿Tienen esmeril en stock, a qué precio y qué garantía tiene?"`) → ejecutó `['buscar_producto', 'buscar_politicas']` e informó stock (18 unidades a `$42,990 CLP`) y garantía de `12 meses` según `garantias.md`.
 
+## 20261101_2008 — Instrucción 17: especificación de la Etapa 5 (`t16`–`t17`: MCP filesystem y comprobantes) en `plan.json`
+
+**Pedido:** agregar a `plan.json` únicamente las tareas de la Etapa 5 (`t16`: módulo `src/bodega/mcp.py` con `verificar_node()`, event loop en hilo de fondo con `run_async(coro)` y `conectar_mcp(dir_comprobantes)` usando `MultiServerMCPClient` con `@modelcontextprotocol/server-filesystem` y envoltorios síncronos `StructuredTool.from_function` para `write_file`, `read_file` y `list_directory`; `t17`: integración de `herramientas_mcp` en `construir_grafo` expuestas únicamente en `agente_comprobante` y registradas en el nodo `herramientas`, con verificaciones normal y adversarial).
+
+**Realizado:**
+- Se agregaron en `plan.json` las tareas `t16` y `t17` en estado `pendiente`, conservando `t01`–`t15` en estado `hecho` con todas sus evidencias.
+- Se rotuló `docs/instrucciones/instruccion_17.md` y se generó `docs/salidas_instrucciones/salida_17.txt` con el volcado completo de la especificación.
+- Se actualizó el estado en `README.md` y `docs/BITACORA.md`.
+
+**Verificación:** `plan.json` validado con 17 tareas (`t01`–`t15` en `hecho`, `t16`–`t17` en `pendiente`) y dependencias consistentes (`t16`→`['t02']`; `t17`→`['t07', 't10', 't16']`).
+
 ## Pendientes
 
 - [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
+- [ ] Ejecutar `t16`–`t17` (Etapa 5: servidor MCP filesystem y emisión de comprobantes).
 - [x] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.
 - [x] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.
 - [x] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
