@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1855 (America/Santiago)
+> **Actualizado:** 20261101_1910 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -202,9 +202,21 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 - `python main.py bodega --saltos "¿cuántas huinchas de medir hay?"` recorrió el grafo (`cargar_memoria -> router -> agente_consulta -> herramientas(buscar_producto) -> ...`) y devolvió la respuesta con el stock exacto (22 unidades).
 - Historial conversacional con `SqliteSaver` validado en turnos sucesivos recordando el nombre del usuario (`Andrea`).
 
+## 20261101_1910 — Instrucción 13: especificación de la Etapa 3 (`t10`–`t12`) en `plan.json`
+
+**Pedido:** agregar a `plan.json` únicamente las tareas de la Etapa 3 (`t10`: juez real en `graph.py` con `Veredicto`, sanitización vía `RemoveMessage` y sustitución por `RESPUESTA_SEGURA`; `t11`: memoria de perfil real en `graph.py` con `PerfilUsuario` y persistencia en `perfil_usuario` de SQLite; `t12`: suite de pruebas de seguridad e inmutabilidad de base de datos en `scripts/prueba_seguridad.py`).
+
+**Realizado:**
+- Se actualizaron las tareas `t05` a `t09` en `plan.json` marcándolas como `hecho` con su evidencia de verificación de la Etapa 2.
+- Se agregaron las tareas `t10`, `t11` y `t12` en estado `pendiente`, con sus dependencias, entregables y verificaciones observables basadas en las reglas de `AGENTS.md`.
+- Se rotuló `docs/instrucciones/instruccion_13.md` y se creó `docs/salidas_instrucciones/salida_13.txt`.
+
+**Verificación:** `plan.json` validado sintácticamente con 12 tareas (`t01`–`t09` en `hecho`, `t10`–`t12` en `pendiente`).
+
 ## Pendientes
 
 - [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
+- [ ] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.
 - [x] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).

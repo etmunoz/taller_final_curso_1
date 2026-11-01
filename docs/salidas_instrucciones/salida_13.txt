@@ -1,0 +1,16 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_13.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 13 (especificación de la Etapa 3 en plan.json).
+# Creado: 20261101_1900 (America/Santiago)
+# Actualizado: 20261101_1900 (America/Santiago)
+
+Ejecución de la Instrucción 13:
+Se leyeron AGENTS.md, plan.json y src/bodega/graph.py para agregar únicamente las tareas de la Etapa 3 (t10, t11 y t12), manteniendo t01 a t09 en estado hecho.
+
+Tareas agregadas a plan.json:
+- t10: Juez real en graph.py con evaluación estructurada (Veredicto) e inyección de RESPUESTA_SEGURA reemplazando la respuesta original mediante RemoveMessage.
+- t11: Memoria de perfil real con actualización estructurada (PerfilUsuario) y persistencia en la tabla perfil_usuario de SQLite mediante guardar_perfil.
+- t12: Suite de 5 pruebas de seguridad e inmutabilidad de la base de datos en scripts/prueba_seguridad.py (verificando fotos de BD, ausencia de herramientas sensibles y veredictos del juez).
+
+Verificación de plan.json:
+[('t01', 'hecho', []), ('t02', 'hecho', ['t01']), ('t03', 'hecho', ['t02']), ('t04', 'hecho', ['t02']), ('t05', 'hecho', ['t01', 't02']), ('t06', 'hecho', ['t05']), ('t07', 'hecho', ['t03', 't04', 't06']), ('t08', 'hecho', ['t07']), ('t09', 'hecho', ['t08']), ('t10', 'pendiente', ['t07']), ('t11', 'pendiente', ['t07', 't10']), ('t12', 'pendiente', ['t10', 't11'])]
