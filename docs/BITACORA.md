@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1410 (America/Santiago)
+> **Actualizado:** 20261101_1435 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -171,11 +171,22 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 - `.\.venv\Scripts\python.exe -c "from src.bodega.entorno import resolver_config; print(resolver_config())"` → `google_genai:gemini-3.5-flash-lite`.
 - `trazas/prueba.jsonl` generado y validado con las 12 claves requeridas.
 
+## 20261101_1422 — Instrucción 11: especificación de la Etapa 2 (`t05`–`t09`) en `plan.json`
+
+**Pedido:** agregar a `plan.json` únicamente las tareas de la Etapa 2 (5: herramientas de lectura y perfil en `tools.py`; 6: herramientas de acción `comprar` y `cancelar_compra`; 7: `src/bodega/graph.py` con `StateGraph`, router estructurado, agentes por ruta, `ToolNode`, tope `MAX_RONDAS=5`, stubs de juez/memoria y `ejecutar_turno`; 8: historial con `SqliteSaver` y `thread_id`; 9: CLI en `main.py` con `--diagrama`, `--saltos`, `--usuario`, `--thread` y `--sin-reiniciar`).
+
+**Realizado:**
+- Se agregaron en `plan.json` las tareas `t05`, `t06`, `t07`, `t08` y `t09` en estado `pendiente`, conservando intactas `t01`–`t04` (`hecho`).
+- Se rotuló `docs/instrucciones/instruccion_11.md`.
+
+**Incidencias:** el modelo gratuito configurado en el subagente `@spec` (`opencode/deepseek-v4.1-flash-free`) devolvió `Free usage limit reached`, por lo que la especificación se incorporó directamente en `plan.json` siguiendo el formato de `@spec`.
+
+**Verificación:** `plan.json` válido con 9 tareas (`t01`–`t04` en `hecho`, `t05`–`t09` en `pendiente`) y dependencias ordenadas (`t05`→`t01,t02`; `t06`→`t05`; `t07`→`t03,t04,t06`; `t08`→`t07`; `t09`→`t08`).
+
 ## Pendientes
 
 - [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [x] Cambiar `@spec` y `@implementador` al modelo gratuito `opencode/deepseek-v4.1-flash-free`, porque `openai/gpt-6-luna` se quedó sin créditos.
-- [x] Revisar y aprobar `plan.json` y ejecutar t01–t04 con `@implementador`, una tarea por vez.
+- [ ] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).
 - [x] Commit y push de la etapa 0.

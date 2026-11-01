@@ -76,6 +76,97 @@
         "configurar(verboso=False) no imprime nada y configurar(verboso=True) imprime una linea por llamada"
       ],
       "evidencia": "20261101_1405: .\\.venv\\Scripts\\python.exe con src.bodega traza y entorno. (a) configurar(verboso=True) + crear_llm() + llamar_llm('prueba', modelo, [SystemMessage, HumanMessage('¿Cuántos cascos hay?')], modelo_id=str(resolver_config()), temperatura=0, thread_id='prueba') imprimio '[traza] prueba google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 320 tok · tool_calls=0 · respuesta=No tengo acceso a la cantidad actual de cascos...' y devolvio AIMessage; trazas/prueba.jsonl quedo con 1 linea JSON valida. (b) json.loads de esa linea devuelve exactamente las 12 claves pedidas, sin faltantes ni sobrantes: ts=2026-11-01T14:03:00-03:00, thread_id=prueba, nodo=prueba, modelo, temperatura=0, system_prompt completo, n_mensajes=2, ultimo_mensaje='¿Cuántos cascos hay?', respuesta, salida_estructurada=null, tool_calls=[], tokens={input:43, output:277, total:320}. (c) configurar(verboso=False) con stdout capturado devolvio '' (vacio) y trazas/prueba.jsonl paso de 1 a 2 lineas. Extra: la rama with_structured_output(Clasificacion, include_raw=True) imprimio su linea y registro salida_estructurada={categoria, motivo} con tokens 38/319/357 en trazas/prueba_estructurada.jsonl; resumen(None)='' , resumen(12345)='12345', colapsa saltos/espacios y recorta con '…'; configurar() acepta ruta propia y se puede repetir. Nota: modelo registra el id pedido (google_genai:...) aunque crear_llm cayo a ollama:qwen3:8b por falta de GOOGLE_API_KEY."
+    },
+    {
+      "id": "t05",
+      "nombre": "Herramientas de lectura del catálogo, compras del usuario y perfil en SQLite",
+      "estado": "pendiente",
+      "depende_de": [
+        "t01",
+        "t02"
+      ],
+      "descripcion": "Crear src/bodega/tools.py con herramientas decoradas con @tool de langchain_core.tools, docstring clara y errores capturados devueltos como texto (regla 4 de AGENTS.md): buscar_producto(nombre: str) con coincidencia tolerante en tres niveles (1: substring insensible a mayúsculas/acentos; 2: todas las palabras singularizadas sin stopwords presentes en el nombre; 3: la primera palabra útil), listar_productos(categoria: str = '') filtrando opcionalmente por categoría, y mis_compras(config: RunnableConfig) que obtiene usuario_id exclusivamente desde config['configurable']['usuario_id'] (nunca como argumento decidido por el LLM). Agregar las funciones auxiliares leer_perfil(usuario_id: str) -> str, guardar_perfil(usuario_id: str, resumen: str) -> None sobre la tabla perfil_usuario, y stock_de(nombre: str) -> int | None para comprobaciones. Exportar HERRAMIENTAS_LECTURA = [buscar_producto, listar_productos, mis_compras]. Asegurar en crear_bd.py que los 23 productos incluyan nombres como 'Casco de seguridad blanco' y 'Caja de guantes de nitrilo talla M' (manteniendo 23 productos, 'clavos' en 0 y las 2 compras de 'pedro') para las verificaciones literales.",
+      "entregables": [
+        "src/bodega/tools.py: buscar_producto, listar_productos, mis_compras con @tool",
+        "src/bodega/tools.py: leer_perfil, guardar_perfil, stock_de y HERRAMIENTAS_LECTURA",
+        "crear_bd.py: nombres del catálogo semilla alineados con las pruebas de búsqueda ('Casco de seguridad blanco', 'Caja de guantes de nitrilo talla M')"
+      ],
+      "verificacion": [
+        "buscar_producto.invoke({'nombre': 'cascos de seguridad blancos'}) encuentra 'Casco de seguridad blanco'",
+        "buscar_producto.invoke({'nombre': 'motosierra'}) devuelve un texto que empieza por 'No existe ningún producto'",
+        "mis_compras.invoke({}, config={'configurable': {'usuario_id': 'pedro'}}) devuelve las 2 compras de pedro y con 'andrea' indica que no tiene compras"
+      ]
+    },
+    {
+      "id": "t06",
+      "nombre": "Herramientas de acción: comprar y cancelar_compra con control de sesión",
+      "estado": "pendiente",
+      "depende_de": [
+        "t05"
+      ],
+      "descripcion": "Agregar en src/bodega/tools.py las herramientas de acción con @tool, docstring clara y errores devueltos como texto (regla 4 de AGENTS.md): comprar(producto_id: int, cantidad: int, config: RunnableConfig) que lee usuario_id de config['configurable']['usuario_id'], valida cantidad > 0, existencia del producto y stock suficiente, inserta la compra activa en compras y rebaja stock en una transacción SQLite, devolviendo un string JSON con compra_id, producto, cantidad, total_clp, stock_antes, stock_despues y fecha; y cancelar_compra(compra_id: int, config: RunnableConfig) que verifica que exista una compra activa con ese id perteneciente al usuario_id de la sesión, la marca inactiva (activa = 0) y repone el stock del producto. Exportar HERRAMIENTAS_ACCION = [comprar, cancelar_compra].",
+      "entregables": [
+        "src/bodega/tools.py: comprar(producto_id, cantidad, config) y cancelar_compra(compra_id, config)",
+        "src/bodega/tools.py: lista HERRAMIENTAS_ACCION"
+      ],
+      "verificacion": [
+        "comprar 3 unidades del casco deja stock_antes - 3 en SELECT stock FROM productos y agrega una fila activa en compras",
+        "cancelar_compra sobre esa compra repone el stock al valor original y marca activa = 0",
+        "intentar cancelar una compra de 'pedro' con usuario_id='andrea' devuelve 'No existe una compra activa...'"
+      ]
+    },
+    {
+      "id": "t07",
+      "nombre": "Grafo StateGraph con router estructurado, agentes por ruta, ToolNode y tope de rondas",
+      "estado": "pendiente",
+      "depende_de": [
+        "t03",
+        "t04",
+        "t06"
+      ],
+      "descripcion": "Crear src/bodega/graph.py respetando las reglas 1, 2, 3, 5, 6, 7 y 8 de AGENTS.md. Definir los modelos Pydantic DecisionRuta(ruta: Literal['consulta', 'compra', 'politicas', 'comprobante', 'conversacion', 'fuera_de_alcance'], motivo: str), Veredicto(aprobado: bool, motivo: str) y PerfilUsuario(resumen: str), y el estado EstadoAgente(MessagesState) con ruta_elegida: str, perfil: str, rondas: int, veredicto_juez: str y ruta: Annotated[list[str], operator.add]. Implementar construir_grafo(llm, vector_store=None, herramientas_mcp=None, checkpointer=None, modelo_id='', temperatura=0, dir_comprobantes=None, verboso=True) con: (1) cargar_memoria (lee perfil con leer_perfil, rondas=0, agrega 'cargar_memoria' a ruta); (2) router (usa SYSTEM_ROUTER desde prompts.py y una copia no persistida de la conversación donde el último HumanMessage envuelve <perfil_usuario> y <mensaje>, invocando llm.with_structured_output(DecisionRuta, include_raw=True) vía llamar_llm); (3) cinco nodos agente_consulta, agente_compra, agente_politicas, agente_comprobante y agente_conversacion creados por una fábrica con herramientas según la ruta (consulta: HERRAMIENTAS_LECTURA; compra: HERRAMIENTAS_LECTURA + HERRAMIENTAS_ACCION; politicas: HERRAMIENTAS_LECTURA + buscar_politicas placeholder hasta la etapa 4; comprobante: HERRAMIENTAS_LECTURA + herramientas_mcp; conversacion: ninguna), donde cada nodo incrementa rondas, envuelve en una copia del último HumanMessage las etiquetas <perfil_usuario>, <ruta>, <carpeta_comprobantes> y <mensaje> (regla 6: datos en el user prompt, nunca concatenados al system prompt), y si rondas >= MAX_RONDAS (5, regla 5) invoca al LLM sin herramientas con SYSTEM_AGENTE_SIN_HERRAMIENTAS; (4) nodo herramientas con ToolNode de todas las herramientas que agrega a ruta 'herramientas(nombre1,nombre2)'; (5) nodos juez (stub que aprueba siempre en esta etapa y agrega 'juez' a ruta) y actualizar_memoria (stub que agrega 'actualizar_memoria' a ruta). Aristas: START -> cargar_memoria -> router; condicional router -> agente_<ruta> (fuera_de_alcance -> agente_conversacion); condicional de agente_consulta/compra/politicas/comprobante -> herramientas si hay tool_calls y rondas < MAX_RONDAS, si no -> juez; agente_conversacion -> juez; condicional herramientas -> agente_<ruta_elegida>; juez -> actualizar_memoria -> END. Implementar ejecutar_turno(app, texto, usuario_id='pedro', thread_id='default', verboso=True) que invoca con config={'configurable': {'thread_id': thread_id, 'usuario_id': usuario_id}} y devuelve el estado junto con respuesta, herramientas_usadas (nombres de los ToolMessage nuevos del turno) y saltos (sublista de ruta generada en este turno).",
+      "entregables": [
+        "src/bodega/graph.py: DecisionRuta, Veredicto, PerfilUsuario y EstadoAgente",
+        "src/bodega/graph.py: construir_grafo(...) con 11 nodos y aristas condicionales",
+        "src/bodega/graph.py: ejecutar_turno(app, texto, usuario_id, thread_id, verboso)"
+      ],
+      "verificacion": [
+        "con llm=None, construir_grafo(None).get_graph().draw_mermaid() compila sin clave e incluye los 11 nodos del flujo",
+        "con el LLM real, ejecutar_turno sobre '¿Cuántas cajas de guantes de nitrilo talla M quedan?' recorre cargar_memoria -> router -> agente_consulta -> herramientas(buscar_producto) -> agente_consulta -> juez -> actualizar_memoria y la respuesta contiene el stock real de bodega.db"
+      ]
+    },
+    {
+      "id": "t08",
+      "nombre": "Persistencia de conversación entre turnos con SqliteSaver y thread_id",
+      "estado": "pendiente",
+      "depende_de": [
+        "t07"
+      ],
+      "descripcion": "Integrar el checkpointer SqliteSaver(sqlite3.connect(RUTA_MEMORIA, check_same_thread=False)) de langgraph.checkpoint.sqlite al compilar el grafo en construir_grafo, asegurando que el historial de mensajes persista por thread_id en RUTA_MEMORIA. Verificar que en dos turnos consecutivos sobre el mismo thread_id el modelo recuerde la información dicha por el usuario en el primer turno sin respuestas fijas en el código.",
+      "entregables": [
+        "src/bodega/graph.py / src/bodega/entorno.py: soporte y helper de checkpointer SqliteSaver sobre RUTA_MEMORIA",
+        "prueba reproducible de dos turnos en el mismo thread_id con SqliteSaver"
+      ],
+      "verificacion": [
+        "turno 1: 'Hola, soy Andrea, del área de ventas. ¿Cuántos cascos hay?' y turno 2: '¿Recuerdas cómo me llamo y de qué área soy?' en el mismo thread_id devuelven en el turno 2 una respuesta que contiene 'Andrea' y 'ventas' sin respuestas fijas en código",
+        "el estado del thread en el checkpointer acumula los mensajes de ambos turnos"
+      ]
+    },
+    {
+      "id": "t09",
+      "nombre": "CLI en main.py con soporte para --diagrama, --saltos, --usuario, --thread y modo interactivo",
+      "estado": "pendiente",
+      "depende_de": [
+        "t08"
+      ],
+      "descripcion": "Actualizar main.py en la raíz para ejecutar 'python main.py bodega [mensaje] [--saltos] [--diagrama] [--usuario USUARIO] [--thread THREAD] [--sin-reiniciar]'. Con --diagrama construye el grafo con llm=None e imprime el diagrama Mermaid sin requerir claves ni llamadas al modelo. Con mensaje ejecuta un turno (regenerando la base salvo que se pase --sin-reiniciar), imprime la respuesta y, si se pasa --saltos, imprime '[saltos] nodo1 → nodo2 → ...' y las herramientas usadas. Sin mensaje abre un bucle interactivo por consola.",
+      "entregables": [
+        "main.py: CLI completa para el agente bodega con flags --diagrama, --saltos, --usuario, --thread y --sin-reiniciar"
+      ],
+      "verificacion": [
+        "python main.py bodega --diagrama imprime el diagrama Mermaid del grafo sin pedir claves",
+        "python main.py bodega --saltos '¿cuántos cascos hay?' imprime la línea '[saltos] ...' con el recorrido real de LangGraph y la respuesta con el stock"
+      ]
     }
   ]
 }

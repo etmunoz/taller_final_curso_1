@@ -18,8 +18,8 @@ CATEGORIAS = ("seguridad", "herramientas", "construccion", "pinturas", "fijacion
 
 # (nombre, categoria, stock_semilla, precio_clp)
 PRODUCTOS: list[tuple[str, str, int, float]] = [
-    ("casco de seguridad", "seguridad", 40, 8990.0),
-    ("guantes de cabritilla", "seguridad", 60, 3490.0),
+    ("Casco de seguridad blanco", "seguridad", 40, 8990.0),
+    ("Caja de guantes de nitrilo talla M", "seguridad", 45, 14990.0),
     ("lentes de proteccion", "seguridad", 75, 2990.0),
     ("chaleco reflectante", "seguridad", 30, 12990.0),
     ("protectores auditivos", "seguridad", 50, 4590.0),
@@ -27,7 +27,7 @@ PRODUCTOS: list[tuple[str, str, int, float]] = [
     ("taladro percutor", "herramientas", 12, 64990.0),
     ("llave adjustable", "herramientas", 35, 9990.0),
     ("serrucho manual", "herramientas", 20, 13990.0),
-    ("nivel de burbuja", "herramientas", 18, 8990.0),
+    ("huincha de medir", "herramientas", 22, 4990.0),
     ("saco de cemento 25 kg", "construccion", 120, 7990.0),
     ("saco de arena 25 kg", "construccion", 80, 3990.0),
     ("ladrillo fiscal", "construccion", 900, 390.0),
@@ -45,7 +45,7 @@ PRODUCTOS: list[tuple[str, str, int, float]] = [
 
 # (usuario_id, nombre_producto, cantidad, fecha)
 COMPRAS: list[tuple[str, str, int, str]] = [
-    ("pedro", "casco de seguridad", 3, "2026-10-28 10:15"),
+    ("pedro", "Casco de seguridad blanco", 3, "2026-10-28 10:15"),
     ("pedro", "taladro percutor", 1, "2026-10-30 17:40"),
 ]
 
