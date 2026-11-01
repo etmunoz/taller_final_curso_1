@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs/instrucciones/instruccion_16.md`
 > **Objetivo:** Instrucción 16: implementación de la Etapa 4 (t13, t14, t15), levantamiento de Redis Stack en Docker en localhost:6379, trazas de chunks y punto de control RAG.
-> **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
+> **Actualizado:** 20261101_1628 (America/Santiago)
 
 @implementador implementa lo que está faltando.
 

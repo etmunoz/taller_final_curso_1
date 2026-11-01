@@ -4,7 +4,7 @@
 # Archivo: activate.ps1
 # Objetivo: Desactiva conda y activa el entorno virtual del proyecto en PowerShell; crea .venv si falta y, con -Sync, ejecuta uv sync.
 # Creado: 20261026_2207 (America/Santiago)
-# Actualizado: 20261101_2105 (America/Santiago)
+# Actualizado: 20261101_1735 (America/Santiago)
 # ======================================================================
 
 <#

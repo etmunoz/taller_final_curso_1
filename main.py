@@ -2,7 +2,7 @@
 Archivo: main.py
 Objetivo: CLI principal para ejecutar el agente bodega (modo interactivo, turnos únicos, generación de Mermaid sin claves y control de saltos mediante setup.preparar).
 Creado: 20261101_1530 (America/Santiago)
-Actualizado: 20261101_2105 (America/Santiago)
+Actualizado: 20261101_1735 (America/Santiago)
 """
 
 from __future__ import annotations

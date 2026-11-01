@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs/instrucciones/instruccion_18.md`
 > **Objetivo:** Instrucción 18: implementación de la Etapa 5 (t16 y t17: servidor MCP filesystem e integración en agente_comprobante) y verificación del punto de control.
-> **Creado:** 20261101_2015 (America/Santiago)
-> **Actualizado:** 20261101_2015 (America/Santiago)
+> **Creado:** 20261101_1644 (America/Santiago)
+> **Actualizado:** 20261101_1644 (America/Santiago)
 
 @implementador implementa lo que está pendiente.
 

@@ -2,7 +2,7 @@
 # Archivo: docs/salidas_instrucciones/salida_12.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas y salidas de consola de la Instrucción 12 (Etapa 2, tareas t05 a t09).
 # Creado: 20261101_1430 (America/Santiago)
-# Actualizado: 20261101_1855 (America/Santiago)
+# Actualizado: 20261101_1546 (America/Santiago)
 
 Ejecuto la instrucción 12. Volcado completo de ejecuciones de consola y trazas por cada tarea:
 

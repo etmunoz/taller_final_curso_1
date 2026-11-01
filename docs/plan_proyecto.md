@@ -2,7 +2,7 @@
 > **Archivo:** `docs/plan_proyecto.md`
 > **Objetivo:** Plan del caso y de los criterios de la pauta: base obligatoria y ampliaciones de la tarea final.
 > **Creado:** 20261026_2212 (America/Santiago)
-> **Actualizado:** 20261101_2105 (America/Santiago)
+> **Actualizado:** 20261101_1735 (America/Santiago)
 
 # Plan del proyecto: agente de bodega
 

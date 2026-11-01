@@ -1,8 +1,8 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_20.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones de la Instrucción 20 (Etapa 6 final: t18 setup.py, t19 golden_set.json al 100%, t20 notebook ejecutado con nbconvert y t21 README.md).
-# Creado: 20261101_2035 (America/Santiago)
-# Actualizado: 20261101_2058 (America/Santiago)
+# Creado: 20261101_1705 (America/Santiago)
+# Actualizado: 20261101_1718 (America/Santiago)
 
 Ejecuto la instrucción 20. Volcado completo de ejecuciones de consola, checklist de setup, evaluación del Golden Set y salidas del notebook ejecutado con `jupyter nbconvert`:
 

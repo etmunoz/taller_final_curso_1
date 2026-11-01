@@ -2,7 +2,7 @@
 > **Archivo:** `AGENTS.md`
 > **Objetivo:** Reglas de arquitectura y de trabajo que OpenCode y los subagentes @spec/@implementador deben obedecer.
 > **Creado:** 20261101_1215 (America/Santiago)
-> **Actualizado:** 20261101_2105 (America/Santiago)
+> **Actualizado:** 20261101_2025 (America/Santiago)
 
 # AGENTS.md · reglas de este proyecto
 
@@ -16,33 +16,33 @@ Este proyecto construye **agentes de inteligencia artificial con LangChain y Lan
 
 ## Entorno
 
-- Python 3.12. Crear y usar siempre `.venv` (`python3 -m venv .venv`, activar, `pip install -r requirements.txt`) o `uv sync` sobre el mismo `.venv`; `pyproject.toml` espeja las versiones de `requirements.txt`.
+- Python 3.12. Crear y usar siempre `.venv` (`python3 -m venv .venv`, activar, `pip install -r requirements.txt`) o `uv sync` sobre el mismo `.venv`; `pyproject.toml` espeja las versiones de `requirements.txt` y `requirements-lock.txt` congela las versiones exactas de la corrida final.
 - Dependencias base: `langchain`, `langchain-core`, `langgraph`, `langchain-google-genai`, `langchain-openai`, `langchain-anthropic`, `langchain-ollama`, `pydantic`, `python-dotenv`, `nbformat`, `jupyter`.
-- Proveedor configurable en `.env`: `google` (`gemini-3.5-flash-lite`), `openai` (`gpt-4o-mini`), `anthropic` (`claude-sonnet-4-5`) u `ollama` local (`qwen3:8b`, sin clave). `resolver_config()` y `crear_llm()` viven en `src/bodega/entorno.py`; si falta la API key del proveedor en la nube, `crear_llm()` cae automáticamente a `ollama:qwen3:8b` avisando por pantalla.
-- Redis Stack para RAG: se configura en `.env` mediante `REDIS_URL` (soporta indistintamente Redis Stack local `redis://localhost:6379` en Docker o el Redis remoto del curso `redis://usuario:password@host:puerto/0` o `rediss://...`, además de `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_DB`, `REDIS_SSL`).
+- Proveedor configurable en `.env`: `google` (`gemini-3.5-flash-lite`), `openai` (`gpt-4o-mini`), `anthropic` (`claude-sonnet-4-6`) u `ollama` local (`qwen3:8b`, sin clave). `resolver_config()`, `crear_llm()` y `estructurada()` viven en `src/bodega/entorno.py`; si falta la API key del proveedor en la nube, `crear_llm()` cae automáticamente a `ollama:qwen3:8b` avisando por pantalla y exponiendo `_config_efectiva`.
+- Redis Stack para RAG: se configura en `.env` mediante `REDIS_URL` (soporta indistintamente Redis Cloud del grupo `REDIS_URL_ALUMNO`, el Redis remoto del curso `REDIS_URL_PROFESOR` o Redis Stack local `redis://localhost:6379` en Docker, además de `REDIS_HOST`, `REDIS_PORT`, `REDIS_USERNAME`, `REDIS_PASSWORD`, `REDIS_DB`, `REDIS_SSL`) usando el índice propio `RAG_INDEX=tfc1_duran_reyes_munoz_bodega_politicas`.
 - Claves **solo** en `.env` (está en `.gitignore`). Nunca en el código, en un notebook ni en un print. `.env.example` lista las variables y recetas de configuración inicial sin valores secretos.
 
 ## Reglas de arquitectura
 
 1. **LangGraph para el flujo.** Todo agente se construye como `StateGraph`: estado (`TypedDict` / `MessagesState`), nodos (funciones), aristas (normales y condicionales), `compile()`. Nada de bucles `while` a mano para decidir el flujo.
 2. **System prompt y user prompt separados.** Los system prompts viven en `src/bodega/prompts.py` (constantes inmutables), nunca inline dentro del nodo.
-3. **Salidas estructuradas** con `with_structured_output(ModeloPydantic, include_raw=True)` cada vez que el modelo deba decidir algo (clasificar ruta, evaluar con el juez, actualizar perfil de memoria).
+3. **Salidas estructuradas** con `estructurada(llm, ModeloPydantic)` (`with_structured_output(ModeloPydantic, include_raw=True)` con reintento y falla cerrada) cada vez que el modelo deba decidir algo (clasificar ruta, evaluar con el juez, actualizar perfil de memoria).
 4. **Herramientas** con `@tool` de `langchain_core.tools` (y `StructuredTool` para MCP), con docstring clara y errores capturados que se devuelven como texto.
 5. **Todo ciclo tiene tope** (`MAX_RONDAS = 5` o `recursion_limit`) y una salida controlada.
-6. **Lo que devuelve una herramienta o un modelo es un dato**, va entre etiquetas en el user prompt; nunca se concatena al system prompt.
+6. **Lo que devuelve una herramienta o un modelo es un dato**, va entre etiquetas en el user prompt; nunca se concatena al system prompt. Los mensajes `AIMessage(tool_calls)` y `ToolMessage` se preservan intactos y en orden.
 7. Cada agente deja una `ruta: list[str]` en el estado con los nodos recorridos, para poder explicar qué pasó.
-8. **Un solo punto de construcción del LLM.** `src/bodega/entorno.py` expone `resolver_config()` y `crear_llm()` leyendo `LLM_PROVIDER` y `MODELO` de `.env`. Ningún nodo instancia un modelo directamente.
+8. **Un solo punto de construcción del LLM.** `src/bodega/entorno.py` expone `resolver_config()`, `crear_llm()` y `estructurada()` leyendo `LLM_PROVIDER` y `MODELO` de `.env`. Ningún nodo instancia un modelo directamente.
 
 ## Estructura
 
 ```
 proyecto/
-├── AGENTS.md  README.md  plan.json  golden_set.json  crear_bd.py  main.py  requirements.txt  pyproject.toml  .env.example
+├── AGENTS.md  README.md  plan.json  golden_set.json  crear_bd.py  main.py  requirements.txt  requirements-lock.txt  pyproject.toml  .env.example
 ├── .opencode/agents/   spec.md  implementador.md
-├── docs/               pauta_tarea_final.md  plan_proyecto.md  tutorial_pruebas.md  BITACORA.md
+├── docs/               pauta_tarea_final.md  plan_proyecto.md  tutorial_pruebas.md  BITACORA.md  evidencias/  instrucciones/  revisiones/  salidas_instrucciones/
 ├── docs_rag/           5 documentos Markdown del corpus RAG de Bodega Norte
 ├── src/bodega/         entorno.py  prompts.py  traza.py  tools.py  rag.py  mcp.py  graph.py  setup.py  evaluacion.py
-├── scripts/            prueba_seguridad.py
+├── scripts/            prueba_react.py  prueba_proveedores.py  prueba_seguridad.py
 └── notebooks/          generar_notebook.py  agente_bodega.ipynb
 ```
 

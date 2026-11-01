@@ -2,7 +2,7 @@
 # Archivo: docs/salidas_instrucciones/salida_15.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de la especificación de la Etapa 4 (tareas t13 a t15: corpus docs_rag/, src/bodega/rag.py y herramienta buscar_politicas) en plan.json y verificación del plan.
 # Creado: 20261101_1940 (America/Santiago)
-# Actualizado: 20261101_1945 (America/Santiago)
+# Actualizado: 20261101_1623 (America/Santiago)
 
 Ejecuto la instrucción 15. Especificación de la Etapa 4 (`t13` a `t15`) en `plan.json`:
 

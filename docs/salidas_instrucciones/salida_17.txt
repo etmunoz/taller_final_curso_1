@@ -2,7 +2,7 @@
 # Archivo: docs/salidas_instrucciones/salida_17.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de la especificación de la Etapa 5 (tareas t16 y t17: módulo src/bodega/mcp.py con servidor MCP filesystem e integración en agente_comprobante) en plan.json y verificación del plan.
 # Creado: 20261101_2005 (America/Santiago)
-# Actualizado: 20261101_2008 (America/Santiago)
+# Actualizado: 20261101_1640 (America/Santiago)
 
 Ejecuto la instrucción 17. Especificación de la Etapa 5 (`t16` y `t17`) en `plan.json`:
 

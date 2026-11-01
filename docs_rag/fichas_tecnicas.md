@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs_rag/fichas_tecnicas.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte con las especificaciones técnicas y rendimientos de los principales productos del catálogo.
-> **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
+> **Actualizado:** 20261101_1628 (America/Santiago)
 
 # Fichas Técnicas de Productos — Catálogo Bodega Norte
 

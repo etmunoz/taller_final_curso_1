@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs_rag/despacho_y_horarios.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte sobre horarios de atención presencial, tarifas de despacho a obra y horarios de corte logístico.
-> **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
+> **Actualizado:** 20261101_1628 (America/Santiago)
 
 # Horarios de Atención y Condiciones de Despacho — Bodega Norte
 

@@ -1,8 +1,8 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_18.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, descubrimiento del servidor MCP filesystem y salidas de consola de la Instrucción 18 (Etapa 5, tareas t16 y t17 y punto de control MCP).
-# Creado: 20261101_2015 (America/Santiago)
-# Actualizado: 20261101_2025 (America/Santiago)
+# Creado: 20261101_1644 (America/Santiago)
+# Actualizado: 20261101_1648 (America/Santiago)
 
 Ejecuto la instrucción 18. Volcado completo de ejecuciones de consola, cliente MCP filesystem y verificaciones por cada tarea:
 

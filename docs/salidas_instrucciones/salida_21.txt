@@ -1,8 +1,8 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_21.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones y salidas de la Instrucción 21 (configuración multi-proveedor LLM, soporte de Redis remoto del curso, alineación de .md, tutorial docs/tutorial_pruebas.md y Sección 14 ejecutada en notebooks/agente_bodega.ipynb).
-# Creado: 20261101_2105 (America/Santiago)
-# Actualizado: 20261101_2118 (America/Santiago)
+# Creado: 20261101_1735 (America/Santiago)
+# Actualizado: 20261101_1740 (America/Santiago)
 
 Ejecuto la instrucción 21. Volcado completo de los 4 puntos solicitados, pruebas de configuración inicial (4 proveedores + Redis remoto/local) y ejecución del notebook con la Sección 14 del tutorial:
 

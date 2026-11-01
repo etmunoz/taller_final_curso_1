@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs_rag/garantias.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte con la tabla oficial de plazos de garantía por familia de productos y procedimiento de servicio técnico.
-> **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
+> **Actualizado:** 20261101_1628 (America/Santiago)
 
 # Política de Garantías y Servicio Técnico — Bodega Norte
 

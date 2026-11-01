@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs_rag/formas_de_pago_y_descuentos.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte sobre medios de pago aceptados, tramos de descuento por volumen y crédito comercial para constructoras.
-> **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
+> **Actualizado:** 20261101_1628 (America/Santiago)
 
 # Formas de Pago, Descuentos por Volumen y Crédito — Bodega Norte
 

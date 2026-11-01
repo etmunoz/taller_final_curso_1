@@ -1,8 +1,8 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs/instrucciones/instruccion_20.md`
 > **Objetivo:** Instrucción 20: implementación final de la Etapa 6 (setup.py, golden_set.json + evaluador al 100%, generación y ejecución de notebooks/agente_bodega.ipynb con nbconvert y actualización integral de README.md).
-> **Creado:** 20261101_2035 (America/Santiago)
-> **Actualizado:** 20261101_2035 (America/Santiago)
+> **Creado:** 20261101_1705 (America/Santiago)
+> **Actualizado:** 20261101_1705 (America/Santiago)
 
 @implementador implementa lo que queda pendiente.
 

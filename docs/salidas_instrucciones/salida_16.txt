@@ -1,8 +1,8 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_16.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas de chunks, índice Redis Stack y salidas de consola de la Instrucción 16 (Etapa 4, tareas t13 a t15 y punto de control RAG).
-# Creado: 20261101_1955 (America/Santiago)
-# Actualizado: 20261101_2000 (America/Santiago)
+# Creado: 20261101_1632 (America/Santiago)
+# Actualizado: 20261101_1636 (America/Santiago)
 
 Ejecuto la instrucción 16. Volcado completo de ejecuciones de consola, levantamiento de Redis Stack en Docker, trazas de chunks y verificaciones por cada tarea:
 

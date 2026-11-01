@@ -1,7 +1,7 @@
 > **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 > **Archivo:** `docs_rag/politica_devoluciones.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte sobre plazos, requisitos y condiciones de devolución y reembolso de productos.
-> **Creado:** 20261101_1950 (America/Santiago)
+> **Creado:** 20261101_1628 (America/Santiago)
 > **Actualizado:** 20261101_2050 (America/Santiago)
 
 # Política de Devoluciones y Cambios — Bodega Norte

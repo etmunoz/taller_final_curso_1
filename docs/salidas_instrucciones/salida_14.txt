@@ -1,8 +1,8 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_14.txt
 # Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas y salidas de consola de la Instrucción 14 (Etapa 3, tareas t10 a t12 y punto de control de seguridad).
-# Creado: 20261101_1925 (America/Santiago)
-# Actualizado: 20261101_1935 (America/Santiago)
+# Creado: 20261101_1615 (America/Santiago)
+# Actualizado: 20261101_1622 (America/Santiago)
 
 Ejecuto la instrucción 14. Volcado completo de ejecuciones de consola y trazas por cada tarea:
 
