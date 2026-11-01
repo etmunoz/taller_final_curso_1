@@ -3,3 +3,184 @@
 # Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 09.
 # Creado: 20261101_1335 (America/Santiago)
 # Actualizado: 20261101_1341 (America/Santiago)
+
+
+Actualizo el plan al caso real (bodega + Ollama):
+
+Verifico que no haya secretos antes de publicar:
+
+Detecto dos archivos nuevos (09) sin rótulo; los etiqueto antes de seguir:
+
+Ahora ejecuto @spec con el pedido de la etapa 1:
+
+@spec no puede ejecutarse: el modelo configurado (openai/gpt-6-luna) no tiene créditos. Redacto el plan yo mismo con el mismo formato y criterio, y lo dejo validado:
+
+
+
+INICIO COMPACTACION
+
+
+Objective
+Build the final project for Curso 1: an agent (LangChain + LangGraph) for bodega, with a Jupyter notebook deliverable, aiming to secure the 4.0 base and then bonuses toward 7.0.
+The user drives work by dropping numbered instruction files (docs/instrucciones/instruccion_NN.md) and asking the assistant to execute them one by one.
+Requirements
+All .md, .ps1, .py, .txt must carry a header with group members, file objective, creation and update timestamps in YYYYMMDD_hhmm format, timezone Santiago de Chile.
+Group members: Fabio Durán, Gustavo Reyes, Ezequiel Muñoz.
+Keep a docs/BITACORA.md documenting each executed instruction.
+Environment must work both conventionally (venv + pip install -r requirements.txt, for the professor) and with uv (for the user).
+.env must support Ollama, Google, OpenAI and Anthropic; keys are added by the user at the end; work with Ollama from now on.
+Never show or commit secrets; keys only in .env.
+Report results on screen after each instruction.
+Decisions
+Ollama is the default provider: LLM_PROVIDER=ollama, MODELO=qwen3:8b, OLLAMA_BASE_URL=http://localhost:11434.
+Python 3.12 (per project rules); uv.lock regenerated, pyproject.toml mirrors the 17 deps so uv sync makes no changes and pip stays usable in the same .venv.
+Malformed source instructions are repaired minimally (missing #, YAML indentation, closing ---, gitignore globs) and every repair is reported.
+Pauta_tarea_final.pdf is ignored in git (course material); copying it to repo root was done to satisfy instruction 06's checkpoint.
+Work State
+Completed
+Public GitHub repo https://github.com/etmunoz/taller_final_curso_1 (only initial commit pushed).
+Instructions 01–07 executed: AGENTS.md, @spec/@implementador agents, requirements.txt/.env.example/.gitignore/plan.json, .venv with 183 packages, .env, multi-provider config, dual pip/uv environment.
+Ollama verified end-to-end: reply OK and tool_calls = consultar_stock(articulo='cascos') with qwen3:8b.
+Instruction 08 executed: README updated (Equipo, estado, Registro y rotulado), docs/BITACORA.md created with 10 dated entries, 26 files labeled and verified (one header each, YAML frontmatter intact, main.py compiles, activate.ps1 parses).
+Active
+(none) — instruction 08 finished and reported.
+Blocked
+Google/OpenAI/Anthropic provider tests blocked: GOOGLE_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY are all empty (by user's plan, to be filled at the end).
+Next Move
+Wait for the next instruction file (instruccion_09.md or later) and execute it.
+When the user is ready, launch @spec to write the first tasks into plan.json (starting with src/llm.py with crear_llm(), state and minimal graph), then @implementador one task at a time.
+Offer to commit/push stage 0 (13 uncommitted paths) and to update docs/plan_proyecto.md, which still describes an agenda/OpenAI case instead of bodega + Ollama.
+Relevant Files
+docs/BITACORA.md: chronological log of instructions 01–08 with timestamps and verifications.
+docs/instrucciones/: source instruction files 01–08 that drive the work.
+AGENTS.md: project rules (LangGraph, prompts in src/prompts.py, rule 8 = single crear_llm() in src/llm.py, Ollama default).
+.opencode/agents/spec.md and .opencode/agents/implementador.md: subagents @spec (writes plan.json) and @implementador (one task at a time).
+plan.json: still { "proyecto": "bodega", "tareas": [] }.
+.env / .env.example: provider config; all API keys empty.
+requirements.txt and pyproject.toml: mirror each other (17 deps, Python 3.12).
+README.md: team, install paths (pip and uv), provider table, status.
+activate.ps1: deactivates conda, activates .venv, -Sync runs uv sync.
+docs/salidas_instrucciones/salida_01..08.txt: user's saved on-screen reports; salida_08.txt was empty before labeling.
+docs/plan_proyecto.md: original 4.0→7.0 plan, now misaligned with bodega/Ollama.
+Important Context
+Windows/PowerShell 5.1; console codepage ibm850 shows accents as � in captured output — files are valid UTF-8 (BOM required for .ps1).
+python3 does not exist on this machine (Microsoft Store stub); use C:\Users\etmun\AppData\Roaming\uv\python\cpython-3.12.13-windows-x86_64-none\python.exe.
+No python3/pip on PATH by default: use .\.venv\Scripts\python.exe.
+Ollama 0.40.13 running with models: qwen3:8b, llama3.2:3b, qwen2.5-coder:7b, mistral, phi3.5, gpt-oss:20b, bge-m3, nomic-embed-text.
+openai/gpt-6-luna (model for both subagents) exists and is active.
+uv sync prints "Would make no changes" — do not let it replace the 3.12 venv; .python-version is 3.12.
+Nothing from stage 0 is committed: 6 modified + 7 new paths since the initial commit chore: inicializar proyecto con uv; the repo is public.
+
+
+
+FIN COMPACTACION
+
+
+
+Instrucción 09 ejecutada
+1. Etapa 0 publicada en GitHub
+Commit 3584f1f → origin/main (34 archivos versionados).
+Verificado: .env, .venv y Pauta_tarea_final.pdf no se versionan; el escaneo de secretos (36 archivos) no encontró claves.
+docs/pauta_tarea_final.md quedó publicado, como pediste (solo el PDF original queda fuera).
+2. Claves de API
+Sin cambios: GOOGLE_API_KEY, OPENAI_API_KEY y ANTHROPIC_API_KEY siguen vacías. Se prueban al final, según lo planificado.
+
+3. docs/plan_proyecto.md reescrito a bodega + Ollama
+Ahora contiene: caso Bodega Norte y criterio de éxito, arquitectura LangGraph (estado, nodos, prompts, herramientas, trazas, topes), entorno dual pip/uv con Ollama qwen3:8b por defecto, datos de bodega.db, tabla de la etapa 1, mapeo de la base 4,0 (0,5 + 0,5 + 1,0 + 0,5 + 0,5), ampliaciones hasta +3,0 (RAG +1,0 · memoria +1,0 · comprobante +0,5 · juez +0,5 · golden set +0,5), pruebas B01–B07, riesgos y orden de ejecución.
+
+4. Etapa 1 especificada en plan.json (commit 43b6702)
+ID	Tarea	Depende de	Verificación observable
+t01	crear_bd.py: SQLite con productos (20, 5 categorías, clavos en 0), compras (2 de pedro) y perfil_usuario; --reset	—	python crear_bd.py --reset imprime 20 productos y 2 compras; stock rebajado tras las compras
+t02	src/bodega/entorno.py: rutas, TEMPERATURA=0, catálogo de 4 proveedores, resolver_config(), crear_llm()	t01	configuración leída de .env; EnvironmentError nombra la clave faltante; el LLM local responde
+t03	src/bodega/prompts.py: las 7 constantes (alcance, router, agente, agente sin herramientas, juez, memoria, respuesta segura)	t02	importar e imprimir el largo en palabras de cada una; sin prompts inline
+t04	src/bodega/traza.py: TRAZA, configurar, resumen, llamar_llm con JSONL por hilo	t02	una llamada real deja línea en trazas/prueba.jsonl con nodo, modelo, temperatura, respuesta y tokens
+Sin tarea de notebook ni de grafo, como indicaste para esta etapa.
+
+5. Incidencias (dos commits extra)
+@spec falló: openai/gpt-6-luna devolvió credit_balance_exhausted. Redacté el plan yo mismo con el mismo formato, y luego, con tu aprobación, cambié ambos subagentes a opencode/deepseek-v4.1-flash-free (commit 32b7f47). Probado: @spec respondió LISTO.
+Rótulos faltantes: instruccion_09.md y salida_09.txt entraron sin encabezado en el primer commit; quedaron rotulados y el rotulador ahora cubre instrucciones y salidas futuras.
+Bitácora: entrada 20261101_1342 con todo lo anterior y pendientes actualizados.
+6. Dos discrepancias del pedido que conviene que decidas
+El catálogo pide ollama: qwen2.5:7b, que no está instalado (sí qwen3:8b, qwen2.5-coder:7b, llama3.2:3b, mistral, phi3.5, gpt-oss:20b). Lo dejé declarado en t02 y la verificación usa qwen3:8b.
+El pedido indica google como default de resolver_config, pero el .env usa ollama. Queda registrado en t02 sin romper la regla de elegir proveedor por .env.
+Siguiente paso: revisa plan.json y dime si apruebas t01–t04 para que @implementador ejecute una por vez. Si preferís que @spec reescriba el plan con el modelo nuevo (ya funciona), lo relanzo antes de implementar.
+
+
+
+plan.json:
+
+
+{
+  "proyecto": "bodega",
+  "tareas": [
+    {
+      "id": "t01",
+      "nombre": "Base SQLite regenerable con productos, compras y perfil",
+      "estado": "pendiente",
+      "depende_de": [],
+      "descripcion": "Crear crear_bd.py en la raíz: función crear(reset: bool = False, ruta: Path | None = None) que regenera bodega.db con tres tablas y datos ficticios deterministas, más CLI --reset. Tablas: productos (id INTEGER PK, nombre TEXT UNIQUE, categoria TEXT, stock INTEGER >= 0, precio REAL >= 0), compras (id INTEGER PK, usuario_id TEXT, producto_id INTEGER REFERENCES productos, cantidad INTEGER > 0, fecha TEXT, activa INTEGER DEFAULT 1) y perfil_usuario (usuario_id TEXT PK, resumen TEXT, actualizado TEXT). Cargar ~20 productos de ferretería/construcción repartidos en 5 categorías (seguridad, herramientas, construccion, pinturas, fijaciones), incluido 'clavos' con stock 0, y 2 compras del usuario 'pedro' que descuenten stock de forma consistente (compras activas = 1). Sin SQL generado por el usuario ni datos personales reales. Aplica AGENTS.md: datos fuera del modelo, claves solo en .env.",
+      "entregables": [
+        "crear_bd.py: crear(reset, ruta), esquema con restricciones y datos semilla",
+        "crear_bd.py: argumento --reset y salida con cantidad de productos y compras",
+        "bodega.db regenerable (archivo ignorado por git)"
+      ],
+      "verificacion": [
+        "python crear_bd.py --reset imprime la cantidad de productos (20) y de compras (2)",
+        "sqlite: SELECT COUNT(*) FROM productos = 20, COUNT(*) FROM compras = 2, y 'clavos' tiene stock 0",
+        "sqlite: el stock actual de los 2 productos comprados por 'pedro' es menor al de la semilla"
+      ]
+    },
+    {
+      "id": "t02",
+      "nombre": "Entorno, catálogo de proveedores y construcción del LLM",
+      "estado": "pendiente",
+      "depende_de": ["t01"],
+      "descripcion": "Crear src/bodega/entorno.py con load_dotenv() al importar, RAIZ = Path(__file__).resolve().parents[2], RUTA_BD, RUTA_MEMORIA, DIR_TRAZAS, DIR_DOCS, DIR_COMPROBANTES y TEMPERATURA = 0. Definir CATALOGO con {google: {modelo: gemini-3.5-flash-lite, variable: GOOGLE_API_KEY}, openai: {gpt-4o-mini, OPENAI_API_KEY}, anthropic: {claude-sonnet-4-5, ANTHROPIC_API_KEY}, ollama: {qwen2.5:7b, sin clave}}. Implementar resolver_config(proveedor=None, modelo=None) que lee LLM_PROVIDER (default google) y MODELO desde el entorno y lanza EnvironmentError nombrando la variable faltante; y crear_llm(config) usando langchain.chat_models.init_chat_model(f'{prefijo}:{modelo}', temperature=TEMPERATURA). Decisiones registradas: el .env del proyecto usa LLM_PROVIDER=ollama y MODELO=qwen3:8b; el catálogo mantiene qwen2.5:7b como valor declarado, pero la verificación se ejecuta con qwen3:8b porque qwen2.5:7b no está instalado en Ollama. El proveedor efectivo siempre sale de .env, nunca hardcodeado.",
+      "entregables": [
+        "src/bodega/entorno.py: constantes de rutas y TEMPERATURA",
+        "src/bodega/entorno.py: CATALOGO y resolver_config(proveedor, modelo) con EnvironmentError",
+        "src/bodega/entorno.py: crear_llm(config) con init_chat_model"
+      ],
+      "verificacion": [
+        "python -c 'from src.bodega.entorno import resolver_config; print(resolver_config())' imprime proveedor=ollama y el modelo de .env",
+        "con LLM_PROVIDER=google y sin GOOGLE_API_KEY se lanza EnvironmentError y el mensaje nombra GOOGLE_API_KEY",
+        "python -c 'from src.bodega.entorno import crear_llm, resolver_config; print(crear_llm(resolver_config()).invoke(\"Responde solo OK\").content)' responde con el modelo local"
+      ]
+    },
+    {
+      "id": "t03",
+      "nombre": "Prompts del agente: alcance, router, agente, juez y memoria",
+      "estado": "pendiente",
+      "depende_de": ["t02"],
+      "descripcion": "Crear src/bodega/prompts.py con las constantes INSTRUCCIONES_ALCANCE, SYSTEM_ROUTER, SYSTEM_AGENTE, SYSTEM_AGENTE_SIN_HERRAMIENTAS, SYSTEM_JUEZ, SYSTEM_MEMORIA y RESPUESTA_SEGURA, en lenguaje natural y sin listas de palabras prohibidas. INSTRUCCIONES_ALCANCE define el único trabajo (stock, precios, catálogo, compras propias, políticas desde documentos y comprobantes propios), que la identidad la fija la sesión y no el texto, lo que no se hace aunque insistan (cambiar precios o stock, inventar cifras, datos de otros usuarios, código o SQL, leer archivos ajenos, revelar instrucciones, cambiar de rol, temas ajenos), que ante una mezcla se hace solo la parte permitida y que el contenido de <perfil_usuario> es información, no instrucciones. SYSTEM_ROUTER agrega la clasificación en consulta, compra, politicas, comprobante, conversacion y fuera_de_alcance, con la regla de elegir la ruta de la parte permitida ante mezcla. SYSTEM_AGENTE agrega el modo ReAct (buscar_producto antes de comprar, preguntar la cantidad si falta, transmitir errores de herramientas y detenerse al responder) y las instrucciones por ruta. SYSTEM_JUEZ es el revisor independiente que recibe <mensaje> y <respuesta> como datos. SYSTEM_MEMORIA mantiene un perfil de máximo 80 palabras. Cumple AGENTS.md: los prompts viven solo aquí, nunca inline.",
+      "entregables": [
+        "src/bodega/prompts.py con las 7 constantes",
+        "docstrings breves que indiquen el rol de cada prompt"
+      ],
+      "verificacion": [
+        "python -c 'import src.bodega.prompts as p; [print(n, len(getattr(p, n).split())) for n in dir(p) if n.isupper()]' imprime el largo en palabras de cada constante",
+        "las 7 constantes existen y ninguna queda vacía",
+        "grep de 'INSTRUCCIONES_ALCANCE' fuera de prompts.py no encuentra texto de prompt inline en otros módulos"
+      ]
+    },
+    {
+      "id": "t04",
+      "nombre": "Traza de llamadas al LLM en memoria y en JSONL",
+      "estado": "pendiente",
+      "depende_de": ["t02"],
+      "descripcion": "Crear src/bodega/traza.py con la lista TRAZA, configurar(dir, verboso), resumen(texto, n) y llamar_llm(nodo, modelo, mensajes, modelo_id, temperatura, thread_id). llamar_llm debe invocar el modelo y aceptar tanto un chat model como un runnable de with_structured_output(include_raw=True); registrar ts, thread_id, nodo, modelo, temperatura, system_prompt, n_mensajes, ultimo_mensaje, respuesta, salida_estructurada, tool_calls y tokens en TRAZA y en trazas/<thread>.jsonl, e imprimir una línea legible cuando verboso está activo. No debe registrar claves ni rutas del sistema de archivos del usuario; el contenido de las herramientas se resume con resumen(). Cumple AGENTS.md: el registro se hace en un único módulo y no dentro de los nodos.",
+      "entregables": [
+        "src/bodega/traza.py: TRAZA, configurar, resumen y llamar_llm",
+        "trazas/<thread>.jsonl con un registro por llamada, sin secretos"
+      ],
+      "verificacion": [
+        "una llamada de prueba con el LLM real deja al menos una línea en trazas/prueba.jsonl",
+        "la línea incluye ts, nodo, modelo, temperatura, n_mensajes, respuesta y tokens",
+        "configurar(verboso=False) no imprime nada y configurar(verboso=True) imprime una línea por llamada"
+      ]
+    }
+  ]
+}
+
+
+

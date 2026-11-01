@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1342 (America/Santiago)
+> **Actualizado:** 20261101_1410 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -154,11 +154,28 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Decisión posterior (20261101_1342):** a pedido del usuario, `@spec` e `@implementador` pasan de `openai/gpt-6-luna` a `opencode/deepseek-v4.1-flash-free` para que la etapa 1 pueda ejecutarse sin saldo de OpenAI.
 
+## 20261101_1410 — Instrucción 10: implementación de la Etapa 1 (`t01`–`t04`) y punto de control
+
+**Pedido:** aplicar la aclaración de entorno (si `MODELO` empieza por `"gemini"` pero `LLM_PROVIDER` no es `google`, usar el modelo por defecto del proveedor), trabajar con Ollama permitiendo usar modelos en la nube cuando exista clave, y cumplir el punto de control (`python crear_bd.py --reset` imprime `"23 productos, 2 compras"`, `resolver_config()` imprime `google_genai:gemini-3.5-flash-lite`, y existe `trazas/prueba.jsonl`).
+
+**Realizado:**
+- Ajuste de `plan.json` (23 productos en `t01` y regla de entorno + caída automática a Ollama en `t02`) y actualización de `.env.example`, `.env` y `.gitignore` (`memoria.json`).
+- `t01` (`crear_bd.py`): base SQLite regenerable con 23 productos en 5 categorías (`clavos` con stock 0) y 2 compras activas de `pedro` que descuentan stock.
+- `t02` (`src/bodega/entorno.py`, `src/__init__.py`, `src/bodega/__init__.py`): constantes de rutas, `CATALOGO` de 4 proveedores, `resolver_config()` con default `google` (`google_genai:gemini-3.5-flash-lite`) y descarte de modelos de otra familia, y `crear_llm()` con respaldo automático a `ollama:qwen3:8b` cuando falta la API key del proveedor en la nube.
+- `t03` (`src/bodega/prompts.py`): las 7 constantes (`INSTRUCCIONES_ALCANCE`, `SYSTEM_ROUTER`, `SYSTEM_AGENTE`, `SYSTEM_AGENTE_SIN_HERRAMIENTAS`, `SYSTEM_JUEZ`, `SYSTEM_MEMORIA`, `RESPUESTA_SEGURA`) en lenguaje natural y sin prompts inline fuera del módulo.
+- `t04` (`src/bodega/traza.py`): registro en `TRAZA` y en `trazas/<thread_id>.jsonl` con `configurar()`, `resumen()` y `llamar_llm()` soportando llamadas normales y salidas estructuradas (`include_raw=True`), sin exponer secretos.
+- Rotulado de los archivos nuevos (`crear_bd.py`, `src/__init__.py`, `src/bodega/__init__.py`, `src/bodega/entorno.py`, `src/bodega/prompts.py`, `src/bodega/traza.py`, `docs/instrucciones/instruccion_10.md` y `docs/salidas_instrucciones/salida_10.txt`).
+
+**Verificación (punto de control):**
+- `.\.venv\Scripts\python.exe crear_bd.py --reset` → `23 productos, 2 compras`.
+- `.\.venv\Scripts\python.exe -c "from src.bodega.entorno import resolver_config; print(resolver_config())"` → `google_genai:gemini-3.5-flash-lite`.
+- `trazas/prueba.jsonl` generado y validado con las 12 claves requeridas.
+
 ## Pendientes
 
 - [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
 - [x] Cambiar `@spec` y `@implementador` al modelo gratuito `opencode/deepseek-v4.1-flash-free`, porque `openai/gpt-6-luna` se quedó sin créditos.
-- [ ] Revisar y aprobar `plan.json` y ejecutar t01–t04 con `@implementador`, una tarea por vez.
+- [x] Revisar y aprobar `plan.json` y ejecutar t01–t04 con `@implementador`, una tarea por vez.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
 - [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).
 - [x] Commit y push de la etapa 0.

@@ -6,6 +6,7 @@ __pycache__/
 bodega.db
 memoria.db
 memoria.db-*
+memoria.json
 trazas/
 comprobantes/*.txt
 # editores y sistema
