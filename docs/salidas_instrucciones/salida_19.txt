@@ -1,0 +1,148 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_19.txt
+# Objetivo: Volcado crudo, íntegro y detallado paso a paso de la especificación de la Etapa 6 (tareas finales t18 a t21: setup.py, golden_set.json + evaluador, notebook ejecutable agente_bodega.ipynb y README.md) en plan.json y verificación del plan.
+# Creado: 20261101_2030 (America/Santiago)
+# Actualizado: 20261101_2033 (America/Santiago)
+
+Ejecuto la instrucción 19. Especificación de la Etapa 6 (`t18` a `t21`) en `plan.json`:
+
+======================= t18 / t19 / t20 / t21 (Especificación Etapa 6)
+
+Pedido:
+@spec Lee AGENTS.md, plan.json y src/bodega/. Agrega SOLO estas tareas finales:
+    18. src/bodega/setup.py::preparar(reiniciar_todo=True, recargar_rag=True, proveedor=None, modelo=None, verboso=True,
+    con_rag=True, con_mcp=True) → objeto Entorno(config_llm, llm, app, vector_store, info_rag, herramientas_mcp,
+    mcp_descubiertas, mcp_config, n_productos, n_compras, lineas). Pasos con una línea "[ok] ..." cada uno y errores
+    accionables: dependencias (importlib.metadata.version), resolver_config + crear_llm + llamada de prueba "Responde solo
+    OK", borrar memoria.db/trazas/comprobantes/*.txt si reiniciar_todo, crear_bd.crear(reset), traza.configurar,
+    Redis+embeddings+corpus, Node+MCP, SqliteSaver y construir_grafo. main.py pasa a usar preparar(). Verificación:
+    python main.py bodega --saltos "¿cuántos cascos hay?" imprime el checklist completo y el turno.
+    19. golden_set.json versión 1.x con ~20 casos y campos id, descripcion, entrada, usuario_id, thread_id opcional y esperado
+    con criterios: ruta (lista), herramientas_incluye, herramientas_excluye, contiene_alguno, contiene_stock_de,
+    no_contiene, stock_cambia {producto: delta}, juez. Cubrir: consulta normal, listado, inexistente, compra válida,
+    compra sin stock, cancelación, historial (2 turnos mismo thread), memoria (thread nuevo), RAG con y sin necesidad,
+    MCP con y sin necesidad, y 6 de seguridad (código, jailbreak de rol, suplantación, modificar precios, revelar prompt,
+    mezcla permitido+indebido). Más una función evaluar_caso que regenera la BD al inicio, ejecuta cada caso, imprime
+    PASA/FALLA con motivos, guarda trazas/resultado_golden_set.json y exige 100 %. Verificación: la corrida imprime
+    "Resultado: N/N casos aprobados"; si un caso falla por redacción, ampliar contiene_alguno y anotarlo en README; nunca
+    eliminar casos.
+    20. notebooks/generar_notebook.py con nbformat → notebooks/agente_bodega.ipynb, que importa desde src/bodega sin duplicar
+    lógica. Primera celda: chdir a la raíz y sys.path. Secciones: 0 Setup (preparar(), checklist, esquema RAG, config
+    MCP, búsqueda de prueba); 1 caso y criterio de éxito (tabla usuario/entrada/alcance/salida/comprobación y por qué LLM
+    herramienta); 2 trazabilidad (modelo, prompts, INSTRUCCIONES_ALCANCE impresas); 3 herramientas (prueba directa);
+    4 grafo con draw_mermaid() impreso y draw_mermaid_png() en try/except, función conversar(); 5 caso normal + segundo
+    turno; 6 compra antes/después + sin stock + inexistente; 7 memoria (inicial → actualización → thread nuevo);
+    8 RAG (sin necesidad, con necesidad mostrando fragmentos, mixto); 9 MCP (sin necesidad, con necesidad y archivo);
+    10 seguridad (6 casos con prueba_seguridad); 11 juez aislado (benigno, adversarial, efecto en el estado);
+    12 golden set; 13 resumen de trazas y ficha de reproducción. Cada prueba termina con assert y una línea
+    "COMPROBACIÓN: ...: OK". Verificación: jupyter nbconvert --to notebook --execute termina sin errores.
+    21. README.md: ficha mínima de reproducción (Python 3.12 y .venv, modelo e identificador exacto, requirements, variables
+    sin valores, datos y recetas, Docker y Node), instalación y ejecución, estructura, mapa pauta → sección del notebook,
+    decisiones de diseño (usuario_id desde la sesión, herramientas por ruta, datos entre etiquetas, historial vs memoria)
+    y registro de correcciones. Verificación: el archivo existe y una persona puede seguirlo desde cero.
+
+Salida de la especificación:
+plan.json actualizado con las tareas finales t18, t19, t20 y t21 en estado pendiente, manteniendo t01 a t17 en estado hecho con sus evidencias completas.
+
+PS> & ".\.venv\Scripts\python.exe" -c "import json; d = json.load(open('plan.json', encoding='utf-8')); [print(t['id'], t['estado'], t['nombre'], t['depende_de']) for t in d['tareas']]"
+t01 hecho Base SQLite regenerable con productos, compras y perfil []
+t02 hecho Entorno, catálogo de proveedores y construcción del LLM ['t01']
+t03 hecho Prompts del agente: alcance, router, agente, juez y memoria ['t02']
+t04 hecho Traza de llamadas al LLM en memoria y en JSONL ['t02']
+t05 hecho Herramientas de lectura del catálogo, compras del usuario y perfil en SQLite ['t01', 't02']
+t06 hecho Herramientas de acción: comprar y cancelar_compra con control de sesión ['t05']
+t07 hecho Grafo StateGraph con router estructurado, agentes por ruta, ToolNode y tope de rondas ['t03', 't04', 't06']
+t08 hecho Persistencia de conversación entre turnos con SqliteSaver y thread_id ['t07']
+t09 hecho CLI en main.py con soporte para --diagrama, --saltos, --usuario, --thread y modo interactivo ['t08']
+t10 hecho Juez real en graph.py con evaluación estructurada y filtrado seguro mediante RemoveMessage ['t07']
+t11 hecho Memoria de perfil real con actualización estructurada y persistencia en SQLite ['t07', 't10']
+t12 hecho Suite de pruebas de seguridad e inmutabilidad de la base de datos (scripts/prueba_seguridad.py) ['t10', 't11']
+t13 hecho Corpus docs_rag/ con 5 documentos Markdown ficticios de políticas y fichas técnicas de Bodega Norte []
+t14 hecho Módulo RAG sobre Redis Stack con embeddings multi-proveedor y particionado jerárquico (src/bodega/rag.py) ['t02', 't13']
+t15 hecho Herramienta buscar_politicas con RAG real e integración en agente_politicas y consultas mixtas ['t07', 't14']
+t16 hecho Cliente MCP de filesystem con envoltorio síncrono en hilo de fondo (src/bodega/mcp.py) ['t02']
+t17 hecho Integración de herramientas MCP en agente_comprobante y verificación de generación segura de comprobantes ['t07', 't10', 't16']
+t18 pendiente Orquestador de preparación integral del entorno y migración de main.py (src/bodega/setup.py) ['t09', 't14', 't16', 't17']
+t19 pendiente Conjunto de evaluación versionado (golden_set.json) y evaluador automatizado al 100 % ['t12', 't15', 't17', 't18']
+t20 pendiente Generador de notebook reproducible (notebooks/generar_notebook.py) y ejecución completa de notebooks/agente_bodega.ipynb ['t18', 't19']
+t21 pendiente Documentación final en README.md con ficha de reproducción, mapa de la pauta, decisiones de diseño y registro de correcciones ['t19', 't20']
+
+Volcado JSON de las tareas agregadas (t18, t19, t20, t21):
+PS> & ".\.venv\Scripts\python.exe" -c "import json; d = json.load(open('plan.json', encoding='utf-8')); print(json.dumps([t for t in d['tareas'] if t['id'] in ('t18', 't19', 't20', 't21')], indent=2, ensure_ascii=False))"
+[
+  {
+    "id": "t18",
+    "nombre": "Orquestador de preparación integral del entorno y migración de main.py (src/bodega/setup.py)",
+    "estado": "pendiente",
+    "depende_de": [
+      "t09",
+      "t14",
+      "t16",
+      "t17"
+    ],
+    "descripcion": "Crear src/bodega/setup.py con la dataclass Entorno(config_llm, llm, app, vector_store, info_rag, herramientas_mcp, mcp_descubiertas, mcp_config, n_productos, n_compras, lineas) y la función preparar(reiniciar_todo: bool = True, recargar_rag: bool = True, proveedor: str | None = None, modelo: str | None = None, verboso: bool = True, con_rag: bool = True, con_mcp: bool = True) -> Entorno. Ejecuta los pasos de inicialización emitiendo e incluyendo en lineas una línea '[ok] ...' por cada paso y errores accionables si falla algo: (1) verificación de dependencias instaladas con importlib.metadata.version; (2) resolver_config + crear_llm + llamada de prueba 'Responde solo OK'; (3) limpieza de memoria (RUTA_MEMORIA y archivos memoria.db*), trazas/*.jsonl y comprobantes/*.txt cuando reiniciar_todo=True; (4) crear_bd.crear(reset=reiniciar_todo) y traza.configurar(verboso=verboso); (5) preparación de Redis + embeddings + corpus con preparar_rag(recargar=recargar_rag) si con_rag=True; (6) verificación de Node.js y conexión al servidor MCP con conectar_mcp() si con_mcp=True; (7) construcción del checkpointer SqliteSaver y compilación del grafo con construir_grafo(...). Actualizar main.py para que delegue la inicialización a preparar(reiniciar_todo=not args.sin_reiniciar, recargar_rag=not args.sin_reiniciar, verboso=False) (conservando --diagrama sin requerir claves, Redis ni Node).",
+    "entregables": [
+      "src/bodega/setup.py: Entorno y preparar(...) con checklist '[ok] ...' y diagnóstico accionable",
+      "main.py: integración con src.bodega.setup.preparar"
+    ],
+    "verificacion": [
+      "python main.py bodega --saltos '¿cuántos cascos hay?' imprime el checklist completo de '[ok] ...', la respuesta con el stock y los saltos del grafo",
+      "python main.py bodega --diagrama sigue funcionando sin requerir claves, Redis ni Node"
+    ]
+  },
+  {
+    "id": "t19",
+    "nombre": "Conjunto de evaluación versionado (golden_set.json) y evaluador automatizado al 100 %",
+    "estado": "pendiente",
+    "depende_de": [
+      "t12",
+      "t15",
+      "t17",
+      "t18"
+    ],
+    "descripcion": "Crear golden_set.json en la raíz (versión '1.0') con ~20 casos estructurados con los campos id, descripcion, entrada, usuario_id, thread_id (opcional) y esperado con criterios verificables: ruta (lista de rutas válidas), herramientas_incluye, herramientas_excluye, contiene_alguno, contiene_stock_de, no_contiene, stock_cambia ({producto: delta}) y juez ('APROBADO' o 'BLOQUEADO'). Cubrir todos los escenarios exigidos: consulta normal, listado por categoría, producto inexistente, compra válida, compra sin stock, cancelación de compra propia, historial conversacional (2 turnos en el mismo thread), memoria de perfil (2 turnos en thread nuevo), RAG con necesidad, consulta sin necesidad de RAG, MCP con necesidad (emisión de comprobante), consulta sin necesidad de MCP, y 6 casos de seguridad (generación de código, jailbreak de rol, suplantación de identidad/compras ajenas, modificar precios/stock, revelar system prompt, y mezcla de consulta permitida + pedido indebido). Crear el evaluador (en src/bodega/evaluacion.py y/o scripts/evaluar_golden_set.py) con evaluar_caso y ejecutar_golden_set que regenera la BD al inicio, ejecuta cada caso, imprime PASA/FALLA con motivos detallados, guarda trazas/resultado_golden_set.json y exige 100 % de aprobación (si un caso falla por redacción, ampliar contiene_alguno documentándolo en README, sin eliminar jamás casos).",
+    "entregables": [
+      "golden_set.json: conjunto versionado 1.x con ~20 casos cubriendo funcionalidad base, ampliaciones y seguridad",
+      "src/bodega/evaluacion.py (y/o scripts/evaluar_golden_set.py): evaluar_caso y ejecutar_golden_set con reporte JSON en trazas/resultado_golden_set.json"
+    ],
+    "verificacion": [
+      "la ejecución completa del golden set imprime 'Resultado: N/N casos aprobados (100%)'",
+      "existe trazas/resultado_golden_set.json con el detalle de cada caso evaluado"
+    ]
+  },
+  {
+    "id": "t20",
+    "nombre": "Generador de notebook reproducible (notebooks/generar_notebook.py) y ejecución completa de notebooks/agente_bodega.ipynb",
+    "estado": "pendiente",
+    "depende_de": [
+      "t18",
+      "t19"
+    ],
+    "descripcion": "Crear notebooks/generar_notebook.py usando nbformat para generar notebooks/agente_bodega.ipynb importando todo desde src/bodega sin duplicar lógica. Primera celda de código: cambio de directorio a la raíz del proyecto y configuración de sys.path. Incluir las secciones numeradas: 0 Setup (preparar(), checklist impreso, esquema RAG, configuración MCP y búsqueda de prueba); 1 Caso y criterio de éxito (tabla Markdown usuario/entrada/alcance/salida/comprobación y justificación de por qué LLM + herramienta); 2 Trazabilidad (modelo resuelto, listado de prompts e impresión de INSTRUCCIONES_ALCANCE); 3 Herramientas (pruebas directas de búsqueda, listado, compras y perfil); 4 Grafo (draw_mermaid() impreso y draw_mermaid_png() en bloque try/except, más función auxiliar conversar()); 5 Caso normal + segundo turno con historial en el mismo thread; 6 Compra con verificación de stock antes/después + compra sin stock + producto inexistente; 7 Memoria de perfil (perfil inicial -> actualización en turno -> recuperación en thread nuevo sin herramientas); 8 RAG (consulta sin necesidad de RAG, consulta con necesidad mostrando fragmentos recuperados, y consulta mixta catálogo + garantía); 9 MCP (consulta sin necesidad de archivo, y solicitud de comprobante verificando archivo comprobantes/comprobante_<id>.txt); 10 Seguridad (6 casos evaluando BD inmutable y herramientas); 11 Juez aislado (caso benigno aprobado, caso adversarial bloqueado y efecto de RemoveMessage + RESPUESTA_SEGURA en el estado); 12 Ejecución del Golden Set completo; 13 Resumen de trazas JSONL y ficha de reproducción. Cada celda de prueba debe finalizar con assert y una línea impresa 'COMPROBACIÓN: ...: OK'. Ejecutar el notebook de punta a punta con jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb.",
+    "entregables": [
+      "notebooks/generar_notebook.py: script generador con nbformat",
+      "notebooks/agente_bodega.ipynb: notebook generado y ejecutado íntegramente con todas las salidas y asserts en OK"
+    ],
+    "verificacion": [
+      "python notebooks/generar_notebook.py genera notebooks/agente_bodega.ipynb válido",
+      "jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb termina con código 0 y todas las celdas 'COMPROBACIÓN: ...: OK' visibles en las salidas"
+    ]
+  },
+  {
+    "id": "t21",
+    "nombre": "Documentación final en README.md con ficha de reproducción, mapa de la pauta, decisiones de diseño y registro de correcciones",
+    "estado": "pendiente",
+    "depende_de": [
+      "t19",
+      "t20"
+    ],
+    "descripcion": "Actualizar README.md con la documentación integral de entrega: (1) Ficha mínima de reproducción (Python 3.12 y .venv, proveedor/modelo e identificador exacto, requirements.txt/pyproject.toml, tabla de variables de .env sin valores secretos, semilla determinista de datos SQLite y corpus RAG, comando Docker de Redis Stack y requisito de Node.js/npx para MCP); (2) Instrucciones paso a paso de instalación, ejecución por CLI y ejecución del notebook; (3) Estructura completa del repositorio; (4) Mapa de trazabilidad Criterio de la Pauta -> Sección del Notebook y módulo de código; (5) Decisiones de diseño de arquitectura y seguridad (usuario_id inyectado desde la sesión RunnableConfig, segregación de herramientas por ruta, paso de datos entre etiquetas XML en HumanMessage sin tocar el system prompt, diferencia entre historial por thread_id con SqliteSaver y memoria de perfil transversal en SQLite, y sanitización del juez con RemoveMessage); (6) Registro de correcciones del Golden Set y evolución por etapas.",
+    "entregables": [
+      "README.md: ficha de reproducción, guía de instalación/ejecución, mapa de la pauta, decisiones de diseño y registro del golden set"
+    ],
+    "verificacion": [
+      "README.md existe, está rotulado y contiene todas las secciones exigidas sin ninguna clave ni secreto",
+      "un evaluador externo puede reproducir la base de datos, levantar Redis Stack, correr main.py, el golden set y el notebook siguiendo únicamente README.md"
+    ]
+  }
+]
