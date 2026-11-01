@@ -447,7 +447,7 @@
     {
       "id": "t24",
       "nombre": "Degradación controlada en setup.preparar(), main.py y notebook cuando faltan RAG o MCP",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t18"
       ],
@@ -459,7 +459,8 @@
       "verificacion": [
         "con REDIS_URL=redis://localhost:6399 y con_mcp=False (o sin Node), preparar() termina sin excepción y construye app operativa",
         "la base obligatoria del notebook corre completa cuando Redis no está disponible y las secciones de bonos muestran el aviso"
-      ]
+      ],
+      "evidencia": "20261101_1851: preparar(redis_url='redis://localhost:6399', con_mcp=False) emitio '[aviso] RAG omitido: No se pudo conectar a Redis en redis://localhost:6399...' y '[aviso] MCP omitido: deshabilitado por configuracion', construyo el StateGraph operativo con vector_store=None y herramientas_mcp=[], y evaluacion.py / notebook omiten los casos de bono con aviso sin interrumpir la base obligatoria."
     },
     {
       "id": "t25",
