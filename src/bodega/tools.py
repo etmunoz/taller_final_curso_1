@@ -2,7 +2,7 @@
 Archivo: src/bodega/tools.py
 Objetivo: Herramientas de lectura, perfil y acción del agente Bodega Norte, con manejo de errores como texto y control de sesión.
 Creado: 20261101_1440 (America/Santiago)
-Actualizado: 20261101_1440 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -327,6 +327,39 @@ def cancelar_compra(compra_id: int, config: RunnableConfig) -> str:
             con.close()
     except Exception as e:
         return f"Error al cancelar compra: {e}"
+
+
+def crear_herramienta_rag(vector_store: Any, k: int = 3) -> Any:
+    """Construye y devuelve la herramienta @tool buscar_politicas(pregunta) vinculada al vector_store de Redis."""
+
+    @tool
+    def buscar_politicas(pregunta: str) -> str:
+        """Busca en los documentos oficiales de políticas, garantías, devoluciones, despachos, pagos y fichas técnicas de Bodega Norte."""
+        if not pregunta or not str(pregunta).strip():
+            return "Error: debes indicar una pregunta o tema de políticas a consultar."
+        if vector_store is None:
+            return "Error: el índice vectorial de políticas (RAG) no está inicializado."
+        try:
+            resultados = vector_store.similarity_search_with_score(str(pregunta).strip(), k=k)
+            if not resultados:
+                return f"No se encontraron fragmentos relevantes en las políticas para '{pregunta}'."
+
+            bloques: list[str] = []
+            for doc, score in resultados:
+                meta = getattr(doc, "metadata", {}) or {}
+                fuente = meta.get("fuente") or "documento_desconocido"
+                seccion = meta.get("seccion") or "General"
+                contenido = getattr(doc, "page_content", str(doc)).strip()
+                try:
+                    score_txt = f"{float(score):.4f}"
+                except (TypeError, ValueError):
+                    score_txt = str(score)
+                bloques.append(f"[{fuente} | {seccion} | {score_txt}] {contenido}")
+            return "\n\n".join(bloques)
+        except Exception as e:
+            return f"Error al consultar políticas en el índice RAG: {e}"
+
+    return buscar_politicas
 
 
 HERRAMIENTAS_LECTURA = [buscar_producto, listar_productos, mis_compras]

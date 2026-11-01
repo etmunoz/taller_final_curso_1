@@ -1,0 +1,126 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_16.txt
+# Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas de chunks, índice Redis Stack y salidas de consola de la Instrucción 16 (Etapa 4, tareas t13 a t15 y punto de control RAG).
+# Creado: 20261101_1955 (America/Santiago)
+# Actualizado: 20261101_2000 (America/Santiago)
+
+Ejecuto la instrucción 16. Volcado completo de ejecuciones de consola, levantamiento de Redis Stack en Docker, trazas de chunks y verificaciones por cada tarea:
+
+======================= t13
+
+You are a subagent spawned by another session.
+Ejecuta únicamente la tarea `t13` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01–t12 ya están `hecho`).
+
+Requisitos de `t13`:
+- Crear `docs_rag/` con 5 archivos Markdown ficticios de Bodega Norte y cifras concretas:
+  1. `politica_devoluciones.md` (10 días hábiles, sin uso, boleta o factura, consumibles abiertos no se devuelven, reembolso 5 días hábiles transferencia).
+  2. `garantias.md` (tabla: taladro y esmeril 12 meses, herramientas manuales 6 meses, casco y zapatos 3 meses, servicio técnico 10 días hábiles).
+  3. `despacho_y_horarios.md` (horarios L-V 08:30-18:00, sáb 09:00-13:30, despacho gratis sobre $150.000, $8.000/$12.000 bajo ese monto, pedidos antes de 12:00 salen el mismo día).
+  4. `formas_de_pago_y_descuentos.md` (5 % sobre $300.000, 10 % sobre $1.000.000, crédito a 30 días para constructoras).
+  5. `fichas_tecnicas.md` (taladro, esmeril, casco, guantes, zapatos, cemento, látex 40 m²/galón, yeso-cartón).
+- Verificación: los 5 archivos existen y suman más de 900 palabras.
+
+Salida de la verificación t13:
+PS> .\.venv\Scripts\python.exe -c "from pathlib import Path; archivos = sorted(Path('docs_rag').glob('*.md')); [print(a.name, len(a.read_text(encoding='utf-8').split()), 'palabras') for a in archivos]; print('Total archivos:', len(archivos), '| Total palabras:', sum(len(a.read_text(encoding='utf-8').split()) for a in archivos))"
+despacho_y_horarios.md 432 palabras
+fichas_tecnicas.md 590 palabras
+formas_de_pago_y_descuentos.md 423 palabras
+garantias.md 455 palabras
+politica_devoluciones.md 469 palabras
+Total archivos: 5 | Total palabras: 2369
+
+
+======================= t14
+
+You are a subagent spawned by another session.
+Ejecuta únicamente la tarea `t14` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t13 ya está `hecho`).
+
+Requisitos y aclaraciones de `t14`:
+- Levantar e instalar un Redis Stack en Docker para `trabajo_final_1` en `localhost:6379` (`REDIS_URL` en `.env`).
+- Si `FT._LIST` muestra el índice, borrarlo con `FT.DROPINDEX ... DD` antes de recargar. Imprimir el esquema del índice al terminar.
+- Sacar trazas de ejemplo de los chunks para tener respaldo de lo realizado.
+- `src/bodega/rag.py`: `EmbeddingsLocales` (`fastembed`, `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`), `resolver_embedding_provider`, `crear_embeddings`, `conectar_redis`, `cargar_corpus` (`MarkdownHeaderTextSplitter` por `#` y `##` + `RecursiveCharacterTextSplitter` 600/100, metadatos `fuente` y `seccion`), `preparar_rag` con `RedisConfig(index_name="bodega_politicas", distance_metric="COSINE", indexing_algorithm="HNSW", embedding_dimensions=dim, metadata_schema=[fuente tag, seccion text])`, devolviendo `(RedisVectorStore, InfoRAG)`.
+
+Salida del levantamiento de Redis Stack en Docker:
+PS> docker run -d --name redis-rag -p 6379:6379 redis/redis-stack-server:latest
+PS> docker ps --filter "name=redis-rag"
+be7781db865f3f459f19de55fc4645c4de3cfa8271e270a601357fa13d992fe3
+CONTAINER ID   IMAGE                             COMMAND            CREATED         STATUS                  PORTS                                         NAMES
+be7781db865f   redis/redis-stack-server:latest   "/entrypoint.sh"   3 seconds ago   Up Less than a second   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp   redis-rag
+
+Salida de la verificación t14 (trazas de ejemplo de los chunks, esquema del índice COSINE/HNSW y búsqueda semántica con scores):
+PS> .\.venv\Scripts\python.exe -c "from src.bodega.rag import preparar_rag, cargar_corpus; chunks = cargar_corpus(); print('Total chunks:', len(chunks)); [print('Chunk', i+1, c.metadata, len(c.page_content), 'chars ->', repr(c.page_content[:110])) for i, c in enumerate(chunks[:6])]; vs, info = preparar_rag(recargar=True); res = vs.similarity_search_with_score('plazo para devolver un producto', k=2); [print('Match', j+1, doc.metadata, f'score={score:.4f}', repr(doc.page_content[:140])) for j, (doc, score) in enumerate(res)]"
+Total chunks: 33
+Chunk 1 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Horarios de Atención y Condiciones de Despacho — Bodega Norte'} 267 chars -> '# Horarios de Atención y Condiciones de Despacho — Bodega Norte  \nBodega Norte opera con un sistema logístico '
+Chunk 2 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Horarios de Atención Presencial y Retiro en Bodega'} 451 chars -> '## Horarios de Atención Presencial y Retiro en Bodega  \nNuestra casa matriz, sala de ventas y patio de carga a'
+Chunk 3 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Horarios de Atención Presencial y Retiro en Bodega'} 353 chars -> '- **Domingos y festivos:** cerrado tanto para atención presencial como para despacho en ruta.  \nPara el retiro'
+Chunk 4 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Tarifas de Despacho y Monto para Envío Gratis'} 557 chars -> '## Tarifas de Despacho y Monto para Envío Gratis  \nEl costo del transporte a domicilio u obra se calcula según'
+Chunk 5 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Horario de Corte y Plazos de Salida a Ruta'} 381 chars -> '## Horario de Corte y Plazos de Salida a Ruta  \nNuestra flota de camiones y furgones de reparto organiza sus s'
+Chunk 6 {'fuente': 'despacho_y_horarios.md', 'seccion': 'Horario de Corte y Plazos de Salida a Ruta'} 436 chars -> '- **Pedidos después de las 12:00 horas:** Las compras confirmadas a partir de las 12:01 horas o durante la jor'
+Índice Redis: bodega_politicas | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 33 | Embeddings: google:models/gemini-embedding-001
+Match 1 {'fuente': 'politica_devoluciones.md', 'seccion': 'Plazo y Requisitos para Devolución'} score=0.1040 '## Plazo y Requisitos para Devolución  \nTodo cliente dispone de un plazo máximo de **10 días hábiles** corridos desde la fecha de recepción '
+Match 2 {'fuente': 'garantias.md', 'seccion': 'Procedimiento y Plazo del Servicio Técnico'} score=0.1527 '2. **Plazo de respuesta:** El diagnóstico oficial y la reparación o reemplazo del equipo por parte del **servicio técnico demora un máximo d'
+
+
+======================= t15 (Herramienta RAG en el Grafo y Punto de Control)
+
+You are a subagent spawned by another session.
+Ejecuta únicamente la tarea `t15` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t14 ya está `hecho`).
+
+Requisitos de `t15`:
+- En `src/bodega/tools.py`: `crear_herramienta_rag(vector_store, k=3)` que devuelve una `@tool buscar_politicas(pregunta)` con los 3 mejores fragmentos formateados `"[fuente | sección | score] contenido"`.
+- En `src/bodega/graph.py`: se construye con el `vector_store` recibido y se usa solo en `agente_politicas` (reemplaza el placeholder).
+- Verificación con LLM real y Punto de Control:
+  1. `"¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?"` → ruta `politicas`, `buscar_politicas` ejecutada, respuesta con `"10"`, `"boleta"` y citando `politica_devoluciones.md`.
+  2. `"¿Cuántos cascos quedan?"` → NO ejecuta `buscar_politicas` (no toca Redis).
+  3. `"¿Tienen esmeril en stock, a qué precio y qué garantía tiene?"` → usa `buscar_producto` y `buscar_politicas`.
+
+Volcado completo de la verificación t15 y Punto de Control:
+PS> .\.venv\Scripts\python.exe -c "from crear_bd import crear; from src.bodega.entorno import crear_llm, resolver_config; from src.bodega.rag import preparar_rag; from src.bodega.graph import construir_grafo, ejecutar_turno; crear(reset=True); vs, info = preparar_rag(recargar=True); cfg = resolver_config(); llm = crear_llm(cfg); app = construir_grafo(llm=llm, vector_store=vs, modelo_id=str(cfg)); print('\n--- Caso 1: Devoluciones ---'); r1 = ejecutar_turno(app, '¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?', usuario_id='pedro', thread_id='t15_rag_v2_1'); print('Ruta elegida:', r1['ruta_elegida']); print('Saltos:', r1['saltos']); print('Herramientas:', r1['herramientas_usadas']); print('Veredicto:', r1['veredicto_juez']); print('Respuesta:', r1['respuesta']); print('\n--- Caso 2: Solo stock (no debe tocar Redis) ---'); r2 = ejecutar_turno(app, '¿Cuántos cascos quedan?', usuario_id='pedro', thread_id='t15_rag_v2_2'); print('Ruta elegida:', r2['ruta_elegida']); print('Saltos:', r2['saltos']); print('Herramientas:', r2['herramientas_usadas']); print('Veredicto:', r2['veredicto_juez']); print('Respuesta:', r2['respuesta']); print('\n--- Caso 3: Mixta (stock + garantía) ---'); r3 = ejecutar_turno(app, '¿Tienen esmeril en stock, a qué precio y qué garantía tiene?', usuario_id='pedro', thread_id='t15_rag_v2_3'); print('Ruta elegida:', r3['ruta_elegida']); print('Saltos:', r3['saltos']); print('Herramientas:', r3['herramientas_usadas']); print('Veredicto:', r3['veredicto_juez']); print('Respuesta:', r3['respuesta'])"
+C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+23 productos, 2 compras
+Índice Redis: bodega_politicas | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 33 | Embeddings: google:models/gemini-embedding-001
+
+--- Caso 1: Devoluciones ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 718 tok · tool_calls=1 · respuesta=
+[traza] agente_politicas google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 860 tok · tool_calls=1 · respuesta=
+[traza] agente_politicas google_genai:gemini-3.5-flash-lite T=0 · 4 msgs · 1429 tok · tool_calls=0 · respuesta=Según el documento **politica_devoluciones.md**, dispones de un plazo máximo de **10 días hábiles** desde la fecha de recepción o retiro del pedido para solicitar la devolución de un producto sin uso.…
+[traza] juez google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 766 tok · tool_calls=1 · respuesta=
+[traza] actualizar_memoria google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 659 tok · tool_calls=1 · respuesta=
+Ruta elegida: politicas
+Saltos: ['cargar_memoria', 'router', 'agente_politicas', 'herramientas(buscar_politicas)', 'agente_politicas', 'juez', 'actualizar_memoria']
+Herramientas: ['buscar_politicas']
+Veredicto: APROBADO: La respuesta aborda una consulta sobre las políticas de la bodega basándose en los documentos disponibles, lo cual está completamente dentro del alcance permitido.
+Respuesta: Según el documento **politica_devoluciones.md**, dispones de un plazo máximo de **10 días hábiles** desde la fecha de recepción o retiro del pedido para solicitar la devolución de un producto sin uso.
+
+Para realizar la devolución, necesitas presentar lo siguiente:
+1. **Documento tributario obligatorio:** La boleta o factura original (física o electrónica) emitida por Bodega Norte, junto con el comprobante interno de despacho o retiro.
+2. **Estado del producto:** El artículo debe encontrarse sin uso, limpio, con sellos de fábrica intactos, etiquetas adheridas y en su embalaje original completo (con manuales, accesorios y piezas de fijación).
+
+--- Caso 2: Solo stock (no debe tocar Redis) ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 749 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 808 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 4 msgs · 887 tok · tool_calls=0 · respuesta=Quedan 37 unidades del Casco de seguridad blanco (ID 1), con un precio de $8,990 CLP cada uno.
+[traza] juez google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 631 tok · tool_calls=1 · respuesta=
+[traza] actualizar_memoria google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 579 tok · tool_calls=1 · respuesta=
+Ruta elegida: consulta
+Saltos: ['cargar_memoria', 'router', 'agente_consulta', 'herramientas(buscar_producto)', 'agente_consulta', 'juez', 'actualizar_memoria']
+Herramientas: ['buscar_producto']
+Veredicto: APROBADO: La respuesta consulta correctamente el stock de un producto del catálogo dentro del alcance permitido.
+Respuesta: Quedan 37 unidades del Casco de seguridad blanco (ID 1), con un precio de $8,990 CLP cada uno.
+
+--- Caso 3: Mixta (stock + garantía) ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 777 tok · tool_calls=1 · respuesta=
+[traza] agente_politicas google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 886 tok · tool_calls=1 · respuesta=
+[traza] agente_politicas google_genai:gemini-3.5-flash-lite T=0 · 4 msgs · 957 tok · tool_calls=1 · respuesta=
+[traza] agente_politicas google_genai:gemini-3.5-flash-lite T=0 · 6 msgs · 1529 tok · tool_calls=0 · respuesta=El esmeril angular (ID 8) se encuentra disponible en stock con 18 unidades a un precio de $42,990 CLP. Según el documento **garantias.md**, la garantía para taladros y esmeriles es de **12 meses** y c…
+[traza] juez google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 722 tok · tool_calls=1 · respuesta=
+[traza] actualizar_memoria google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 633 tok · tool_calls=1 · respuesta=
+Ruta elegida: politicas
+Saltos: ['cargar_memoria', 'router', 'agente_politicas', 'herramientas(buscar_producto)', 'agente_politicas', 'herramientas(buscar_politicas)', 'agente_politicas', 'juez', 'actualizar_memoria']
+Herramientas: ['buscar_producto', 'buscar_politicas']
+Veredicto: APROBADO: La respuesta se encuentra completamente dentro del alcance de la bodega de insumos Bodega Norte, respondiendo sobre el stock, precio y garantía de un producto del catálogo utilizando los datos permitidos.
+Respuesta: El esmeril angular (ID 8) se encuentra disponible en stock con 18 unidades a un precio de $42,990 CLP. 
+
+Según el documento **garantias.md**, la garantía para taladros y esmeriles es de **12 meses** y cubre fallas de motor eléctrico, interruptor electrónico, caja de engranajes y cabezal percutor por defecto de fábrica.

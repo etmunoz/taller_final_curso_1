@@ -2,7 +2,7 @@
 Archivo: main.py
 Objetivo: CLI principal para ejecutar el agente bodega (modo interactivo, turnos únicos, generación de Mermaid y control de saltos).
 Creado: 20261101_1530 (America/Santiago)
-Actualizado: 20261101_1530 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -41,10 +41,18 @@ def main() -> None:
     if not args.sin_reiniciar:
         crear_base(reset=False)
 
-    # 3. Preparación del LLM y construcción del grafo con SqliteSaver checkpointer
+    # 3. Preparación del LLM, índice RAG (si Redis Stack está activo) y construcción del grafo con SqliteSaver checkpointer
     config_llm = resolver_config()
     llm = crear_llm(config_llm)
-    app = construir_grafo(llm=llm, modelo_id=str(config_llm), temperatura=0)
+    vector_store = None
+    try:
+        from src.bodega.rag import preparar_rag
+
+        vector_store, _ = preparar_rag(recargar=not args.sin_reiniciar)
+    except Exception as exc:
+        print(f"[rag] aviso: RAG no disponible ({exc})")
+
+    app = construir_grafo(llm=llm, vector_store=vector_store, modelo_id=str(config_llm), temperatura=0)
 
     # 4. Modo un solo turno (si se pasa mensaje)
     if args.mensaje:

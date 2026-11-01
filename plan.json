@@ -232,7 +232,7 @@
     {
       "id": "t13",
       "nombre": "Corpus docs_rag/ con 5 documentos Markdown ficticios de políticas y fichas técnicas de Bodega Norte",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [],
       "descripcion": "Crear el directorio docs_rag/ en la raíz con 5 archivos Markdown ficticios de Bodega Norte con cifras concretas verificables para las pruebas de recuperación RAG: (1) politica_devoluciones.md (plazo de 10 días hábiles desde la recepción, producto sin uso y en su embalaje original, presentar boleta o factura electrónica, los consumibles abiertos como pinturas, adhesivos o sellantes no se devuelven, reembolso en 5 días hábiles mediante transferencia bancaria); (2) garantias.md (tabla de cobertura: taladro percutor y esmeril angular con 12 meses de garantía legal y técnica, herramientas manuales con 6 meses, casco de seguridad y zapatos de seguridad con 3 meses, diagnóstico en servicio técnico autorizado en un plazo máximo de 10 días hábiles); (3) despacho_y_horarios.md (horarios de atención lunes a viernes de 08:30 a 18:00 y sábados de 09:00 a 13:30, despacho gratis en compras sobre $150.000 CLP, costo de despacho de $8.000 CLP urbano y $12.000 CLP periférico bajo ese monto, los pedidos confirmados antes de las 12:00 salen a reparto el mismo día hábil); (4) formas_de_pago_y_descuentos.md (descuento por volumen de 5 % en compras sobre $300.000 CLP y de 10 % en compras sobre $1.000.000 CLP, línea de crédito a 30 días para empresas constructoras registradas previa evaluación comercial); (5) fichas_tecnicas.md (especificaciones técnicas de taladro percutor, esmeril angular, casco de seguridad, guantes de nitrilo, zapatos de seguridad, saco de cemento 25 kg, pintura látex blanco con rendimiento de 40 m²/galón y plancha de yeso-cartón). Todos los documentos estructurados con encabezados # y ## y rotulados según las convenciones del proyecto.",
       "entregables": [
@@ -245,12 +245,13 @@
       "verificacion": [
         "los 5 archivos existen en docs_rag/",
         "el conteo total de palabras entre los 5 archivos supera las 900 palabras y contiene todas las cifras exigidas"
-      ]
+      ],
+      "evidencia": "20261101_1952: Los 5 archivos existen en docs_rag/ y suman 2369 palabras (despacho_y_horarios.md 432, fichas_tecnicas.md 590, formas_de_pago_y_descuentos.md 423, garantias.md 455, politica_devoluciones.md 469) con todas las cifras requeridas."
     },
     {
       "id": "t14",
       "nombre": "Módulo RAG sobre Redis Stack con embeddings multi-proveedor y particionado jerárquico (src/bodega/rag.py)",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t02",
         "t13"
@@ -263,12 +264,13 @@
       "verificacion": [
         "con Redis Stack corriendo, preparar_rag imprime/devuelve InfoRAG.esquema() con campos, dimensiones, COSINE, HNSW y n fragmentos",
         "vector_store.similarity_search_with_score('plazo para devolver un producto', k=2) devuelve fragmentos de politica_devoluciones.md con sus scores"
-      ]
+      ],
+      "evidencia": "20261101_1956: Contenedor redis-rag (redis/redis-stack-server:latest) levantado en localhost:6379; preparar_rag(recargar=True) verifico FT._LIST / FT.DROPINDEX DD e imprimio 'Índice Redis: bodega_politicas | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 33 | Embeddings: google:models/gemini-embedding-001'; similarity_search_with_score('plazo para devolver un producto', k=2) devolvio como Match 1 {'fuente': 'politica_devoluciones.md', 'seccion': 'Plazo y Requisitos para Devolución'} con score=0.1040."
     },
     {
       "id": "t15",
       "nombre": "Herramienta buscar_politicas con RAG real e integración en agente_politicas y consultas mixtas",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t07",
         "t14"
@@ -282,7 +284,8 @@
         "'¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?' va por ruta politicas, ejecuta buscar_politicas y responde mencionando '10' y 'boleta'",
         "'¿Cuántos cascos quedan?' NO ejecuta buscar_politicas",
         "'¿Tienen esmeril en stock, a qué precio y qué garantía tiene?' ejecuta tanto buscar_producto como buscar_politicas y responde con stock/disponibilidad y la garantía de 12 meses"
-      ]
+      ],
+      "evidencia": "20261101_1958: (1) Consulta de devolución fue por ruta=politicas, ejecuto buscar_politicas y respondio citando politica_devoluciones.md, '10 días hábiles' y 'boleta o factura'; (2) '¿Cuántos cascos quedan?' fue por ruta=consulta y ejecuto solo ['buscar_producto'] sin tocar Redis; (3) '¿Tienen esmeril en stock, a qué precio y qué garantía tiene?' ejecuto ['buscar_producto', 'buscar_politicas'] y respondio con 18 unidades a $42,990 CLP y garantía de 12 meses citando garantias.md."
     }
   ]
 }

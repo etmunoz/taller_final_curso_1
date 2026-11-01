@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1945 (America/Santiago)
+> **Actualizado:** 20261101_2000 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -239,10 +239,28 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** `plan.json` validado con 15 tareas (`t01`–`t12` en `hecho`, `t13`–`t15` en `pendiente`) y dependencias consistentes (`t13`→`[]`; `t14`→`['t02', 't13']`; `t15`→`['t07', 't14']`).
 
+## 20261101_2000 — Instrucción 16: implementación de la Etapa 4 (`t13`–`t15`), Redis Stack en Docker y punto de control RAG
+
+**Pedido:** implementar las tareas pendientes de la Etapa 4 (`t13`, `t14` y `t15`), levantar e instalar Redis Stack en Docker en `localhost:6379` (`REDIS_URL` en `.env`), verificar con `FT._LIST` y borrar con `FT.DROPINDEX ... DD` antes de recargar, imprimir el esquema del índice al terminar, sacar trazas de ejemplo de los chunks y cumplir el punto de control: el esquema impreso dice `COSINE`/`HNSW` y la cantidad de fragmentos; la pregunta de devoluciones cita `politica_devoluciones.md`; la pregunta de stock no toca Redis.
+
+**Realizado:**
+- **Docker Redis Stack:** levantado el contenedor `redis-rag` (`redis/redis-stack-server:latest`) expuesto en `0.0.0.0:6379->6379/tcp` con el módulo RediSearch (`search`) activo.
+- **`t13` (`docs_rag/`):** creados y rotulados los 5 documentos Markdown ficticios de Bodega Norte (`politica_devoluciones.md`, `garantias.md`, `despacho_y_horarios.md`, `formas_de_pago_y_descuentos.md`, `fichas_tecnicas.md`) sumando **2.369 palabras** (> 900 requeridas) con todas las cifras de prueba.
+- **`t14` (`src/bodega/rag.py` y `src/bodega/entorno.py`):** implementado `EmbeddingsLocales` (`fastembed` con `sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2`), `resolver_embedding_provider`, `crear_embeddings` (`google:models/gemini-embedding-001`, `openai:text-embedding-3-small`, `ollama:nomic-embed-text`, `local`), `conectar_redis` (verifica `ping` y módulo `search`), `cargar_corpus` (`MarkdownHeaderTextSplitter` `#`/`##` + `RecursiveCharacterTextSplitter` 600/100 con metadatos `fuente` y `seccion`), e `InfoRAG`/`preparar_rag` con `FT._LIST`, `FT.DROPINDEX bodega_politicas DD`, `RedisConfig(index_name="bodega_politicas", distance_metric="COSINE", indexing_algorithm="HNSW")` y `RedisVectorStore`.
+- **`t15` (`src/bodega/tools.py`, `src/bodega/graph.py`, `src/bodega/prompts.py`, `crear_bd.py` y `main.py`):** implementada la fábrica `crear_herramienta_rag(vector_store, k=3)` que devuelve `@tool buscar_politicas(pregunta)` con formato `[fuente | sección | score] contenido`, integrada en `agente_politicas` reemplazando el placeholder. Se incluyó `esmeril angular` en los 23 productos semilla de `crear_bd.py` para la consulta mixta de stock + garantía.
+- **Documentación y evidencias:** tareas `t13`, `t14` y `t15` marcadas como `hecho` en `plan.json`; rotulado de `docs/instrucciones/instruccion_16.md` y volcado completo en `docs/salidas_instrucciones/salida_16.txt`.
+
+**Verificación (punto de control):**
+- `preparar_rag(recargar=True)` imprimió: `Índice Redis: bodega_politicas | Algoritmo: HNSW | Métrica: COSINE | Dimensiones: 3072 | Campos: [fuente (TAG), seccion (TEXT), text (TEXT), embedding (VECTOR HNSW COSINE dim=3072)] | Fragmentos indexados: 33 | Embeddings: google:models/gemini-embedding-001`.
+- Trazas de ejemplo de los 33 chunks generados y búsqueda `similarity_search_with_score("plazo para devolver un producto", k=2)` → Match 1 en `politica_devoluciones.md` (`score=0.1040`).
+- Pregunta de devolución (`"¿Cuántos días hábiles tengo para devolver un producto sin uso y qué necesito presentar?"`) → `ruta=politicas`, ejecutó `buscar_politicas`, citó `politica_devoluciones.md`, `10 días hábiles` y `boleta o factura`.
+- Pregunta de stock (`"¿Cuántos cascos quedan?"`) → `ruta=consulta`, ejecutó únicamente `buscar_producto` sin tocar Redis.
+- Pregunta mixta (`"¿Tienen esmeril en stock, a qué precio y qué garantía tiene?"`) → ejecutó `['buscar_producto', 'buscar_politicas']` e informó stock (18 unidades a `$42,990 CLP`) y garantía de `12 meses` según `garantias.md`.
+
 ## Pendientes
 
 - [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [ ] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.
+- [x] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.
 - [x] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.
 - [x] Ejecutar `t05`–`t09` (Etapa 2) y verificar el punto de control.
 - [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.

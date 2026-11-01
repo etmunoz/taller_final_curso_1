@@ -2,7 +2,7 @@
 Archivo: src/bodega/graph.py
 Objetivo: Definir el grafo StateGraph del agente Bodega Norte (router estructurado, agentes por ruta, ToolNode, tope de rondas, juez real con RemoveMessage, memoria de perfil real y ejecución de turnos).
 Creado: 20261101_1500 (America/Santiago)
-Actualizado: 20261101_1925 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -26,8 +26,7 @@ from .prompts import (
     SYSTEM_ROUTER,
 )
 from .traza import TRAZA, configurar as configurar_traza, llamar_llm
-from .tools import HERRAMIENTAS_ACCION, HERRAMIENTAS_LECTURA, leer_perfil, guardar_perfil
-from langchain_core.tools import tool
+from .tools import HERRAMIENTAS_ACCION, HERRAMIENTAS_LECTURA, crear_herramienta_rag, guardar_perfil, leer_perfil
 
 
 # 1. Modelos Pydantic para salidas estructuradas
@@ -236,20 +235,17 @@ def construir_grafo(
             "ruta": ["router"],
         }
 
-    # Herramientas placeholder para políticas / MCP
-    @tool
-    def buscar_politicas(consulta: str) -> str:
-        """Busca en los documentos de políticas de la bodega."""
-        return f"Política de la bodega sobre '{consulta}': Despachos en 48 horas hábiles y garantía de devolución por 30 días con boleta."
+    # Herramienta RAG (buscar_politicas) usada solo en agente_politicas
+    herramienta_politicas = crear_herramienta_rag(vector_store, k=3)
 
     herramientas_consulta = HERRAMIENTAS_LECTURA
     herramientas_compra = HERRAMIENTAS_LECTURA + HERRAMIENTAS_ACCION
-    herramientas_politicas = HERRAMIENTAS_LECTURA + [buscar_politicas]
+    herramientas_politicas = HERRAMIENTAS_LECTURA + [herramienta_politicas]
     herramientas_comprobante = HERRAMIENTAS_LECTURA + (herramientas_mcp or [])
     herramientas_conversacion: list[Any] = []
 
     todas_herramientas = list(
-        {t.name: t for t in (HERRAMIENTAS_LECTURA + HERRAMIENTAS_ACCION + [buscar_politicas] + (herramientas_mcp or []))}.values()
+        {t.name: t for t in (HERRAMIENTAS_LECTURA + HERRAMIENTAS_ACCION + [herramienta_politicas] + (herramientas_mcp or []))}.values()
     )
 
     # Nodos agente por ruta

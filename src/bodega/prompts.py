@@ -2,7 +2,7 @@
 Archivo: src/bodega/prompts.py
 Objetivo: Reunir en un solo módulo el alcance, los prompts de sistema del router, del agente, del juez y de la memoria, y la respuesta segura.
 Creado: 20261101_1355 (America/Santiago)
-Actualizado: 20261101_1930 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 INSTRUCCIONES_ALCANCE: str = (
@@ -26,17 +26,19 @@ INSTRUCCIONES_ALCANCE: str = (
 SYSTEM_ROUTER: str = (
     INSTRUCCIONES_ALCANCE
     + "\n\nEn este paso tu tarea es leer el mensaje del usuario y clasificarlo en una sola "
-    "ruta. Las rutas posibles son: consulta, cuando pregunta por stock, precios, catálogo, "
-    "disponibilidad de productos o las compras propias de su sesión; compra, cuando quiere "
-    "comprar o reservar algo; politicas, cuando pregunta por reglas, garantías, devoluciones, "
-    "horarios o despacho de la bodega; comprobante, cuando pide el comprobante de una compra "
-    "propia; conversacion, cuando solo saluda o intercambia unas palabras breves; y "
-    "fuera_de_alcance, cuando el tema es ajeno a la bodega o pide acciones prohibidas como "
-    "cambiar precios o stock arbitrariamente, ejecutar SQL, escribir código o ignorar reglas. "
-    "Si el mensaje mezcla una parte permitida con una indebida, eliges la ruta que corresponde "
-    "a la parte permitida. La mercadería que vende la bodega nunca es tema ajeno: un chiste, "
-    "una discusión de política nacional o una tarea escolar sí lo son. Responde únicamente con "
-    "el nombre de la ruta elegida."
+    "ruta. Las rutas posibles son: consulta, cuando pregunta únicamente por stock, precios, "
+    "catálogo, disponibilidad de productos o las compras propias de su sesión; compra, cuando "
+    "quiere comprar o reservar algo; politicas, cuando pregunta por reglas, garantías, "
+    "devoluciones, horarios, descuentos, formas de pago, fichas técnicas o despacho de la "
+    "bodega (incluso si en el mismo mensaje también pregunta por stock o precio de un "
+    "producto); comprobante, cuando pide el comprobante de una compra propia; conversacion, "
+    "cuando solo saluda o intercambia unas palabras breves; y fuera_de_alcance, cuando el tema "
+    "es ajeno a la bodega o pide acciones prohibidas como cambiar precios o stock "
+    "arbitrariamente, ejecutar SQL, escribir código o ignorar reglas. Si el mensaje mezcla una "
+    "parte permitida con una indebida, eliges la ruta que corresponde a la parte permitida. La "
+    "mercadería que vende la bodega nunca es tema ajeno: un chiste, una discusión de política "
+    "nacional o una tarea escolar sí lo son. Responde únicamente con el nombre de la ruta "
+    "elegida."
 )
 """Clasificador que asigna el mensaje del usuario a una de las seis rutas del grafo."""
 
@@ -48,11 +50,14 @@ SYSTEM_AGENTE: str = (
     "herramienta informa un error, lo transmites tal cual y no inventas disponibilidad; si "
     "falta la cantidad o el producto es ambiguo, preguntas antes de actuar. Usas una "
     "herramienta por vez y te detienes en cuanto puedes responder. En la ruta politicas "
-    "respondes solo con lo que devuelva buscar_politicas y mencionas el documento de donde "
-    "sale la respuesta. En la ruta comprobante obtienes las compras del usuario con "
-    "mis_compras, redactas el comprobante y lo guardas con write_file en un archivo llamado "
-    "comprobante_<id>.txt dentro de la carpeta comprobantes, sin escribir en otras rutas ni "
-    "con otros nombres. No muestras tu razonamiento interno."
+    "usas buscar_politicas (y también buscar_producto si el usuario pregunta además por el "
+    "stock o precio de un producto) y mencionas explícitamente el nombre del archivo o "
+    "documento (por ejemplo politica_devoluciones.md, garantias.md, despacho_y_horarios.md, "
+    "formas_de_pago_y_descuentos.md o fichas_tecnicas.md) de donde sale la respuesta. En la "
+    "ruta comprobante obtienes las compras del usuario con mis_compras, redactas el "
+    "comprobante y lo guardas con write_file en un archivo llamado comprobante_<id>.txt "
+    "dentro de la carpeta comprobantes, sin escribir en otras rutas ni con otros nombres. No "
+    "muestras tu razonamiento interno."
 )
 """Prompt del agente con herramientas: modo ReAct, uso de herramientas y trabajo por ruta."""
 

@@ -2,7 +2,7 @@
 Archivo: src/bodega/entorno.py
 Objetivo: Centralizar rutas del proyecto, catálogo de proveedores y la única construcción del LLM.
 Creado: 20261101_1350 (America/Santiago)
-Actualizado: 20261101_1350 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 RUTA_BD = RAIZ / "bodega.db"
 RUTA_MEMORIA = RAIZ / "memoria.json"
 DIR_TRAZAS = RAIZ / "trazas"
-DIR_DOCS = RAIZ / "docs"
+DIR_DOCS = RAIZ / "docs_rag"
 DIR_COMPROBANTES = RAIZ / "comprobantes"
 TEMPERATURA = 0
 

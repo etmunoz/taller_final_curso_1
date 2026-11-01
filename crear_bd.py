@@ -2,7 +2,7 @@
 Archivo: crear_bd.py
 Objetivo: Generar bodega.db con las tablas productos, compras y perfil_usuario, con datos ficticios deterministas.
 Creado: 20261101_1345 (America/Santiago)
-Actualizado: 20261101_1345 (America/Santiago)
+Actualizado: 20261101_1955 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ PRODUCTOS: list[tuple[str, str, int, float]] = [
     ("protectores auditivos", "seguridad", 50, 4590.0),
     ("martillo carpintero", "herramientas", 25, 11990.0),
     ("taladro percutor", "herramientas", 12, 64990.0),
+    ("esmeril angular", "herramientas", 18, 42990.0),
     ("llave adjustable", "herramientas", 35, 9990.0),
     ("serrucho manual", "herramientas", 20, 13990.0),
     ("huincha de medir", "herramientas", 22, 4990.0),
@@ -36,7 +37,6 @@ PRODUCTOS: list[tuple[str, str, int, float]] = [
     ("latex blanco 4 L", "pinturas", 33, 18990.0),
     ("esmalte al agua blanco 1 L", "pinturas", 28, 9990.0),
     ("rodillo felpa 23 cm", "pinturas", 40, 5490.0),
-    ("brocha 3 pulgadas", "pinturas", 55, 3290.0),
     ("clavos", "fijaciones", 0, 2490.0),
     ("tornillos autoperforantes 100 un", "fijaciones", 65, 4990.0),
     ("tarugo plastico 8 mm 100 un", "fijaciones", 48, 2990.0),
