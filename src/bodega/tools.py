@@ -2,7 +2,7 @@
 Archivo: src/bodega/tools.py
 Objetivo: Herramientas de lectura, perfil y acción del agente Bodega Norte, con manejo de errores como texto y control de sesión.
 Creado: 20261101_1440 (America/Santiago)
-Actualizado: 20261101_1955 (America/Santiago)
+Actualizado: 20261101_1849 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -354,7 +354,9 @@ def crear_herramienta_rag(vector_store: Any, k: int = 3) -> Any:
                     score_txt = f"{float(score):.4f}"
                 except (TypeError, ValueError):
                     score_txt = str(score)
-                bloques.append(f"[{fuente} | {seccion} | {score_txt}] {contenido}")
+                bloques.append(
+                    f"[{fuente} | {seccion} | score={score_txt} (distancia_coseno, menor=más parecido)] {contenido}"
+                )
             return "\n\n".join(bloques)
         except Exception as e:
             return f"Error al consultar políticas en el índice RAG: {e}"

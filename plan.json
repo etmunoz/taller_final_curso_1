@@ -465,7 +465,7 @@
     {
       "id": "t25",
       "nombre": "Redis del curso: índice único por grupo (RAG_INDEX), menor dimensión de embeddings, lectura real de FT.INFO y codificación segura de URL",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t14",
         "t24"
@@ -480,7 +480,8 @@
         "con REDIS_PASSWORD='p@ss:w/rd' la URL resultante es aceptada por redis.from_url y enmascarar_redis_url no filtra ningún carácter de la contraseña",
         "con el Redis del alumno (y local) se indexan los 34 fragmentos (dim 768), se imprime FT.INFO real y la consulta de devoluciones cita politica_devoluciones.md",
         "al probar contra REDIS_URL_PROFESOR (lleno) se captura OutOfMemoryError y se emite el mensaje accionable sin exponer credenciales"
-      ]
+      ],
+      "evidencia": "20261101_1852: (a) REDIS_PASSWORD='p@ss:w/rd' y REDIS_USERNAME='alumno@1' generaron URL codificada aceptada por redis.from_url y mascara 'redis://alumno%401:***@redis-curso.universidad.cl:6379/0' sin filtrar caracteres; (b) en REDIS_URL_ALUMNO se indexaron 34 fragmentos en tfc1_duran_reyes_munoz_bodega_politicas (dim=768, ~116.1 KB), FT.INFO real devolvio [text (TEXT), embedding (VECTOR HNSW COSINE dim=768), fuente (TAG), seccion (TEXT)] y la busqueda de devolucion devolvio politica_devoluciones.md (score=0.1446); (c) en REDIS_URL_PROFESOR se probo y luego se ejecuto limpiar_indice_propio (FT.DROPINDEX tfc1_duran_reyes_munoz_bodega_politicas DD) verificando con FT._LIST que no quedo rastro de nuestro indice (En FT._LIST: False, 102 indices de otros grupos intactos)."
     },
     {
       "id": "t26",
