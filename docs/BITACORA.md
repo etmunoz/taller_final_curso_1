@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_1330 (America/Santiago)
+> **Actualizado:** 20261101_1342 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -135,10 +135,28 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** 26/26 archivos con exactamente un rótulo; frontmatter de los dos agentes sigue siendo lo primero del archivo y parsea (PyYAML); `main.py` compila (`py_compile`); `activate.ps1` parsea sin errores (`Parser::ParseFile`); `plan.json` y `.env` no se tocaron.
 
+## 20261101_1342 — Instrucción 09: etapa 0 publicada y etapa 1 especificada
+
+**Pedido:** commit y push de la etapa 0; dejar las claves para el final; actualizar `docs/plan_proyecto.md` al caso bodega + Ollama; publicar la pauta transcripta; especificar con `@spec` las tareas de la etapa 1.
+
+**Realizado:**
+- `docs/plan_proyecto.md` reescrito para Bodega Norte: caso y criterio de éxito, arquitectura LangGraph, entorno y proveedores, datos, tabla de tareas de la etapa 1, mapeo de la base 4,0, ampliaciones hasta +3,0, pruebas B01–B07, riesgos y orden de ejecución.
+- Pauta transcripta (`docs/pauta_tarea_final.md`) incluida en el repositorio público; el PDF original sigue ignorado.
+- Commit `3584f1f` («docs: etapa 0 …») pusheado a `origin/main`.
+- Rotulados `docs/instrucciones/instruccion_09.md` y `docs/salidas_instrucciones/salida_09.txt`, que quedaron sin encabezado en el primer commit; el rotulador se generalizó para instrucciones y salidas futuras.
+- `plan.json`: cuatro tareas pendientes de la etapa 1 (t01 `crear_bd.py`, t02 `src/bodega/entorno.py`, t03 `src/bodega/prompts.py`, t04 `src/bodega/traza.py`), con dependencias y verificaciones observables.
+
+**Incidencia:** `@spec` no pudo ejecutarse: el modelo configurado (`openai/gpt-6-luna`) responde `credit_balance_exhausted`. El plan se redactó a mano con el mismo formato y criterio, y queda igualmente sujeto a revisión.
+
+**Decisiones registradas:** el catálogo mantiene `ollama: qwen2.5:7b` (no instalado) y el default `google` en `resolver_config`, mientras el `.env` usa `ollama`/`qwen3:8b`; ambas cosas quedaron documentadas en t02 y la verificación usa el modelo local instalado. No se agrega tarea de notebook en esta etapa, como pidió la instrucción.
+
+**Verificación:** `plan.json` parsea (4 tareas; t02→t01, t03→t02, t04→t02); el escaneo previo al commit no encontró patrones de claves en 36 archivos; push confirmado (`main...origin/main` sin desfase); los dos archivos nuevos quedaron con un único rótulo.
+
 ## Pendientes
 
-- [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor.
-- [ ] Etapa 1: lanzar `@spec` para escribir las tareas en `plan.json` (empezando por `src/llm.py` con `crear_llm()`, estado y grafo mínimo) y ejecutarlas una por vez con `@implementador`.
-- [ ] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
-- [ ] Decidir si `docs/pauta_tarea_final.md` se publica en el repositorio público.
-- [ ] Commit y push de la etapa 0 (hoy todo está sin commitear).
+- [ ] Completar `GOOGLE_API_KEY`, `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
+- [ ] Habilitar los subagentes: `openai/gpt-6-luna` no tiene créditos; decidir entre agregar créditos o cambiar el modelo de `@spec` y `@implementador`.
+- [ ] Revisar y aprobar `plan.json` y ejecutar t01–t04 con `@implementador`, una tarea por vez.
+- [x] Actualizar `docs/plan_proyecto.md` al caso `bodega` + Ollama.
+- [x] Publicar `docs/pauta_tarea_final.md` en el repositorio público (el PDF no se publica).
+- [x] Commit y push de la etapa 0.

@@ -1,0 +1,5 @@
+# Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+# Archivo: docs/salidas_instrucciones/salida_09.txt
+# Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 09.
+# Creado: 20261101_1335 (America/Santiago)
+# Actualizado: 20261101_1341 (America/Santiago)

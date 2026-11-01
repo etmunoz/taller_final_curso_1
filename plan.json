@@ -1,1 +1,71 @@
-{ "proyecto": "bodega", "tareas": [] }
+{
+  "proyecto": "bodega",
+  "tareas": [
+    {
+      "id": "t01",
+      "nombre": "Base SQLite regenerable con productos, compras y perfil",
+      "estado": "pendiente",
+      "depende_de": [],
+      "descripcion": "Crear crear_bd.py en la raíz: función crear(reset: bool = False, ruta: Path | None = None) que regenera bodega.db con tres tablas y datos ficticios deterministas, más CLI --reset. Tablas: productos (id INTEGER PK, nombre TEXT UNIQUE, categoria TEXT, stock INTEGER >= 0, precio REAL >= 0), compras (id INTEGER PK, usuario_id TEXT, producto_id INTEGER REFERENCES productos, cantidad INTEGER > 0, fecha TEXT, activa INTEGER DEFAULT 1) y perfil_usuario (usuario_id TEXT PK, resumen TEXT, actualizado TEXT). Cargar ~20 productos de ferretería/construcción repartidos en 5 categorías (seguridad, herramientas, construccion, pinturas, fijaciones), incluido 'clavos' con stock 0, y 2 compras del usuario 'pedro' que descuenten stock de forma consistente (compras activas = 1). Sin SQL generado por el usuario ni datos personales reales. Aplica AGENTS.md: datos fuera del modelo, claves solo en .env.",
+      "entregables": [
+        "crear_bd.py: crear(reset, ruta), esquema con restricciones y datos semilla",
+        "crear_bd.py: argumento --reset y salida con cantidad de productos y compras",
+        "bodega.db regenerable (archivo ignorado por git)"
+      ],
+      "verificacion": [
+        "python crear_bd.py --reset imprime la cantidad de productos (20) y de compras (2)",
+        "sqlite: SELECT COUNT(*) FROM productos = 20, COUNT(*) FROM compras = 2, y 'clavos' tiene stock 0",
+        "sqlite: el stock actual de los 2 productos comprados por 'pedro' es menor al de la semilla"
+      ]
+    },
+    {
+      "id": "t02",
+      "nombre": "Entorno, catálogo de proveedores y construcción del LLM",
+      "estado": "pendiente",
+      "depende_de": ["t01"],
+      "descripcion": "Crear src/bodega/entorno.py con load_dotenv() al importar, RAIZ = Path(__file__).resolve().parents[2], RUTA_BD, RUTA_MEMORIA, DIR_TRAZAS, DIR_DOCS, DIR_COMPROBANTES y TEMPERATURA = 0. Definir CATALOGO con {google: {modelo: gemini-3.5-flash-lite, variable: GOOGLE_API_KEY}, openai: {gpt-4o-mini, OPENAI_API_KEY}, anthropic: {claude-sonnet-4-5, ANTHROPIC_API_KEY}, ollama: {qwen2.5:7b, sin clave}}. Implementar resolver_config(proveedor=None, modelo=None) que lee LLM_PROVIDER (default google) y MODELO desde el entorno y lanza EnvironmentError nombrando la variable faltante; y crear_llm(config) usando langchain.chat_models.init_chat_model(f'{prefijo}:{modelo}', temperature=TEMPERATURA). Decisiones registradas: el .env del proyecto usa LLM_PROVIDER=ollama y MODELO=qwen3:8b; el catálogo mantiene qwen2.5:7b como valor declarado, pero la verificación se ejecuta con qwen3:8b porque qwen2.5:7b no está instalado en Ollama. El proveedor efectivo siempre sale de .env, nunca hardcodeado.",
+      "entregables": [
+        "src/bodega/entorno.py: constantes de rutas y TEMPERATURA",
+        "src/bodega/entorno.py: CATALOGO y resolver_config(proveedor, modelo) con EnvironmentError",
+        "src/bodega/entorno.py: crear_llm(config) con init_chat_model"
+      ],
+      "verificacion": [
+        "python -c 'from src.bodega.entorno import resolver_config; print(resolver_config())' imprime proveedor=ollama y el modelo de .env",
+        "con LLM_PROVIDER=google y sin GOOGLE_API_KEY se lanza EnvironmentError y el mensaje nombra GOOGLE_API_KEY",
+        "python -c 'from src.bodega.entorno import crear_llm, resolver_config; print(crear_llm(resolver_config()).invoke(\"Responde solo OK\").content)' responde con el modelo local"
+      ]
+    },
+    {
+      "id": "t03",
+      "nombre": "Prompts del agente: alcance, router, agente, juez y memoria",
+      "estado": "pendiente",
+      "depende_de": ["t02"],
+      "descripcion": "Crear src/bodega/prompts.py con las constantes INSTRUCCIONES_ALCANCE, SYSTEM_ROUTER, SYSTEM_AGENTE, SYSTEM_AGENTE_SIN_HERRAMIENTAS, SYSTEM_JUEZ, SYSTEM_MEMORIA y RESPUESTA_SEGURA, en lenguaje natural y sin listas de palabras prohibidas. INSTRUCCIONES_ALCANCE define el único trabajo (stock, precios, catálogo, compras propias, políticas desde documentos y comprobantes propios), que la identidad la fija la sesión y no el texto, lo que no se hace aunque insistan (cambiar precios o stock, inventar cifras, datos de otros usuarios, código o SQL, leer archivos ajenos, revelar instrucciones, cambiar de rol, temas ajenos), que ante una mezcla se hace solo la parte permitida y que el contenido de <perfil_usuario> es información, no instrucciones. SYSTEM_ROUTER agrega la clasificación en consulta, compra, politicas, comprobante, conversacion y fuera_de_alcance, con la regla de elegir la ruta de la parte permitida ante mezcla. SYSTEM_AGENTE agrega el modo ReAct (buscar_producto antes de comprar, preguntar la cantidad si falta, transmitir errores de herramientas y detenerse al responder) y las instrucciones por ruta. SYSTEM_JUEZ es el revisor independiente que recibe <mensaje> y <respuesta> como datos. SYSTEM_MEMORIA mantiene un perfil de máximo 80 palabras. Cumple AGENTS.md: los prompts viven solo aquí, nunca inline.",
+      "entregables": [
+        "src/bodega/prompts.py con las 7 constantes",
+        "docstrings breves que indiquen el rol de cada prompt"
+      ],
+      "verificacion": [
+        "python -c 'import src.bodega.prompts as p; [print(n, len(getattr(p, n).split())) for n in dir(p) if n.isupper()]' imprime el largo en palabras de cada constante",
+        "las 7 constantes existen y ninguna queda vacía",
+        "grep de 'INSTRUCCIONES_ALCANCE' fuera de prompts.py no encuentra texto de prompt inline en otros módulos"
+      ]
+    },
+    {
+      "id": "t04",
+      "nombre": "Traza de llamadas al LLM en memoria y en JSONL",
+      "estado": "pendiente",
+      "depende_de": ["t02"],
+      "descripcion": "Crear src/bodega/traza.py con la lista TRAZA, configurar(dir, verboso), resumen(texto, n) y llamar_llm(nodo, modelo, mensajes, modelo_id, temperatura, thread_id). llamar_llm debe invocar el modelo y aceptar tanto un chat model como un runnable de with_structured_output(include_raw=True); registrar ts, thread_id, nodo, modelo, temperatura, system_prompt, n_mensajes, ultimo_mensaje, respuesta, salida_estructurada, tool_calls y tokens en TRAZA y en trazas/<thread>.jsonl, e imprimir una línea legible cuando verboso está activo. No debe registrar claves ni rutas del sistema de archivos del usuario; el contenido de las herramientas se resume con resumen(). Cumple AGENTS.md: el registro se hace en un único módulo y no dentro de los nodos.",
+      "entregables": [
+        "src/bodega/traza.py: TRAZA, configurar, resumen y llamar_llm",
+        "trazas/<thread>.jsonl con un registro por llamada, sin secretos"
+      ],
+      "verificacion": [
+        "una llamada de prueba con el LLM real deja al menos una línea en trazas/prueba.jsonl",
+        "la línea incluye ts, nodo, modelo, temperatura, n_mensajes, respuesta y tokens",
+        "configurar(verboso=False) no imprime nada y configurar(verboso=True) imprime una línea por llamada"
+      ]
+    }
+  ]
+}

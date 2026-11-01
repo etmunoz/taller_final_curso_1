@@ -1,3 +1,9 @@
+> **Grupo:** Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
+> **Archivo:** `docs/instrucciones/instruccion_09.md`
+> **Objetivo:** Instrucción 09: commit y push de la etapa 0, actualización del plan al caso bodega y especificación de las tareas de la etapa 1.
+> **Creado:** 20261101_1335 (America/Santiago)
+> **Actualizado:** 20261101_1341 (America/Santiago)
+
 ### Decisiones Siguientes:
 
 Pendientes
