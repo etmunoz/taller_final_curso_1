@@ -2,7 +2,7 @@
 Archivo: src/bodega/traza.py
 Objetivo: Registrar cada llamada al LLM en memoria y en trazas/<thread_id>.jsonl, sin secretos.
 Creado: 20261101_1400 (America/Santiago)
-Actualizado: 20261101_1400 (America/Santiago)
+Actualizado: 20261101_1830 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -207,10 +207,16 @@ def _escribir(registro: dict[str, Any], thread_id: str) -> Path:
 def _imprimir(registro: dict[str, Any]) -> None:
     """Línea legible de la llamada, sin claves ni rutas."""
 
+    def _temperatura_txt(temperatura: Any) -> str:
+        if temperatura is None:
+            return "n/d"
+        if isinstance(temperatura, (int, float)):
+            return f"{temperatura:g}"
+        return str(temperatura)
+
     total = registro["tokens"]["total"]
     token_txt = str(total) if total is not None else "n/d"
-    temperatura = registro["temperatura"]
-    temperatura_txt = f"{temperatura:g}" if isinstance(temperatura, (int, float)) else str(temperatura)
+    temperatura_txt = _temperatura_txt(registro["temperatura"])
     print(
         f"[traza] {registro['nodo']} {registro['modelo']} T={temperatura_txt} "
         f"· {registro['n_mensajes']} msgs · {token_txt} tok "
@@ -224,7 +230,7 @@ def llamar_llm(
     modelo: Any,
     mensajes: list[Any],
     modelo_id: str,
-    temperatura: float,
+    temperatura: float | None,
     thread_id: str,
 ) -> BaseMessage:
     """Invoca el modelo, registra la llamada y devuelve la respuesta cruda.
