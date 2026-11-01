@@ -2,7 +2,7 @@
 Archivo: src/bodega/graph.py
 Objetivo: Definir el grafo StateGraph del agente Bodega Norte (router estructurado, agentes por ruta, ToolNode, tope de rondas, juez real con RemoveMessage, memoria de perfil real y ejecución de turnos).
 Creado: 20261101_1500 (America/Santiago)
-Actualizado: 20261101_1955 (America/Santiago)
+Actualizado: 20261101_2020 (America/Santiago)
 """
 
 from __future__ import annotations
@@ -91,7 +91,13 @@ def _extraer_estructurada(resultado_raw: Any, clase_modelo: type[BaseModel]) -> 
 
 
 # 3. Fábrica de nodos agente por ruta
-def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str, llm_base: Any = None):
+def _crear_nodo_agente(
+    ruta_nombre: str,
+    herramientas: list[Any],
+    modelo_id: str,
+    llm_base: Any = None,
+    carpeta_comprobantes: str = "comprobantes",
+):
     """Crea una función de nodo agente especializada para una ruta específica."""
     def nodo_agente(state: EstadoAgente, config: Any = None) -> dict[str, Any]:
         llm = llm_base if llm_base is not None else crear_llm()
@@ -108,7 +114,7 @@ def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str
             prompt_texto = (
                 f"<perfil_usuario>{perfil}</perfil_usuario>\n"
                 f"<ruta>{ruta_nombre}</ruta>\n"
-                f"<carpeta_comprobantes>comprobantes</carpeta_comprobantes>\n"
+                f"<carpeta_comprobantes>{carpeta_comprobantes}</carpeta_comprobantes>\n"
                 f"<usuario_id>{usuario_id}</usuario_id>\n"
                 f"Límite de rondas alcanzado. Responde sin herramientas."
             )
@@ -141,7 +147,7 @@ def _crear_nodo_agente(ruta_nombre: str, herramientas: list[Any], modelo_id: str
         prompt_texto = (
             f"<perfil_usuario>{perfil}</perfil_usuario>\n"
             f"<ruta>{ruta_nombre}</ruta>\n"
-            f"<carpeta_comprobantes>comprobantes</carpeta_comprobantes>\n"
+            f"<carpeta_comprobantes>{carpeta_comprobantes}</carpeta_comprobantes>\n"
             f"<usuario_id>{usuario_id}</usuario_id>\n"
             f"<mensaje>{texto_usuario}</mensaje>"
         )
@@ -248,12 +254,14 @@ def construir_grafo(
         {t.name: t for t in (HERRAMIENTAS_LECTURA + HERRAMIENTAS_ACCION + [herramienta_politicas] + (herramientas_mcp or []))}.values()
     )
 
+    carpeta_txt = str(dir_comprobantes) if dir_comprobantes is not None else "comprobantes"
+
     # Nodos agente por ruta
-    nodo_consulta = _crear_nodo_agente("consulta", herramientas_consulta, modelo_id, llm)
-    nodo_compra = _crear_nodo_agente("compra", herramientas_compra, modelo_id, llm)
-    nodo_politicas = _crear_nodo_agente("politicas", herramientas_politicas, modelo_id, llm)
-    nodo_comprobante = _crear_nodo_agente("comprobante", herramientas_comprobante, modelo_id, llm)
-    nodo_conversacion = _crear_nodo_agente("conversacion", herramientas_conversacion, modelo_id, llm)
+    nodo_consulta = _crear_nodo_agente("consulta", herramientas_consulta, modelo_id, llm, carpeta_txt)
+    nodo_compra = _crear_nodo_agente("compra", herramientas_compra, modelo_id, llm, carpeta_txt)
+    nodo_politicas = _crear_nodo_agente("politicas", herramientas_politicas, modelo_id, llm, carpeta_txt)
+    nodo_comprobante = _crear_nodo_agente("comprobante", herramientas_comprobante, modelo_id, llm, carpeta_txt)
+    nodo_conversacion = _crear_nodo_agente("conversacion", herramientas_conversacion, modelo_id, llm, carpeta_txt)
 
     # 3. Nodo herramientas (ToolNode)
     tool_node_base = ToolNode(todas_herramientas)

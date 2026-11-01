@@ -2,7 +2,7 @@
 # Archivo: requirements.txt
 # Objetivo: Dependencias del proyecto con sus rangos de versión, para la instalación con pip.
 # Creado: 20261101_1226 (America/Santiago)
-# Actualizado: 20261101_1304 (America/Santiago)
+# Actualizado: 20261101_2015 (America/Santiago)
 langchain>=0.3,<0.4
 langchain-core>=0.3,<0.4
 langgraph>=0.4,<0.6
@@ -25,3 +25,4 @@ redis>=5.0
 fastembed>=0.6
 # MCP
 langchain-mcp-adapters>=0.1,<0.2
+mcp>=1.9,<2
