@@ -550,7 +550,7 @@
     {
       "id": "t29",
       "nombre": "Declaración única y consistente de bonos en README.md, docs/tutorial_pruebas.md y notebook",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t26"
       ],
@@ -560,7 +560,8 @@
       ],
       "verificacion": [
         "grep de '+0,5' y '+1,0' en README.md, docs/tutorial_pruebas.md y notebooks/agente_bodega.ipynb muestra exactamente la misma asignación de puntajes"
-      ]
+      ],
+      "evidencia": "20261101_2023: grep de '+0,5' y '+1,0' en README.md, docs/tutorial_pruebas.md y notebooks/agente_bodega.ipynb verifico la misma tabla en los tres documentos: Principal 1 Memoria avanzada (+1,0, Seccion 7), Principal 2 RAG sobre Redis Stack (+1,0, Seccion 8), Principal 3 Servidor MCP Filesystem (+1,0, Seccion 9), y respaldos Herramienta de accion (+0,5, Seccion 6), Juez independiente (+0,5, Seccion 11) y Golden Set v1.1 (+0,5, Seccion 12)."
     },
     {
       "id": "t30",
