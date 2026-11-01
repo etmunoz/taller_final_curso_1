@@ -428,7 +428,7 @@
     {
       "id": "t23",
       "nombre": "Proveedores verificados (Anthropic claude-sonnet-4-6, OpenAI gpt-4o-mini, Google), helper estructurada() y Config efectiva",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t02",
         "t22"
@@ -441,7 +441,8 @@
       "verificacion": [
         "scripts/prueba_proveedores.py ejecuta ping, salida estructurada (DecisionRuta), turno ReAct (cascos -> 37) y 2º turno con el nombre para cada proveedor con clave en .env",
         "la tabla impresa muestra OK en todas las columnas para google, openai y anthropic"
-      ]
+      ],
+      "evidencia": "20261101_1847: .\\.venv\\Scripts\\python.exe scripts/prueba_proveedores.py ejecuto ping, estructurada (DecisionRuta), ReAct (cascos -> 37) e historial (Valeria) para google (google_genai:gemini-3.5-flash-lite), openai (openai:gpt-4o-mini) y anthropic (anthropic:claude-sonnet-4-6), obteniendo OK en las 4 columnas de los 3 proveedores."
     },
     {
       "id": "t24",
