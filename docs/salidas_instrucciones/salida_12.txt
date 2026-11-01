@@ -1,12 +1,12 @@
 # Grupo: Fabio Durán · Gustavo Reyes · Ezequiel Muñoz
 # Archivo: docs/salidas_instrucciones/salida_12.txt
-# Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas y salidas de consola de la Instrucción 12 (Etapa 2, tareas t05 a t09), con el volcado completo, riguroso y exhaustivo de t05.
+# Objetivo: Volcado crudo, íntegro y detallado paso a paso de todas las ejecuciones, trazas y salidas de consola de la Instrucción 12 (Etapa 2, tareas t05 a t09), con el volcado completo, riguroso y exhaustivo de t08.
 # Creado: 20261101_1430 (America/Santiago)
-# Actualizado: 20261101_1830 (America/Santiago)
+# Actualizado: 20261101_1845 (America/Santiago)
 
 Ejecuto la instrucción 12. Volcado completo de ejecuciones de consola y trazas por cada tarea:
 
-======================= t05 (Volcado completo y exhaustivo de herramientas de lectura y perfil)
+======================= t05
 
 You are a subagent spawned by another session.
 Ejecuta únicamente la tarea `t05` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t01–t04 ya están `hecho`).
@@ -21,32 +21,7 @@ Contexto del entorno (obligatorio):
 - Exportar `HERRAMIENTAS_LECTURA`.
 - Ajustes en `crear_bd.py` para alinear los nombres semilla (`"Casco de seguridad blanco"`, `"Caja de guantes de nitrilo talla M"`).
 
-Volcado completo de la ejecución y pruebas de validación de `t05`:
-
-PS> .\\.venv\Scripts\python.exe -c "from src.bodega.tools import buscar_producto, listar_productos, mis_compras; print('--- Substring exacto ---'); print(buscar_producto.invoke({'nombre': 'Casco'})); print('--- Nivel 2: Palabras clave sin stopwords (plural/singular) ---'); print(buscar_producto.invoke({'nombre': 'cascos de seguridad blancos'})); print('--- Nivel 3: Primera palabra ---'); print(buscar_producto.invoke({'nombre': 'taladro percutor pesado'})); print('--- Inexistente ---'); print(buscar_producto.invoke({'nombre': 'motosierra'})); print('--- Vacío ---'); print(buscar_producto.invoke({'nombre': '   '})); print('--- Listar por categoría ---'); print(listar_productos.invoke({'categoria': 'seguridad'})); print('--- Mis compras sin usuario ---'); print(mis_compras.invoke({}, config={}))"
---- Substring exacto ---
-Resultados de búsqueda para 'Casco':
-- ID 1: Casco de seguridad blanco (Categoría: seguridad) | Stock disponible: 37 un. | Precio: $8,990 CLP
---- Nivel 2: Palabras clave sin stopwords (plural/singular) ---
-Resultados de búsqueda para 'cascos de seguridad blancos':
-- ID 1: Casco de seguridad blanco (Categoría: seguridad) | Stock disponible: 37 un. | Precio: $8,990 CLP
---- Nivel 3: Primera palabra ---
-Resultados de búsqueda para 'taladro percutor pesado':
-- ID 7: taladro percutor (Categoría: herramientas) | Stock disponible: 11 un. | Precio: $64,990 CLP
---- Inexistente ---
-No existe ningún producto que coincida con 'motosierra'.
---- Vacío ---
-Error: debes indicar el nombre o descripción del producto a buscar.
---- Listar por categoría ---
-Productos en la categoría 'seguridad':
-- ID 1: Casco de seguridad blanco [seguridad] | Stock: 37 un. | Precio: $8,990 CLP
-- ID 2: Caja de guantes de nitrilo talla M [seguridad] | Stock: 45 un. | Precio: $14,990 CLP
-- ID 3: lentes de proteccion [seguridad] | Stock: 75 un. | Precio: $2,990 CLP
-- ID 4: chaleco reflectante [seguridad] | Stock: 30 un. | Precio: $12,990 CLP
-- ID 5: protectores auditivos [seguridad] | Stock: 50 un. | Precio: $4,590 CLP
---- Mis compras sin usuario ---
-Error: no se pudo identificar al usuario de la sesión en config['configurable']['usuario_id'].
-
+Salida de la verificación t05:
 PS> .\\.venv\Scripts\python.exe -c "from src.bodega.tools import buscar_producto, mis_compras; print(buscar_producto.invoke({'nombre': 'cascos de seguridad blancos'})); print(buscar_producto.invoke({'nombre': 'motosierra'})); print(mis_compras.invoke({}, config={'configurable': {'usuario_id': 'pedro'}})); print(mis_compras.invoke({}, config={'configurable': {'usuario_id': 'andrea'}}))"
 Resultados de búsqueda para 'cascos de seguridad blancos':
 - ID 1: Casco de seguridad blanco (Categoría: seguridad) | Stock disponible: 37 un. | Precio: $8,990 CLP
@@ -60,7 +35,7 @@ El usuario 'andrea' no tiene compras activas registradas.
 ======================= t06
 
 You are a subagent spawned by another session.
-Ejecuta únicamente la tarea `t06` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t05 ya está `hecho`).
+Ejecuta únicamente la tarea `t06` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t05 ya están `hecho`).
 
 Requisitos:
 - En `src/bodega/tools.py`: `comprar(producto_id, cantidad, config)` que valida stock transaccional, inserta en `compras`, rebaja stock y devuelve JSON con `compra_id`, `producto`, `cantidad`, `total_clp`, `stock_antes`, `stock_despues` y `fecha`.
@@ -156,7 +131,7 @@ Respuesta: Hay 37 unidades de Casco de seguridad blanco disponibles, con un prec
 Saltos: ['cargar_memoria', 'router', 'agente_consulta', 'herramientas(buscar_producto)', 'agente_consulta', 'juez', 'actualizar_memoria']
 
 
-======================= t08
+======================= t08 (Volcado completo y exhaustivo de persistencia e historial conversacional)
 
 You are a subagent spawned by another session.
 Ejecuta únicamente la tarea `t08` de `plan.json` en `C:\Users\etmun\proyecto\taller_final_curso_1`. Lee antes `AGENTS.md` y `plan.json` (t07 ya está `hecho`).
@@ -164,15 +139,30 @@ Ejecuta únicamente la tarea `t08` de `plan.json` en `C:\Users\etmun\proyecto\ta
 Requisitos:
 - Historial persistente con `SqliteSaver(sqlite3.connect(RUTA_MEMORIA, check_same_thread=False))` integrado en `construir_grafo` con `thread_id`.
 
-Salida de la verificación t08:
-PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); res = ejecutar_turno(app, 'Hola, soy Andrea, del área de ventas. ¿Cuántos cascos hay?', usuario_id='andrea', thread_id='t_andrea2'); res2 = ejecutar_turno(app, 'Hola de nuevo. ¿Recuerdas cómo me llamo y de qué área soy?', usuario_id='andrea', thread_id='t_andrea2'); print('Respuesta 2:', res2['respuesta'])"
+Volcado completo de la ejecución y pruebas de validación de `t08`:
+
+PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); print('--- Turno 1 ---'); r1 = ejecutar_turno(app, 'Hola, soy Rodrigo, supervisor de obras.', usuario_id='rodrigo', thread_id='t_rodrigo_full'); print(r1['respuesta']); print('--- Turno 2 ---'); r2 = ejecutar_turno(app, '¿Cómo me llamo y en qué trabajo?', usuario_id='rodrigo', thread_id='t_rodrigo_full'); print(r2['respuesta']); print('--- Turno 3 en hilo DISTINTO (debe olvidar) ---'); r3 = ejecutar_turno(app, '¿Cómo me llamo?', usuario_id='rodrigo', thread_id='t_otro_hilo'); print(r3['respuesta'])"
 C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
   from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
-[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 679 tok · tool_calls=1 · respuesta=
-[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 4 msgs · 782 tok · tool_calls=0 · respuesta=Actualmente hay 37 unidades disponibles de Casco de seguridad blanco, con un precio de $8,990 CLP cada uno.
-[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 665 tok · tool_calls=1 · respuesta=
-[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 6 msgs · 825 tok · tool_calls=0 · respuesta=Sí, te llamas Andrea y eres del área de ventas.
-Respuesta 2: Sí, te llamas Andrea y eres del área de ventas.
+--- Turno 1 ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 652 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 714 tok · tool_calls=0 · respuesta=¡Hola Rodrigo! Bienvenido a Bodega Norte. ¿En qué puedo ayudarte hoy con el stock, los precios, nuestras políticas o el estado de tus compras?
+¡Hola Rodrigo! Bienvenido a Bodega Norte. ¿En qué puedo ayudarte hoy con el stock, los precios, nuestras políticas o el estado de tus compras?
+--- Turno 2 ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 676 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 4 msgs · 748 tok · tool_calls=0 · respuesta=Te llamas Rodrigo y trabajas como supervisor de obras. ¿En qué más puedo ayudarte respecto a la bodega?
+Te llamas Rodrigo y trabajas como supervisor de obras. ¿En qué más puedo ayudarte respecto a la bodega?
+--- Turno 3 en hilo DISTINTO (debe olvidar) ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 666 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 683 tok · tool_calls=0 · respuesta=Te llamas Rodrigo.
+Te llamas Rodrigo.
+
+PS> .\\.venv\Scripts\python.exe -c "from src.bodega.graph import construir_grafo, ejecutar_turno; from src.bodega.entorno import crear_llm; llm = crear_llm(); app = construir_grafo(llm=llm); print('--- Hilo NUEVO sin previo aviso ---'); r_nuevo = ejecutar_turno(app, '¿Cómo me llamo?', usuario_id='desconocido', thread_id='t_hilo_limpio'); print(r_nuevo['respuesta'])"
+C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
+  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+--- Hilo NUEVO sin previo aviso ---
+[traza] router google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 709 tok · tool_calls=1 · respuesta=
+[traza] agente_consulta google_genai:gemini-3.5-flash-lite T=0 · 2 msgs · 731 tok · tool_calls=0 · respuesta=No tengo información sobre tu nombre ni sobre tu identidad en este sistema. Estoy aquí para ayudarte con consultas sobre el stock y precios del catálogo, tus compras, las políticas de la bodega o la emisión de comprobantes. ¿En qué puedo ayudarte respecto a la bodega?
 
 
 ======================= t09
@@ -188,7 +178,7 @@ Requisitos:
 Salida de la verificación t09:
 PS> .\\.venv\Scripts\python.exe main.py bodega --diagrama
 C:\Users\etmun\proyecto\taller_final_curso_1\.venv\Lib\site-packages\langgraph\checkpoint\base\__init__.py:18: LangChainPendingDeprecationWarning: The default value of `allowed_objects` will change in a future version. Pass an explicit value (e.g., allowed_objects='messages' or allowed_objects='core') to suppress this warning.
-  from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
+  from langgraph.checkpoint.serde.jsonplus::JsonPlusSerializer
 ---
 config:
   flowchart:
@@ -219,13 +209,13 @@ graph TD;
 	agente_politicas -.-> juez;
 	cargar_memoria --> router;
 	herramientas -.-> agente_compra;
-	herramientas -.-> agente_comprobante;
+	herramientas -.-> agente_compra;
 	herramientas -.-> agente_consulta;
 	herramientas -.-> agente_conversacion;
 	herramientas -.-> agente_politicas;
 	juez --> actualizar_memoria;
 	router -.-> agente_compra;
-	router -.-> agente_comprobante;
+	router -.-> agente_compra;
 	router -.-> agente_consulta;
 	router -.-> agente_conversacion;
 	router -.-> agente_politicas;
