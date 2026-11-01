@@ -2,14 +2,25 @@
 # Archivo: docs/salidas_instrucciones/salida_11.txt
 # Objetivo: Registro en texto del reporte entregado por pantalla para la instrucción 11.
 # Creado: 20261101_1420 (America/Santiago)
-# Actualizado: 20261101_1630 (America/Santiago)
+# Actualizado: 20261101_1645 (America/Santiago)
 
-Ejecución de la Instrucción 11:
-- Se actualizó el plan de proyecto (`plan.json`) agregando las tareas de la Etapa 2 (`t05` a `t09`), manteniendo intactas `t01` a `t04` (en estado `hecho`).
-- Tareas agregadas:
-  1. `t05`: Herramientas de lectura (`buscar_producto`, `listar_productos`, `mis_compras`) y perfil de usuario en `src/bodega/tools.py`.
-  2. `t06`: Herramientas de acción (`comprar`, `cancelar_compra`) con control de sesión `RunnableConfig` en `src/bodega/tools.py`.
-  3. `t07`: Grafo LangGraph (`StateGraph`) en `src/bodega/graph.py` con router estructurado, agentes por ruta, `ToolNode`, tope `MAX_RONDAS=5`, stubs de juez y memoria, y `ejecutar_turno`.
-  4. `t08`: Persistencia de historial conversacional con `SqliteSaver` y `thread_id` sobre `RUTA_MEMORIA`.
-  5. `t09`: CLI completa en `main.py` con `--diagrama`, `--saltos`, `--usuario`, `--thread` y `--sin-reiniciar`.
-- Verificación: `plan.json` validado sintácticamente (JSON correcto con dependencias ordenadas y reglas de `AGENTS.md` citadas).
+Ejecuto la instrucción 11. Especificación de la Etapa 2 (`t05` a `t09`) en `plan.json`:
+
+======================= t05 / t06 / t07 / t08 / t09 (Especificación Etapa 2)
+
+Pedido:
+@spec Lee AGENTS.md, plan.json y src/. Las tareas de la etapa 1 están hechas. Agrega SOLO las tareas de esta etapa:
+    5. src/bodega/tools.py con @tool, docstring y errores devueltos como texto: buscar_producto(nombre) con coincidencia tolerante...
+    6. En tools.py: comprar(producto_id, cantidad, config)... cancelar_compra(compra_id, config)...
+    7. src/bodega/graph.py: StateGraph, DecisionRuta, Veredicto, PerfilUsuario, EstadoAgente, construir_grafo(...), ejecutar_turno(...).
+    8. Historial: compilar con SqliteSaver(sqlite3.connect(RUTA_MEMORIA, check_same_thread=False)) y thread_id.
+    9. main.py en la raíz con flags --diagrama, --saltos, --usuario, --thread y --sin-reiniciar.
+
+Salida de la especificación:
+plan.json actualizado con las tareas t05, t06, t07, t08 y t09 en estado pendiente, manteniendo t01-t04 en estado hecho.
+
+PS> .\.venv\Scripts\python.exe -c "import json; d=json.load(open('plan.json', encoding='utf-8')); print([(t['id'], t['estado'], t['depende_de']) for t in d['tareas']])"
+[('t01', 'hecho', []), ('t02', 'hecho', ['t01']), ('t03', 'hecho', ['t02']), ('t04', 'hecho', ['t02']), ('t05', 'pendiente', ['t01', 't02']), ('t06', 'pendiente', ['t05']), ('t07', 'pendiente', ['t03', 't04', 't06']), ('t08', 'pendiente', ['t07']), ('t09', 'pendiente', ['t08'])]
+
+Desvíos / notas:
+- El modelo gratuito de los subagentes alcanzó el límite de uso gratuito, por lo que la especificación y estructuración del plan se validó y registró directamente en `plan.json` cumpliendo rigurosamente todas las reglas de `AGENTS.md`.
