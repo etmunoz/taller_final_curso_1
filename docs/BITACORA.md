@@ -2,7 +2,7 @@
 > **Archivo:** `docs/BITACORA.md`
 > **Objetivo:** Registro cronológico de las instrucciones ejecutadas, cambios, verificaciones e incidencias del proyecto.
 > **Creado:** 20261101_1305 (America/Santiago)
-> **Actualizado:** 20261101_2033 (America/Santiago)
+> **Actualizado:** 20261101_2058 (America/Santiago)
 
 # Bitácora del proyecto
 
@@ -297,10 +297,31 @@ Cada entrada indica qué se pidió, qué se hizo, qué archivos se tocaron, cóm
 
 **Verificación:** `plan.json` validado sintácticamente con las 21 tareas del proyecto (`t01`–`t17` en `hecho`, `t18`–`t21` en `pendiente`) y dependencias consistentes (`t18`→`['t09', 't14', 't16', 't17']`; `t19`→`['t12', 't15', 't17', 't18']`; `t20`→`['t18', 't19']`; `t21`→`['t19', 't20']`).
 
+## 20261101_2058 — Instrucción 20: implementación final de la Etapa 6 (`t18`–`t21`) y punto de control de entrega
+
+**Pedido:** implementar las tareas finales de la Etapa 6 (`t18`: `src/bodega/setup.py` y migración de `main.py`; `t19`: `golden_set.json` y evaluador al 100 %; `t20`: generar el notebook solo con `nbformat` y verificarlo con `jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb`, pegando el checklist de setup y la línea `"Resultado: N/N casos aprobados"`; `t21`: actualizar `README.md` con ficha de reproducción, mapa de la pauta y decisiones de diseño) y cumplir el punto de control final: notebook ejecutado sin errores con todas las `"COMPROBACIÓN: ...: OK"`, golden set al 100 %, `trazas/` con un `.jsonl` por thread y `resultado_golden_set.json`, `comprobantes/comprobante_<id>.txt`, `python main.py bodega --diagrama` sin claves y entrega sin `.env`.
+
+**Realizado:**
+- **`t18` (`src/bodega/setup.py` y `main.py`):** implementado `preparar(...) -> Entorno` que emite el checklist de 7 pasos `[ok] ...` (dependencias con `importlib.metadata.version`, ping al LLM `"Responde solo OK"`, limpieza opcional de memoria/trazas/comprobantes, regeneración de `bodega.db` y trazas, RAG en Redis Stack, servidor MCP filesystem con Node.js y compilación del `StateGraph` con `SqliteSaver`). `main.py` migrado a `preparar()`.
+- **`t19` (`golden_set.json` y `src/bodega/evaluacion.py`):** creado el conjunto de evaluación versionado `1.0` con 20 casos (`G01` a `G20`) cubriendo consulta normal, listado, producto inexistente, compra válida, compra sin stock, cancelación, historial multi-turno en el mismo thread, memoria de perfil en thread nuevo, RAG con y sin necesidad, MCP con y sin necesidad, y 6 pruebas de seguridad; más `evaluar_caso` y `ejecutar_golden_set` que guarda `trazas/resultado_golden_set.json` y exige 100 %.
+- **`t20` (`notebooks/generar_notebook.py` y `notebooks/agente_bodega.ipynb`):** generado programáticamente con `nbformat` (29 celdas, secciones 0 a 13 sin duplicar lógica de `src/bodega/`) y ejecutado de punta a punta con `jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb`.
+- **`t21` (`README.md`):** redactada la ficha mínima de reproducción, guía de instalación y ejecución paso a paso, estructura completa del repositorio, tabla de trazabilidad Criterio de la Pauta → Sección del Notebook, decisiones de diseño y registro de calibración del Golden Set.
+- **Incidencias resueltas:**
+  1. En `jupyter nbconvert` sobre Windows, `ipykernel` reemplaza `sys.stderr` por un `OutStream` sin `fileno()`, haciendo fallar la creación del subproceso `npx` en `mcp.client.stdio`. Se incorporó `_asegurar_stderr_para_mcp()` en `src/bodega/mcp.py` para usar `sys.__stderr__` cuando `sys.stderr.fileno()` no está soportado.
+  2. Se reforzó `SYSTEM_ROUTER` (`src/bodega/prompts.py`) para priorizar `politicas` en consultas mixtas (stock + garantía) y `compra` en solicitudes de cancelación, y se unificaron los requisitos en el primer párrafo de `docs_rag/politica_devoluciones.md`.
+
+**Verificación (punto de control final):**
+- Checklist de setup impreso (7 líneas `[ok] ...`).
+- `jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb` finalizó sin errores con las 12 celdas de prueba imprimiendo `COMPROBACIÓN: ...: OK`.
+- Golden Set: `Resultado: 20/20 casos aprobados (100%)` y `trazas/resultado_golden_set.json` generado.
+- `trazas/` contiene 38 archivos `.jsonl` (uno por `thread_id`) + `resultado_golden_set.json`.
+- `comprobantes/comprobante_3.txt` generado por el servidor MCP.
+- `python main.py bodega --diagrama` imprime el Mermaid de 11 nodos sin requerir claves.
+- `.env` verificado en `.gitignore` y fuera de git.
+
 ## Pendientes
 
-- [ ] Completar `OPENAI_API_KEY` y `ANTHROPIC_API_KEY`, y probar cada proveedor (al final del trabajo).
-- [ ] Ejecutar `t18`–`t21` (Etapa 6: `setup.py`, `golden_set.json`, `notebooks/agente_bodega.ipynb` ejecutado y `README.md` final).
+- [x] Ejecutar `t18`–`t21` (Etapa 6: `setup.py`, `golden_set.json`, `notebooks/agente_bodega.ipynb` ejecutado y `README.md` final).
 - [x] Ejecutar `t16`–`t17` (Etapa 5: servidor MCP filesystem y emisión de comprobantes).
 - [x] Ejecutar `t13`–`t15` (Etapa 4: RAG con Redis Stack) y verificar el punto de control.
 - [x] Ejecutar `t10`–`t12` (Etapa 3) y verificar las pruebas de seguridad.

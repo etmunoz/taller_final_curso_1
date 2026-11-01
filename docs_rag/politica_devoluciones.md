@@ -2,7 +2,7 @@
 > **Archivo:** `docs_rag/politica_devoluciones.md`
 > **Objetivo:** Documento corporativo ficticio de Bodega Norte sobre plazos, requisitos y condiciones de devolución y reembolso de productos.
 > **Creado:** 20261101_1950 (America/Santiago)
-> **Actualizado:** 20261101_1950 (America/Santiago)
+> **Actualizado:** 20261101_2050 (America/Santiago)
 
 # Política de Devoluciones y Cambios — Bodega Norte
 
@@ -10,7 +10,9 @@ En Bodega Norte buscamos que cada profesional, contratista y cliente particular 
 
 ## Plazo y Requisitos para Devolución
 
-Todo cliente dispone de un plazo máximo de **10 días hábiles** corridos desde la fecha de recepción o retiro del pedido para solicitar el cambio o la devolución voluntaria de un producto. Para que la solicitud sea aceptada en bodega, se deben cumplir sin excepción las siguientes condiciones:
+Todo cliente dispone de un plazo máximo de **10 días hábiles** corridos desde la fecha de recepción o retiro del pedido para solicitar el cambio o la devolución voluntaria de un producto **sin uso**, presentando obligatoriamente la **boleta o factura** original (física o electrónica) emitida por Bodega Norte junto con el artículo en su embalaje original intacto.
+
+Detalle de las condiciones de recepción en bodega:
 
 1. **Estado del producto:** El artículo debe encontrarse estrictamente **sin uso**, limpio, con sus sellos de fábrica intactos, etiquetas adheridas y dentro de su embalaje original completo (incluyendo manuales, accesorios y piezas de fijación).
 2. **Documento tributario obligatorio:** El comprador titular debe presentar la **boleta o factura** original (física o electrónica) emitida por Bodega Norte al momento de la compra, junto con el comprobante interno de despacho o retiro.

@@ -330,7 +330,7 @@
     {
       "id": "t18",
       "nombre": "Orquestador de preparación integral del entorno y migración de main.py (src/bodega/setup.py)",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t09",
         "t14",
@@ -345,12 +345,13 @@
       "verificacion": [
         "python main.py bodega --saltos '¿cuántos cascos hay?' imprime el checklist completo de '[ok] ...', la respuesta con el stock y los saltos del grafo",
         "python main.py bodega --diagrama sigue funcionando sin requerir claves, Redis ni Node"
-      ]
+      ],
+      "evidencia": "20261101_2038: .\\.venv\\Scripts\\python.exe main.py bodega --saltos '¿cuántos cascos hay?' imprimio las 7 lineas '[ok] ...' del checklist (dependencias, LLM, limpieza, SQLite, RAG HNSW/COSINE, MCP Node v26.12.1 y StateGraph con SqliteSaver), respondio con 37 unidades a $8,990 CLP e imprimio los saltos y herramientas; --diagrama funciona sin claves."
     },
     {
       "id": "t19",
       "nombre": "Conjunto de evaluación versionado (golden_set.json) y evaluador automatizado al 100 %",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t12",
         "t15",
@@ -365,12 +366,13 @@
       "verificacion": [
         "la ejecución completa del golden set imprime 'Resultado: N/N casos aprobados (100%)'",
         "existe trazas/resultado_golden_set.json con el detalle de cada caso evaluado"
-      ]
+      ],
+      "evidencia": "20261101_2044: .\\.venv\\Scripts\\python.exe -m src.bodega.evaluacion ejecuto los 20 casos (G01 a G20), imprimio 'Resultado: 20/20 casos aprobados (100%)' y guardo trazas/resultado_golden_set.json."
     },
     {
       "id": "t20",
       "nombre": "Generador de notebook reproducible (notebooks/generar_notebook.py) y ejecución completa de notebooks/agente_bodega.ipynb",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t18",
         "t19"
@@ -383,12 +385,13 @@
       "verificacion": [
         "python notebooks/generar_notebook.py genera notebooks/agente_bodega.ipynb válido",
         "jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb termina con código 0 y todas las celdas 'COMPROBACIÓN: ...: OK' visibles en las salidas"
-      ]
+      ],
+      "evidencia": "20261101_2052: notebooks/generar_notebook.py genero notebooks/agente_bodega.ipynb (29 celdas) y jupyter nbconvert --to notebook --execute --inplace notebooks/agente_bodega.ipynb finalizo con codigo 0, todas las comprobaciones en 'COMPROBACIÓN: ...: OK', 20/20 en el Golden Set, 38 archivos .jsonl en trazas/ y comprobantes/comprobante_3.txt creado."
     },
     {
       "id": "t21",
       "nombre": "Documentación final en README.md con ficha de reproducción, mapa de la pauta, decisiones de diseño y registro de correcciones",
-      "estado": "pendiente",
+      "estado": "hecho",
       "depende_de": [
         "t19",
         "t20"
@@ -400,7 +403,8 @@
       "verificacion": [
         "README.md existe, está rotulado y contiene todas las secciones exigidas sin ninguna clave ni secreto",
         "un evaluador externo puede reproducir la base de datos, levantar Redis Stack, correr main.py, el golden set y el notebook siguiendo únicamente README.md"
-      ]
+      ],
+      "evidencia": "20261101_2055: README.md actualizado y rotulado con la ficha minima de reproduccion, instalacion y ejecucion paso a paso, estructura completa, mapa criterio de la pauta -> seccion del notebook, decisiones de diseño y registro de calibracion del Golden Set."
     }
   ]
 }

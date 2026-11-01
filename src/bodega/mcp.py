@@ -8,8 +8,10 @@ Actualizado: 20261101_2015 (America/Santiago)
 from __future__ import annotations
 
 import asyncio
+import io
 import shutil
 import subprocess
+import sys
 import threading
 from pathlib import Path
 from typing import Any
@@ -18,6 +20,38 @@ from langchain_core.tools import StructuredTool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from .entorno import DIR_COMPROBANTES
+
+# En Jupyter / nbconvert sobre Windows, ipykernel reemplaza sys.stderr por OutStream sin fileno() real,
+# lo que hace fallar a subprocess.Popen dentro de mcp.client.stdio. Si sys.stderr no tiene fileno() válido,
+# aseguramos un descriptor válido en sys.__stderr__ o un archivo de respaldo para stdio_client.
+def _asegurar_stderr_para_mcp() -> None:
+    try:
+        sys.stderr.fileno()
+    except (AttributeError, io.UnsupportedOperation):
+        try:
+            if sys.__stderr__ is not None:
+                sys.__stderr__.fileno()
+                errlog_seguro = sys.__stderr__
+            else:
+                raise io.UnsupportedOperation("sin __stderr__")
+        except Exception:
+            import os
+
+            errlog_seguro = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
+
+        import langchain_mcp_adapters.sessions as _lmcp_sessions
+        import mcp.client.stdio as _mcp_stdio
+
+        _orig_stdio = _mcp_stdio.stdio_client
+
+        def _stdio_client_seguro(server: Any, errlog: Any = None):
+            return _orig_stdio(server, errlog=errlog or errlog_seguro)
+
+        _mcp_stdio.stdio_client = _stdio_client_seguro
+        _lmcp_sessions.stdio_client = _stdio_client_seguro
+
+
+_asegurar_stderr_para_mcp()
 
 URL_NODEJS = "https://nodejs.org/"
 NOMBRES_EXPUESTOS = ("write_file", "read_file", "list_directory")
